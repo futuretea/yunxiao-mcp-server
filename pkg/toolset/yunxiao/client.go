@@ -300,3 +300,18 @@ func EncodeRepositoryID(repositoryID string) string {
 	parts := strings.SplitN(repositoryID, "/", 2)
 	return url.PathEscape(parts[0]) + "%2F" + url.PathEscape(parts[1])
 }
+
+func encodePathValue(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	if strings.Contains(value, "%2F") || strings.Contains(value, "%2f") {
+		return value
+	}
+	return url.PathEscape(value)
+}
+
+func encodeFilePath(filePath string) string {
+	return encodePathValue(strings.TrimPrefix(strings.TrimSpace(filePath), "/"))
+}

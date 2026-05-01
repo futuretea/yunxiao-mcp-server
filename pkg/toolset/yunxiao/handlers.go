@@ -58,73 +58,6 @@ func handleGetOrganization(ctx context.Context, client any, params map[string]an
 	return c.GetJSON(ctx, "/platform/organizations/"+url.PathEscape(id), nil)
 }
 
-func handleListRepositories(ctx context.Context, client any, params map[string]any) (string, error) {
-	c, err := getClient(client)
-	if err != nil {
-		return "", err
-	}
-
-	organizationID, err := requiredString(params, "organizationId")
-	if err != nil {
-		return "", err
-	}
-
-	query := url.Values{}
-	setOptionalInt(query, params, "page")
-	setOptionalInt(query, params, "perPage")
-	setOptionalString(query, params, "orderBy")
-	setOptionalString(query, params, "sort")
-	setOptionalString(query, params, "search")
-	setOptionalBool(query, params, "archived")
-
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories"
-	return c.GetJSONWithMetadata(ctx, path, query)
-}
-
-func handleGetRepository(ctx context.Context, client any, params map[string]any) (string, error) {
-	c, err := getClient(client)
-	if err != nil {
-		return "", err
-	}
-
-	organizationID, err := requiredString(params, "organizationId")
-	if err != nil {
-		return "", err
-	}
-	repositoryID, err := requiredString(params, "repositoryId")
-	if err != nil {
-		return "", err
-	}
-
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID)
-	return c.GetJSON(ctx, path, nil)
-}
-
-func handleListBranches(ctx context.Context, client any, params map[string]any) (string, error) {
-	c, err := getClient(client)
-	if err != nil {
-		return "", err
-	}
-
-	organizationID, err := requiredString(params, "organizationId")
-	if err != nil {
-		return "", err
-	}
-	repositoryID, err := requiredString(params, "repositoryId")
-	if err != nil {
-		return "", err
-	}
-
-	query := url.Values{}
-	setOptionalInt(query, params, "page")
-	setOptionalInt(query, params, "perPage")
-	setOptionalString(query, params, "sort")
-	setOptionalString(query, params, "search")
-
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/branches"
-	return c.GetJSONWithMetadata(ctx, path, query)
-}
-
 func handleListPipelines(ctx context.Context, client any, params map[string]any) (string, error) {
 	c, err := getClient(client)
 	if err != nil {
@@ -332,6 +265,18 @@ func requiredString(params map[string]any, key string) (string, error) {
 		return "", fmt.Errorf("%s is required", key)
 	}
 	return value, nil
+}
+
+func requiredOrganizationAndRepository(params map[string]any) (string, string, error) {
+	organizationID, err := requiredString(params, "organizationId")
+	if err != nil {
+		return "", "", err
+	}
+	repositoryID, err := requiredString(params, "repositoryId")
+	if err != nil {
+		return "", "", err
+	}
+	return organizationID, repositoryID, nil
 }
 
 func buildProjectConditions(params map[string]any) string {

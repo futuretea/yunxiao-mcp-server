@@ -19,6 +19,12 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_repositories`
   - `get_repository`
   - `list_branches`
+  - `get_branch`
+  - `list_files`
+  - `get_file_blobs`
+  - `list_commits`
+  - `get_commit`
+  - `compare`
   - `list_pipelines`
   - `get_pipeline`
   - `list_pipeline_runs`
