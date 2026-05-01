@@ -4,15 +4,7 @@ import "testing"
 
 func TestToolsetIncludesBaseReadTools(t *testing.T) {
 	tools := (&Toolset{ReadOnly: true}).GetTools(nil)
-	names := make(map[string]bool, len(tools))
-	for _, tool := range tools {
-		names[tool.Tool.Name] = true
-		if tool.Tool.Annotations.ReadOnlyHint == nil || !*tool.Tool.Annotations.ReadOnlyHint {
-			t.Fatalf("tool %q should be marked read-only", tool.Tool.Name)
-		}
-	}
-
-	for _, want := range []string{
+	wantTools := []string{
 		"get_current_user",
 		"get_current_organization_info",
 		"get_user_organizations",
@@ -42,7 +34,23 @@ func TestToolsetIncludesBaseReadTools(t *testing.T) {
 		"get_project",
 		"search_workitems",
 		"get_workitem",
-	} {
+	}
+	if len(tools) != len(wantTools) {
+		t.Fatalf("tool count = %d, want %d", len(tools), len(wantTools))
+	}
+
+	names := make(map[string]bool, len(tools))
+	for _, tool := range tools {
+		if names[tool.Tool.Name] {
+			t.Fatalf("duplicate tool %q", tool.Tool.Name)
+		}
+		names[tool.Tool.Name] = true
+		if tool.Tool.Annotations.ReadOnlyHint == nil || !*tool.Tool.Annotations.ReadOnlyHint {
+			t.Fatalf("tool %q should be marked read-only", tool.Tool.Name)
+		}
+	}
+
+	for _, want := range wantTools {
 		if !names[want] {
 			t.Fatalf("expected tool %q", want)
 		}
