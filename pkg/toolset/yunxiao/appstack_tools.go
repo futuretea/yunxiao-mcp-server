@@ -7,8 +7,9 @@ import (
 )
 
 func appstackTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 15)
+	tools := make([]toolset.ServerTool, 0, 19)
 	tools = append(tools, appstackApplicationTools()...)
+	tools = append(tools, appstackVariableGroupTools()...)
 	tools = append(tools, appstackAppReleaseWorkflowTools()...)
 	tools = append(tools, appstackChangeOrderTools()...)
 	return tools
@@ -38,6 +39,49 @@ func appstackApplicationTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetApplication,
+		},
+	}
+}
+
+func appstackVariableGroupTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("get_env_variable_groups",
+				mcp.WithDescription("Get AppStack variable groups bound to an environment."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("envName", mcp.Required(), mcp.Description("Environment name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetEnvVariableGroups,
+		},
+		{
+			Tool: mcp.NewTool("get_variable_group",
+				mcp.WithDescription("Get an AppStack application variable group by name."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("variableGroupName", mcp.Required(), mcp.Description("Variable group name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetVariableGroup,
+		},
+		{
+			Tool: mcp.NewTool("get_app_variable_groups",
+				mcp.WithDescription("Get AppStack variable groups for an application."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppVariableGroups,
+		},
+		{
+			Tool: mcp.NewTool("get_app_variable_groups_revision",
+				mcp.WithDescription("Get the revision of AppStack variable groups for an application."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppVariableGroupsRevision,
 		},
 	}
 }
