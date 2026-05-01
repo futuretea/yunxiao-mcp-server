@@ -1,9 +1,12 @@
 package mcp
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
+	yunxiaoToolset "github.com/futuretea/yunxiao-mcp-server/pkg/toolset/yunxiao"
 )
 
 func newTestServer(enabledTools, disabledTools []string) *Server {
@@ -96,5 +99,26 @@ func TestNewServerRejectsZeroEnabledTools(t *testing.T) {
 	}})
 	if err == nil {
 		t.Fatal("NewServer() expected zero enabled tools error")
+	}
+}
+
+func TestRequestAccessTokenPrefersHeader(t *testing.T) {
+	req := httptest.NewRequest(http.MethodPost, "/message?yunxiao_access_token=query-token", nil)
+	req.Header.Set(yunxiaoToolset.AccessTokenHeader, "header-token")
+
+	ctx := withRequestAccessToken(t.Context(), req)
+
+	if got := yunxiaoToolset.AccessTokenFromContext(ctx); got != "header-token" {
+		t.Fatalf("access token = %q", got)
+	}
+}
+
+func TestRequestAccessTokenUsesQueryParam(t *testing.T) {
+	req := httptest.NewRequest(http.MethodPost, "/message?yunxiao_access_token=query-token", nil)
+
+	ctx := withRequestAccessToken(t.Context(), req)
+
+	if got := yunxiaoToolset.AccessTokenFromContext(ctx); got != "query-token" {
+		t.Fatalf("access token = %q", got)
 	}
 }

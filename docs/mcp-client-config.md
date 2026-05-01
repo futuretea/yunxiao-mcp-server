@@ -29,6 +29,20 @@ Use these endpoints:
 
 When running behind a reverse proxy, set `YUNXIAO_MCP_SSE_BASE_URL` or `--sse-base-url` so SSE clients receive the public message URL.
 
+For a shared HTTP service, clients can pass their own token per request:
+
+```text
+x-yunxiao-token: <your-token>
+```
+
+SSE clients can also put the token on the connection URL:
+
+```text
+http://127.0.0.1:3000/sse?yunxiao_access_token=<your-token>
+```
+
+The SSE message endpoint sent back to the client keeps that query token, so later JSON-RPC messages use the same token. Request tokens take precedence over `YUNXIAO_MCP_ACCESS_TOKEN`.
+
 ## Docker
 
 For stdio clients, keep stdin open:

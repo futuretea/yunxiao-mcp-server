@@ -8,7 +8,7 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
 - HTTP Streamable MCP transport 与 SSE transport
 - HTTP health endpoint：`/healthz`
 - Cobra CLI 与 YAML/env/flag 配置加载
-- Yunxiao OpenAPI token 认证：`x-yunxiao-token`
+- Yunxiao OpenAPI token 认证：启动时默认 token，HTTP/SSE 请求级 `x-yunxiao-token` 或 `yunxiao_access_token` 覆盖
 - 工具启用/禁用过滤
 - 基础只读工具：
   - `get_current_user`
@@ -49,7 +49,7 @@ HTTP endpoints：
 - `/mcp`：Streamable HTTP MCP endpoint
 - `/sse`：SSE MCP endpoint
 - `/message`：SSE message endpoint
-- `/healthz`：readiness check；缺少 access token 或未注册工具时返回 `503`
+- `/healthz`：readiness check；未注册工具时返回 `503`
 
 Docker：
 
@@ -79,6 +79,8 @@ MCP client 配置示例见 [docs/mcp-client-config.md](docs/mcp-client-config.md
 - `YUNXIAO_API_BASE_URL`：兼容 Node 参考实现的 base URL 变量
 
 若同时设置新旧环境变量，`YUNXIAO_MCP_*` 优先于兼容用的 legacy 变量。
+
+HTTP/SSE 模式下，客户端也可以在请求 header `x-yunxiao-token` 或 query `yunxiao_access_token` 中传入 token；请求级 token 优先于启动时配置的默认 token，适合多人共享一个 HTTP MCP 服务。
 
 `base_url` 可以是主域名，也可以已经包含 `/oapi/v1`。客户端会避免重复追加 `/oapi/v1`。
 

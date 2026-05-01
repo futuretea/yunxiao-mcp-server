@@ -50,6 +50,54 @@ func TestClientGetJSONAddsAuthHeaderAndAPIBasePath(t *testing.T) {
 	}
 }
 
+func TestClientUsesAccessTokenFromContext(t *testing.T) {
+	var gotToken string
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotToken = r.Header.Get(AccessTokenHeader)
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "default-token", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	ctx := WithAccessToken(context.Background(), "request-token")
+	if _, err := client.GetJSON(ctx, "/platform/users:me", nil); err != nil {
+		t.Fatalf("GetJSON() error = %v", err)
+	}
+
+	if gotToken != "request-token" {
+		t.Fatalf("token = %q", gotToken)
+	}
+}
+
+func TestClientUsesContextAccessTokenWithoutDefaultToken(t *testing.T) {
+	var gotToken string
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotToken = r.Header.Get(AccessTokenHeader)
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	ctx := WithAccessToken(context.Background(), "request-token")
+	if _, err := client.GetJSON(ctx, "/platform/users:me", nil); err != nil {
+		t.Fatalf("GetJSON() error = %v", err)
+	}
+
+	if gotToken != "request-token" {
+		t.Fatalf("token = %q", gotToken)
+	}
+}
+
 func TestClientGetJSONWithMetadataIncludesPaginationHeaders(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

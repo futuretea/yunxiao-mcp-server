@@ -144,6 +144,8 @@ func (s *Server) ServeStdio() error {
 func (s *Server) ServeSSE(baseURL string, httpServer *http.Server) *server.SSEServer {
 	options := []server.SSEOption{
 		server.WithHTTPServer(httpServer),
+		server.WithAppendQueryToMessageEndpoint(),
+		server.WithSSEContextFunc(withRequestAccessToken),
 	}
 	if baseURL != "" {
 		options = append(options, server.WithBaseURL(baseURL))
@@ -156,6 +158,7 @@ func (s *Server) ServeStreamableHTTP(httpServer *http.Server) *server.Streamable
 	return server.NewStreamableHTTPServer(
 		s.server,
 		server.WithStreamableHTTPServer(httpServer),
+		server.WithHTTPContextFunc(withRequestAccessToken),
 		server.WithStateLess(true),
 	)
 }
@@ -170,12 +173,25 @@ func (s *Server) IsHealthy() bool {
 	return s != nil &&
 		s.client != nil &&
 		s.configuration != nil &&
-		s.configuration.AccessToken != "" &&
 		len(s.enabledTools) > 0
 }
 
 // Close releases server resources.
 func (s *Server) Close() {}
+
+func withRequestAccessToken(ctx context.Context, r *http.Request) context.Context {
+	return yunxiaoToolset.WithAccessToken(ctx, requestAccessToken(r))
+}
+
+func requestAccessToken(r *http.Request) string {
+	if r == nil {
+		return ""
+	}
+	if accessToken := strings.TrimSpace(r.Header.Get(yunxiaoToolset.AccessTokenHeader)); accessToken != "" {
+		return accessToken
+	}
+	return strings.TrimSpace(r.URL.Query().Get(yunxiaoToolset.AccessTokenQueryParam))
+}
 
 // NewTextResult creates a standard MCP text result.
 func NewTextResult(content string, err error) *mcp.CallToolResult {

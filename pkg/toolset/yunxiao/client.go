@@ -17,6 +17,15 @@ import (
 
 const apiBasePath = "/oapi/v1"
 
+const (
+	// AccessTokenHeader is the request header used by Yunxiao OpenAPI.
+	AccessTokenHeader = "x-yunxiao-token"
+	// AccessTokenQueryParam is the SSE-compatible query parameter used by the Node reference server.
+	AccessTokenQueryParam = "yunxiao_access_token"
+)
+
+type accessTokenContextKey struct{}
+
 // Client is a minimal Yunxiao OpenAPI client.
 type Client struct {
 	baseURL     *url.URL
@@ -48,6 +57,26 @@ type Pagination struct {
 	NextPage   int `json:"nextPage,omitempty"`
 	Total      int `json:"total,omitempty"`
 	TotalPages int `json:"totalPages,omitempty"`
+}
+
+// WithAccessToken returns a context carrying a request-scoped Yunxiao access token.
+func WithAccessToken(ctx context.Context, accessToken string) context.Context {
+	accessToken = strings.TrimSpace(accessToken)
+	if accessToken == "" {
+		return ctx
+	}
+	return context.WithValue(ctx, accessTokenContextKey{}, accessToken)
+}
+
+// AccessTokenFromContext returns the request-scoped Yunxiao access token, if present.
+func AccessTokenFromContext(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+	if accessToken, ok := ctx.Value(accessTokenContextKey{}).(string); ok {
+		return strings.TrimSpace(accessToken)
+	}
+	return ""
 }
 
 func (e *APIError) Error() string {
@@ -112,8 +141,12 @@ func (c *Client) PostJSONWithMetadata(ctx context.Context, path string, body any
 
 // Request sends an authenticated Yunxiao OpenAPI request.
 func (c *Client) Request(ctx context.Context, method, path string, query url.Values, body any) (*Response, error) {
-	if c.accessToken == "" {
-		return nil, fmt.Errorf("access token is required; set --access-token or YUNXIAO_MCP_ACCESS_TOKEN")
+	accessToken := c.accessToken
+	if scopedToken := AccessTokenFromContext(ctx); scopedToken != "" {
+		accessToken = scopedToken
+	}
+	if accessToken == "" {
+		return nil, fmt.Errorf("access token is required; set --access-token, YUNXIAO_MCP_ACCESS_TOKEN, or pass x-yunxiao-token/yunxiao_access_token on the HTTP request")
 	}
 
 	requestURL := c.resolveURL(path, query)
@@ -134,7 +167,7 @@ func (c *Client) Request(ctx context.Context, method, path string, query url.Val
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", c.userAgent)
-	req.Header.Set("x-yunxiao-token", c.accessToken)
+	req.Header.Set(AccessTokenHeader, accessToken)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
