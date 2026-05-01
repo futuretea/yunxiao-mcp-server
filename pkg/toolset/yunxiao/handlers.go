@@ -279,6 +279,18 @@ func requiredOrganizationAndRepository(params map[string]any) (string, string, e
 	return organizationID, repositoryID, nil
 }
 
+func requiredOrganizationRepositoryAndLocalID(params map[string]any) (string, string, string, error) {
+	organizationID, repositoryID, err := requiredOrganizationAndRepository(params)
+	if err != nil {
+		return "", "", "", err
+	}
+	localID, err := requiredString(params, "localId")
+	if err != nil {
+		return "", "", "", err
+	}
+	return organizationID, repositoryID, localID, nil
+}
+
 func buildProjectConditions(params map[string]any) string {
 	filterConditions := make([]map[string]any, 0)
 	if name, _ := params["name"].(string); name != "" {
@@ -378,6 +390,20 @@ func requiredOrganizationAndPipeline(params map[string]any) (string, string, err
 		return "", "", err
 	}
 	return organizationID, pipelineID, nil
+}
+
+func optionalStringDefault(params map[string]any, key, defaultValue string) string {
+	if value, _ := params[key].(string); strings.TrimSpace(value) != "" {
+		return strings.TrimSpace(value)
+	}
+	return defaultValue
+}
+
+func optionalBoolDefault(params map[string]any, key string, defaultValue bool) bool {
+	if value, ok := params[key].(bool); ok {
+		return value
+	}
+	return defaultValue
 }
 
 func setOptionalStringBody(body map[string]any, params map[string]any, key string) {
