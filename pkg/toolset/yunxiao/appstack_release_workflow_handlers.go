@@ -61,6 +61,77 @@ func handleListAppReleaseStageBriefs(ctx context.Context, client any, params map
 	return c.GetJSON(ctx, path, nil)
 }
 
+func handleListAppReleaseStageRuns(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, appName, releaseWorkflowSn, releaseStageSn, err := requiredAppReleaseStage(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	query := url.Values{}
+	setOptionalString(query, params, "pagination")
+	setOptionalInt(query, params, "perPage")
+	setOptionalString(query, params, "orderBy")
+	setOptionalString(query, params, "sort")
+	setOptionalString(query, params, "nextToken")
+	setOptionalInt(query, params, "page")
+
+	path := appstackReleaseStageResourcePath(organizationID, appName, releaseWorkflowSn, releaseStageSn) + "/executions"
+	return c.GetJSON(ctx, path, query)
+}
+
+func handleListAppReleaseStageExecMetadata(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber, err := requiredAppReleaseStageExecution(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	path := appstackReleaseStageExecutionPath(organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber) + "/integratedMetadata"
+	return c.GetJSON(ctx, path, nil)
+}
+
+func handleGetAppReleaseStagePipelineRun(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber, err := requiredAppReleaseStageExecution(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	path := appstackReleaseStageExecutionPath(organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber) + ":getPipelineRun"
+	return c.GetJSON(ctx, path, nil)
+}
+
+func handleGetAppReleaseStagePipelineJobLog(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber, err := requiredAppReleaseStageExecution(params)
+	if err != nil {
+		return "", err
+	}
+	jobID, err := requiredString(params, "jobId")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	query := url.Values{}
+	query.Set("jobId", jobID)
+
+	path := appstackReleaseStageExecutionPath(organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber) + ":pipelineJobLog"
+	return c.GetJSON(ctx, path, query)
+}
+
 func requiredAppReleaseWorkflow(params map[string]any) (string, string, string, error) {
 	organizationID, appName, err := requiredOrganizationAndApp(params)
 	if err != nil {
@@ -85,6 +156,30 @@ func requiredAppReleaseStage(params map[string]any) (string, string, string, str
 	return organizationID, appName, releaseWorkflowSn, releaseStageSn, nil
 }
 
+func requiredAppReleaseStageExecution(params map[string]any) (string, string, string, string, string, error) {
+	organizationID, appName, releaseWorkflowSn, releaseStageSn, err := requiredAppReleaseStage(params)
+	if err != nil {
+		return "", "", "", "", "", err
+	}
+	executionNumber, err := requiredString(params, "executionNumber")
+	if err != nil {
+		return "", "", "", "", "", err
+	}
+	return organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber, nil
+}
+
 func appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn string) string {
 	return appstackAppPath(organizationID, appName) + "/releaseWorkflow/" + url.PathEscape(releaseWorkflowSn)
+}
+
+func appstackReleaseWorkflowResourcePath(organizationID, appName, releaseWorkflowSn string) string {
+	return appstackAppPath(organizationID, appName) + "/releaseWorkflows/" + url.PathEscape(releaseWorkflowSn)
+}
+
+func appstackReleaseStageResourcePath(organizationID, appName, releaseWorkflowSn, releaseStageSn string) string {
+	return appstackReleaseWorkflowResourcePath(organizationID, appName, releaseWorkflowSn) + "/releaseStages/" + url.PathEscape(releaseStageSn)
+}
+
+func appstackReleaseStageExecutionPath(organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber string) string {
+	return appstackReleaseStageResourcePath(organizationID, appName, releaseWorkflowSn, releaseStageSn) + "/executions/" + url.PathEscape(executionNumber)
 }

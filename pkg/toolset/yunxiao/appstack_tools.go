@@ -7,7 +7,7 @@ import (
 )
 
 func appstackTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 11)
+	tools := make([]toolset.ServerTool, 0, 15)
 	tools = append(tools, appstackApplicationTools()...)
 	tools = append(tools, appstackAppReleaseWorkflowTools()...)
 	tools = append(tools, appstackChangeOrderTools()...)
@@ -43,6 +43,13 @@ func appstackApplicationTools() []toolset.ServerTool {
 }
 
 func appstackAppReleaseWorkflowTools() []toolset.ServerTool {
+	tools := make([]toolset.ServerTool, 0, 8)
+	tools = append(tools, appstackAppReleaseWorkflowOverviewTools()...)
+	tools = append(tools, appstackAppReleaseStageExecutionTools()...)
+	return tools
+}
+
+func appstackAppReleaseWorkflowOverviewTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_app_release_workflows",
@@ -82,6 +89,65 @@ func appstackAppReleaseWorkflowTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListAppReleaseStageBriefs,
+		},
+	}
+}
+
+func appstackAppReleaseStageExecutionTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("list_app_release_stage_runs",
+				mcp.WithDescription("List AppStack release stage execution records."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
+				mcp.WithString("pagination", mcp.Description("Pagination mode. Use keyset for keyset pagination.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size, up to 100.")),
+				mcp.WithString("orderBy", mcp.Description("Sort field: id or gmtCreate.")),
+				mcp.WithString("sort", mcp.Description("Sort direction: asc or desc.")),
+				mcp.WithString("nextToken", mcp.Description("Keyset pagination token from the previous response.")),
+				mcp.WithNumber("page", mcp.Description("Page number when using page pagination.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppReleaseStageRuns,
+		},
+		{
+			Tool: mcp.NewTool("list_app_release_stage_exec_metadata",
+				mcp.WithDescription("List integrated change metadata for an AppStack release stage execution."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
+				mcp.WithString("executionNumber", mcp.Required(), mcp.Description("Release stage execution number.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppReleaseStageExecMetadata,
+		},
+		{
+			Tool: mcp.NewTool("get_app_release_stage_pipeline_run",
+				mcp.WithDescription("Get the pipeline run for an AppStack release stage execution."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
+				mcp.WithString("executionNumber", mcp.Required(), mcp.Description("Release stage execution number.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppReleaseStagePipelineRun,
+		},
+		{
+			Tool: mcp.NewTool("get_app_release_stage_pipeline_job_log",
+				mcp.WithDescription("Get a pipeline job log for an AppStack release stage execution."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
+				mcp.WithString("executionNumber", mcp.Required(), mcp.Description("Release stage execution number.")),
+				mcp.WithString("jobId", mcp.Required(), mcp.Description("Pipeline job ID.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppReleaseStagePipelineJobLog,
 		},
 	}
 }
