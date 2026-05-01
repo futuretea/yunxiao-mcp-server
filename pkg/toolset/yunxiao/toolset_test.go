@@ -35,6 +35,7 @@ func expectedToolNames() []string {
 	names = append(names, expectedProjexToolNames()...)
 	names = append(names, expectedPackageToolNames()...)
 	names = append(names, expectedAppStackToolNames()...)
+	names = append(names, expectedLingmaToolNames()...)
 	return names
 }
 
@@ -211,5 +212,13 @@ func expectedAppStackToolNames() []string {
 		"list_change_order_job_logs",
 		"find_task_operation_log",
 		"list_change_orders_by_origin",
+	}
+}
+
+func expectedLingmaToolNames() []string {
+	return []string{
+		"get_department_usage",
+		"list_developer_members",
+		"get_developer_usage",
 	}
 }
