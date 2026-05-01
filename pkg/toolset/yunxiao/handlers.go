@@ -233,6 +233,27 @@ func setOptionalStringArrayBody(body map[string]any, params map[string]any, key 
 	}
 }
 
+func setOptionalStringArrayQuery(query url.Values, params map[string]any, key string) {
+	switch value := params[key].(type) {
+	case []any:
+		for _, item := range value {
+			if item, ok := item.(string); ok && strings.TrimSpace(item) != "" {
+				query.Add(key, strings.TrimSpace(item))
+			}
+		}
+	case []string:
+		for _, item := range value {
+			if strings.TrimSpace(item) != "" {
+				query.Add(key, strings.TrimSpace(item))
+			}
+		}
+	case string:
+		for _, item := range splitCSV(value) {
+			query.Add(key, item)
+		}
+	}
+}
+
 func setOptionalInt(query url.Values, params map[string]any, key string) {
 	setOptionalIntAs(query, params, key, key)
 }

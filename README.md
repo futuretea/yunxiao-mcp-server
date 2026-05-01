@@ -63,6 +63,7 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_commit_statuses`
   - `list_check_runs`
   - `get_check_run`
+  - `list_merge_requests`
   - `get_merge_request`
   - `list_change_requests`
   - `get_change_request`

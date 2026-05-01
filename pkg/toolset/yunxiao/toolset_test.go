@@ -98,6 +98,7 @@ func expectedCodeUpToolNames() []string {
 		"list_commit_statuses",
 		"list_check_runs",
 		"get_check_run",
+		"list_merge_requests",
 		"get_merge_request",
 		"list_change_requests",
 		"get_change_request",
