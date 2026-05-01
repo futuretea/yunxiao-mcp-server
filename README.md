@@ -79,6 +79,8 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `get_pod_container_log`
   - `get_pod_info`
   - `get_kubernetes_object_info`
+  - `get_global_var`
+  - `list_global_vars`
   - `get_env_variable_groups`
   - `get_variable_group`
   - `get_app_variable_groups`
