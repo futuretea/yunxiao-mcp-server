@@ -7,9 +7,10 @@ import (
 )
 
 func appstackTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 19)
+	tools := make([]toolset.ServerTool, 0, 22)
 	tools = append(tools, appstackApplicationTools()...)
 	tools = append(tools, appstackVariableGroupTools()...)
+	tools = append(tools, appstackOrchestrationTools()...)
 	tools = append(tools, appstackAppReleaseWorkflowTools()...)
 	tools = append(tools, appstackChangeOrderTools()...)
 	return tools
@@ -82,6 +83,42 @@ func appstackVariableGroupTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetAppVariableGroupsRevision,
+		},
+	}
+}
+
+func appstackOrchestrationTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("get_latest_orchestration",
+				mcp.WithDescription("Get the latest AppStack orchestration available for an environment."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("envName", mcp.Required(), mcp.Description("Environment name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetLatestOrchestration,
+		},
+		{
+			Tool: mcp.NewTool("list_app_orchestration",
+				mcp.WithDescription("List AppStack orchestrations for an application."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppOrchestration,
+		},
+		{
+			Tool: mcp.NewTool("get_app_orchestration",
+				mcp.WithDescription("Get an AppStack application orchestration by serial number."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("sn", mcp.Required(), mcp.Description("Orchestration serial number.")),
+				mcp.WithString("tagName", mcp.Description("Optional orchestration tag.")),
+				mcp.WithString("sha", mcp.Description("Optional orchestration commit SHA.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppOrchestration,
 		},
 	}
 }
