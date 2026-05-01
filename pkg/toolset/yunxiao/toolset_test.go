@@ -49,6 +49,8 @@ func expectedPlatformToolNames() []string {
 		"list_organization_departments",
 		"get_organization_department_info",
 		"get_organization_department_ancestors",
+		"list_enterprise_departments",
+		"get_enterprise_department",
 		"list_organization_members",
 		"get_organization_member_info",
 		"get_organization_member_info_by_user_id",
