@@ -7,10 +7,11 @@ import (
 )
 
 func platformTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 15)
+	tools := make([]toolset.ServerTool, 0, 18)
 	tools = append(tools, platformBasicTools()...)
 	tools = append(tools, platformDepartmentTools()...)
 	tools = append(tools, platformMemberTools()...)
+	tools = append(tools, platformGroupTools()...)
 	tools = append(tools, platformRoleAndUserTools()...)
 	return tools
 }

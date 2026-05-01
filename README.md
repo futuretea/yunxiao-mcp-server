@@ -23,6 +23,9 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `get_organization_member_info`
   - `get_organization_member_info_by_user_id`
   - `search_organization_members`
+  - `list_organization_groups`
+  - `get_organization_group`
+  - `list_organization_group_members`
   - `list_organization_roles`
   - `get_organization_role`
   - `list_users`
