@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"slices"
 	"strings"
 	"time"
@@ -139,9 +140,38 @@ func (s *Server) ServeStdio() error {
 	return server.ServeStdio(s.server)
 }
 
+// ServeSSE creates an SSE MCP HTTP handler.
+func (s *Server) ServeSSE(baseURL string, httpServer *http.Server) *server.SSEServer {
+	options := []server.SSEOption{
+		server.WithHTTPServer(httpServer),
+	}
+	if baseURL != "" {
+		options = append(options, server.WithBaseURL(baseURL))
+	}
+	return server.NewSSEServer(s.server, options...)
+}
+
+// ServeStreamableHTTP creates a streamable HTTP MCP handler.
+func (s *Server) ServeStreamableHTTP(httpServer *http.Server) *server.StreamableHTTPServer {
+	return server.NewStreamableHTTPServer(
+		s.server,
+		server.WithStreamableHTTPServer(httpServer),
+		server.WithStateLess(true),
+	)
+}
+
 // GetEnabledTools returns registered tool names.
 func (s *Server) GetEnabledTools() []string {
 	return append([]string(nil), s.enabledTools...)
+}
+
+// IsHealthy reports whether the server has a configured API client and registered tools.
+func (s *Server) IsHealthy() bool {
+	return s != nil &&
+		s.client != nil &&
+		s.configuration != nil &&
+		s.configuration.AccessToken != "" &&
+		len(s.enabledTools) > 0
 }
 
 // Close releases server resources.

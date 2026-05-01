@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/logging"
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/version"
+	internalhttp "github.com/futuretea/yunxiao-mcp-server/pkg/server/http"
 	mcpserver "github.com/futuretea/yunxiao-mcp-server/pkg/server/mcp"
 )
 
@@ -34,7 +36,7 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 			if err := bindFlags(v, cmd); err != nil {
 				return err
 			}
-			return runServer(cfgFile, streams, v)
+			return runServer(cmd.Context(), cfgFile, streams, v)
 		},
 	}
 
@@ -44,6 +46,7 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 
 	command.PersistentFlags().StringVar(&cfgFile, "config", "", "config file path (YAML)")
 	command.Flags().Int("port", 0, "port for HTTP mode; 0 runs stdio mode")
+	command.Flags().String("sse-base-url", "", "public base URL for SSE message endpoints")
 	command.Flags().String("log-level", "info", "log level: trace, debug, info, warn, error, fatal, panic, disabled")
 	command.Flags().String("base-url", config.DefaultBaseURL, "Yunxiao OpenAPI host or API base URL")
 	command.Flags().String("access-token", "", "Yunxiao access token; also read from YUNXIAO_MCP_ACCESS_TOKEN or YUNXIAO_ACCESS_TOKEN")
@@ -59,6 +62,7 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 func bindFlags(v *viper.Viper, cmd *cobra.Command) error {
 	bindings := map[string]string{
 		"port":                    "port",
+		"sse_base_url":            "sse-base-url",
 		"log_level":               "log-level",
 		"base_url":                "base-url",
 		"access_token":            "access-token",
@@ -76,7 +80,7 @@ func bindFlags(v *viper.Viper, cmd *cobra.Command) error {
 	return nil
 }
 
-func runServer(cfgFile string, streams IOStreams, v *viper.Viper) error {
+func runServer(ctx context.Context, cfgFile string, streams IOStreams, v *viper.Viper) error {
 	cfg, err := config.LoadConfig(cfgFile, v)
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
@@ -95,7 +99,7 @@ func runServer(cfgFile string, streams IOStreams, v *viper.Viper) error {
 	defer server.Close()
 
 	if cfg.Port != 0 {
-		return fmt.Errorf("HTTP transport is not implemented yet; set port=0 for stdio mode")
+		return internalhttp.Serve(ctx, server, cfg)
 	}
 
 	return server.ServeStdio()

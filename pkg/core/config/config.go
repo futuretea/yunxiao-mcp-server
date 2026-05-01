@@ -17,6 +17,7 @@ const (
 // StaticConfig contains configuration that is fixed when the server starts.
 type StaticConfig struct {
 	Port                  int      `mapstructure:"port"`
+	SSEBaseURL            string   `mapstructure:"sse_base_url"`
 	LogLevel              string   `mapstructure:"log_level"`
 	BaseURL               string   `mapstructure:"base_url"`
 	AccessToken           string   `mapstructure:"access_token"`
@@ -47,6 +48,14 @@ func (c *StaticConfig) Validate() error {
 	return nil
 }
 
+// GetPortString returns the configured HTTP listen address.
+func (c *StaticConfig) GetPortString() string {
+	if c.Port == 0 {
+		return ""
+	}
+	return fmt.Sprintf(":%d", c.Port)
+}
+
 // LoadConfig loads configuration from defaults, optional YAML, environment, and flags.
 func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	if v == nil {
@@ -54,6 +63,7 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	}
 
 	v.SetDefault("port", 0)
+	v.SetDefault("sse_base_url", "")
 	v.SetDefault("log_level", "info")
 	v.SetDefault("base_url", DefaultBaseURL)
 	v.SetDefault("read_only", true)

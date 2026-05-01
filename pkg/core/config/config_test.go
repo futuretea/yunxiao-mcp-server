@@ -47,6 +47,26 @@ func TestValidateRejectsInvalidBaseURL(t *testing.T) {
 	}
 }
 
+func TestGetPortString(t *testing.T) {
+	tests := []struct {
+		name string
+		port int
+		want string
+	}{
+		{name: "stdio", port: 0, want: ""},
+		{name: "http", port: 8080, want: ":8080"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &StaticConfig{Port: tt.port}
+			if got := cfg.GetPortString(); got != tt.want {
+				t.Fatalf("GetPortString() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestLoadConfigReadsPrefixedEnvironment(t *testing.T) {
 	t.Setenv("YUNXIAO_MCP_ACCESS_TOKEN", "prefixed-token")
 	t.Setenv("YUNXIAO_MCP_BASE_URL", "https://example.com/yunxiao")
