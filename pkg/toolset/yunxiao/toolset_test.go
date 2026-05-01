@@ -4,7 +4,31 @@ import "testing"
 
 func TestToolsetIncludesBaseReadTools(t *testing.T) {
 	tools := (&Toolset{ReadOnly: true}).GetTools(nil)
-	wantTools := []string{
+	wantTools := expectedToolNames()
+	if len(tools) != len(wantTools) {
+		t.Fatalf("tool count = %d, want %d", len(tools), len(wantTools))
+	}
+
+	names := make(map[string]bool, len(tools))
+	for _, tool := range tools {
+		if names[tool.Tool.Name] {
+			t.Fatalf("duplicate tool %q", tool.Tool.Name)
+		}
+		names[tool.Tool.Name] = true
+		if tool.Tool.Annotations.ReadOnlyHint == nil || !*tool.Tool.Annotations.ReadOnlyHint {
+			t.Fatalf("tool %q should be marked read-only", tool.Tool.Name)
+		}
+	}
+
+	for _, want := range wantTools {
+		if !names[want] {
+			t.Fatalf("expected tool %q", want)
+		}
+	}
+}
+
+func expectedToolNames() []string {
+	return []string{
 		"get_current_user",
 		"get_current_organization_info",
 		"get_user_organizations",
@@ -61,30 +85,14 @@ func TestToolsetIncludesBaseReadTools(t *testing.T) {
 		"list_work_item_comments",
 		"list_applications",
 		"get_application",
+		"list_app_release_workflows",
+		"list_app_release_workflow_briefs",
+		"get_app_release_workflow_stage",
+		"list_app_release_stage_briefs",
 		"list_change_order_versions",
 		"get_change_order",
 		"list_change_order_job_logs",
 		"find_task_operation_log",
 		"list_change_orders_by_origin",
-	}
-	if len(tools) != len(wantTools) {
-		t.Fatalf("tool count = %d, want %d", len(tools), len(wantTools))
-	}
-
-	names := make(map[string]bool, len(tools))
-	for _, tool := range tools {
-		if names[tool.Tool.Name] {
-			t.Fatalf("duplicate tool %q", tool.Tool.Name)
-		}
-		names[tool.Tool.Name] = true
-		if tool.Tool.Annotations.ReadOnlyHint == nil || !*tool.Tool.Annotations.ReadOnlyHint {
-			t.Fatalf("tool %q should be marked read-only", tool.Tool.Name)
-		}
-	}
-
-	for _, want := range wantTools {
-		if !names[want] {
-			t.Fatalf("expected tool %q", want)
-		}
 	}
 }

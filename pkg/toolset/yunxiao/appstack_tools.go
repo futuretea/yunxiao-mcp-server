@@ -7,8 +7,9 @@ import (
 )
 
 func appstackTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 7)
+	tools := make([]toolset.ServerTool, 0, 11)
 	tools = append(tools, appstackApplicationTools()...)
+	tools = append(tools, appstackAppReleaseWorkflowTools()...)
 	tools = append(tools, appstackChangeOrderTools()...)
 	return tools
 }
@@ -37,6 +38,50 @@ func appstackApplicationTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetApplication,
+		},
+	}
+}
+
+func appstackAppReleaseWorkflowTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("list_app_release_workflows",
+				mcp.WithDescription("List AppStack release workflows for an application."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppReleaseWorkflows,
+		},
+		{
+			Tool: mcp.NewTool("list_app_release_workflow_briefs",
+				mcp.WithDescription("List AppStack release workflow briefs for an application."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppReleaseWorkflowBriefs,
+		},
+		{
+			Tool: mcp.NewTool("get_app_release_workflow_stage",
+				mcp.WithDescription("Get an AppStack application release workflow stage."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppReleaseWorkflowStage,
+		},
+		{
+			Tool: mcp.NewTool("list_app_release_stage_briefs",
+				mcp.WithDescription("List AppStack release stage briefs for an application release workflow."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppReleaseStageBriefs,
 		},
 	}
 }
