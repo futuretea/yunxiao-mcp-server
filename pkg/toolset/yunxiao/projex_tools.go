@@ -7,11 +7,12 @@ import (
 )
 
 func projexTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 19)
+	tools := make([]toolset.ServerTool, 0, 21)
 	tools = append(tools, projexProjectTools()...)
 	tools = append(tools, projexProjectMetadataTools()...)
 	tools = append(tools, projexSprintTools()...)
 	tools = append(tools, projexWorkitemTools()...)
+	tools = append(tools, projexVersionActivityTools()...)
 	tools = append(tools, projexWorkitemTypeTools()...)
 	return tools
 }
