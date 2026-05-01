@@ -7,6 +7,9 @@ func TestToolsetIncludesBaseReadTools(t *testing.T) {
 	names := make(map[string]bool, len(tools))
 	for _, tool := range tools {
 		names[tool.Tool.Name] = true
+		if tool.Tool.Annotations.ReadOnlyHint == nil || !*tool.Tool.Annotations.ReadOnlyHint {
+			t.Fatalf("tool %q should be marked read-only", tool.Tool.Name)
+		}
 	}
 
 	for _, want := range []string{
@@ -18,6 +21,11 @@ func TestToolsetIncludesBaseReadTools(t *testing.T) {
 		"list_repositories",
 		"get_repository",
 		"list_branches",
+		"list_pipelines",
+		"get_pipeline",
+		"list_pipeline_runs",
+		"get_pipeline_run",
+		"get_latest_pipeline_run",
 	} {
 		if !names[want] {
 			t.Fatalf("expected tool %q", want)
