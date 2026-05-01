@@ -121,6 +121,11 @@ func expectedAppStackToolNames() []string {
 	return []string{
 		"list_applications",
 		"get_application",
+		"search_app_templates",
+		"list_environments",
+		"get_environment",
+		"list_application_members",
+		"list_application_sources",
 		"get_machine_deploy_log",
 		"get_deploy_group",
 		"list_resource_instances",

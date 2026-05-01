@@ -7,8 +7,9 @@ import (
 )
 
 func appstackTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 40)
+	tools := make([]toolset.ServerTool, 0, 45)
 	tools = append(tools, appstackApplicationTools()...)
+	tools = append(tools, appstackApplicationMetadataTools()...)
 	tools = append(tools, appstackDeploymentResourceTools()...)
 	tools = append(tools, appstackResourceProxyTools()...)
 	tools = append(tools, appstackVariableGroupTools()...)
