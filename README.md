@@ -36,6 +36,10 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `get_protected_branch`
   - `list_push_rules`
   - `get_push_rule`
+  - `list_template_repositories`
+  - `list_namespaces`
+  - `get_namespace`
+  - `get_org_namespace`
   - `list_files`
   - `get_file_blobs`
   - `list_commits`
