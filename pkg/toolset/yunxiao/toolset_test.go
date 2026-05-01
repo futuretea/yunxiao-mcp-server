@@ -52,6 +52,12 @@ func TestToolsetIncludesBaseReadTools(t *testing.T) {
 		"get_artifact",
 		"get_sprint",
 		"list_sprints",
+		"list_all_work_item_types",
+		"list_work_item_types",
+		"get_work_item_type",
+		"list_work_item_relation_work_item_types",
+		"get_work_item_type_field_config",
+		"get_work_item_workflow",
 	}
 	if len(tools) != len(wantTools) {
 		t.Fatalf("tool count = %d, want %d", len(tools), len(wantTools))

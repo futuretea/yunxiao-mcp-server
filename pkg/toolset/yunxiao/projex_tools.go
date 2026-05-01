@@ -7,10 +7,11 @@ import (
 )
 
 func projexTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 6)
+	tools := make([]toolset.ServerTool, 0, 12)
 	tools = append(tools, projexProjectTools()...)
 	tools = append(tools, projexSprintTools()...)
 	tools = append(tools, projexWorkitemTools()...)
+	tools = append(tools, projexWorkitemTypeTools()...)
 	return tools
 }
 
@@ -103,6 +104,81 @@ func projexWorkitemTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetWorkitem,
+		},
+	}
+}
+
+func projexWorkitemTypeTools() []toolset.ServerTool {
+	tools := make([]toolset.ServerTool, 0, 6)
+	tools = append(tools, projexWorkitemTypeListTools()...)
+	tools = append(tools, projexWorkitemTypeMetadataTools()...)
+	return tools
+}
+
+func projexWorkitemTypeListTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("list_all_work_item_types",
+				mcp.WithDescription("List all work item types in a Yunxiao organization."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("categories", mcp.Description("Optional work item type categories, such as Req, Bug, or Task.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAllWorkItemTypes,
+		},
+		{
+			Tool: mcp.NewTool("list_work_item_types",
+				mcp.WithDescription("List work item types in one Projex project."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Req, Bug, or Task.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListWorkItemTypes,
+		},
+		{
+			Tool: mcp.NewTool("get_work_item_type",
+				mcp.WithDescription("Get a Projex work item type by ID."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("id", mcp.Required(), mcp.Description("Work item type ID.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetWorkItemType,
+		},
+	}
+}
+
+func projexWorkitemTypeMetadataTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("list_work_item_relation_work_item_types",
+				mcp.WithDescription("List work item types that can be related to a Projex work item type."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
+				mcp.WithString("relationType", mcp.Description("Relation type: PARENT, SUB, ASSOCIATED, DEPEND_ON, or DEPENDED_BY.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListWorkItemRelationWorkItemTypes,
+		},
+		{
+			Tool: mcp.NewTool("get_work_item_type_field_config",
+				mcp.WithDescription("Get field configuration for a Projex work item type."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetWorkItemTypeFieldConfig,
+		},
+		{
+			Tool: mcp.NewTool("get_work_item_workflow",
+				mcp.WithDescription("Get workflow information for a Projex work item type."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetWorkItemWorkflow,
 		},
 	}
 }
