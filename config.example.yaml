@@ -1,0 +1,9 @@
+port: 0
+log_level: info
+base_url: https://openapi-rdc.aliyuncs.com
+access_token: ""
+read_only: true
+enabled_tools: []
+disabled_tools: []
+request_timeout_seconds: 30
+

@@ -1,1 +1,10 @@
 third-party-projects/
+.auto8/
+.auto-runs/
+/yunxiao-mcp-server
+bin/
+dist/
+coverage.out
+*.test
+config.yaml
+config.local.yaml
