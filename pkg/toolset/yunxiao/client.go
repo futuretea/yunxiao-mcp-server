@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -30,6 +31,23 @@ type APIError struct {
 	Method     string
 	URL        string
 	Body       string
+}
+
+// Response contains a Yunxiao response body and selected response metadata.
+type Response struct {
+	Body       json.RawMessage `json:"body"`
+	Pagination *Pagination     `json:"pagination,omitempty"`
+	RequestID  string          `json:"requestId,omitempty"`
+}
+
+// Pagination contains standard Yunxiao pagination headers when present.
+type Pagination struct {
+	Page       int `json:"page,omitempty"`
+	PerPage    int `json:"perPage,omitempty"`
+	PrevPage   int `json:"prevPage,omitempty"`
+	NextPage   int `json:"nextPage,omitempty"`
+	Total      int `json:"total,omitempty"`
+	TotalPages int `json:"totalPages,omitempty"`
 }
 
 func (e *APIError) Error() string {
@@ -67,15 +85,24 @@ func normalizeAPIBaseURL(raw string) (*url.URL, error) {
 
 // GetJSON sends a GET request and returns a pretty-printed JSON response.
 func (c *Client) GetJSON(ctx context.Context, path string, query url.Values) (string, error) {
-	raw, err := c.Request(ctx, http.MethodGet, path, query, nil)
+	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
 	if err != nil {
 		return "", err
 	}
-	return prettyJSON(raw), nil
+	return prettyJSON(resp.Body), nil
+}
+
+// GetJSONWithMetadata sends a GET request and includes pagination metadata in the response.
+func (c *Client) GetJSONWithMetadata(ctx context.Context, path string, query url.Values) (string, error) {
+	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
+	if err != nil {
+		return "", err
+	}
+	return prettyResponseJSON(resp), nil
 }
 
 // Request sends an authenticated Yunxiao OpenAPI request.
-func (c *Client) Request(ctx context.Context, method, path string, query url.Values, body any) (json.RawMessage, error) {
+func (c *Client) Request(ctx context.Context, method, path string, query url.Values, body any) (*Response, error) {
 	if c.accessToken == "" {
 		return nil, fmt.Errorf("access token is required; set --access-token or YUNXIAO_MCP_ACCESS_TOKEN")
 	}
@@ -118,14 +145,38 @@ func (c *Client) Request(ctx context.Context, method, path string, query url.Val
 			Body:       string(responseBody),
 		}
 	}
-	return json.RawMessage(responseBody), nil
+	return &Response{
+		Body:       json.RawMessage(responseBody),
+		Pagination: parsePagination(resp.Header),
+		RequestID:  resp.Header.Get("x-request-id"),
+	}, nil
 }
 
 func (c *Client) resolveURL(path string, query url.Values) string {
 	u := *c.baseURL
-	u.Path = strings.TrimRight(u.Path, "/") + "/" + strings.TrimLeft(path, "/")
+	escapedPath := joinEscapedPath(c.baseURL.EscapedPath(), path)
+	decodedPath, err := url.PathUnescape(escapedPath)
+	if err == nil {
+		u.Path = decodedPath
+		u.RawPath = escapedPath
+	} else {
+		u.Path = strings.TrimRight(u.Path, "/") + "/" + strings.TrimLeft(path, "/")
+		u.RawPath = ""
+	}
 	u.RawQuery = query.Encode()
 	return u.String()
+}
+
+func joinEscapedPath(basePath, path string) string {
+	basePath = strings.TrimRight(basePath, "/")
+	path = strings.TrimLeft(path, "/")
+	if basePath == "" {
+		return "/" + path
+	}
+	if path == "" {
+		return basePath
+	}
+	return basePath + "/" + path
 }
 
 func prettyJSON(raw json.RawMessage) string {
@@ -138,4 +189,72 @@ func prettyJSON(raw json.RawMessage) string {
 		return string(raw)
 	}
 	return string(formatted)
+}
+
+func prettyResponseJSON(resp *Response) string {
+	var data any
+	if err := json.Unmarshal(resp.Body, &data); err != nil {
+		data = string(resp.Body)
+	}
+
+	payload := map[string]any{"data": data}
+	if resp.Pagination != nil {
+		payload["pagination"] = resp.Pagination
+	}
+	if resp.RequestID != "" {
+		payload["requestId"] = resp.RequestID
+	}
+	formatted, err := json.MarshalIndent(payload, "", "  ")
+	if err != nil {
+		return prettyJSON(resp.Body)
+	}
+	return string(formatted)
+}
+
+func parsePagination(header http.Header) *Pagination {
+	pagination := &Pagination{
+		Page:       parseHeaderInt(header, "x-page"),
+		PerPage:    parseHeaderInt(header, "x-per-page"),
+		PrevPage:   parseHeaderInt(header, "x-prev-page"),
+		NextPage:   parseHeaderInt(header, "x-next-page"),
+		Total:      parseHeaderInt(header, "x-total"),
+		TotalPages: parseHeaderInt(header, "x-total-pages"),
+	}
+	if pagination.Page == 0 &&
+		pagination.PerPage == 0 &&
+		pagination.PrevPage == 0 &&
+		pagination.NextPage == 0 &&
+		pagination.Total == 0 &&
+		pagination.TotalPages == 0 {
+		return nil
+	}
+	return pagination
+}
+
+func parseHeaderInt(header http.Header, key string) int {
+	value := header.Get(key)
+	if value == "" {
+		return 0
+	}
+	parsed, err := strconv.Atoi(value)
+	if err != nil {
+		return 0
+	}
+	return parsed
+}
+
+func EncodeRepositoryID(repositoryID string) string {
+	repositoryID = strings.TrimSpace(repositoryID)
+	if repositoryID == "" {
+		return ""
+	}
+	if strings.Contains(repositoryID, "%2F") || strings.Contains(repositoryID, "%2f") {
+		return repositoryID
+	}
+	if !strings.Contains(repositoryID, "/") {
+		return url.PathEscape(repositoryID)
+	}
+
+	parts := strings.SplitN(repositoryID, "/", 2)
+	return url.PathEscape(parts[0]) + "%2F" + url.PathEscape(parts[1])
 }
