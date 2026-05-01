@@ -72,6 +72,89 @@ func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map
 	return marshalPretty(summary)
 }
 
+func handleGetProjectWorkitemContext(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, projectID, err := requiredOrganizationAndID(params)
+	if err != nil {
+		return "", err
+	}
+	category, err := requiredString(params, "category")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	projectPath := projexProjectPath(organizationID, projectID)
+	payload := map[string]any{"filters": projectWorkitemContextFilters(params, category)}
+	if err := addProjectWorkitemContextBaseSections(ctx, c, payload, params, projectPath, category); err != nil {
+		return "", err
+	}
+	if err := addProjectWorkitemTypeContext(ctx, c, payload, params, projectPath); err != nil {
+		return "", err
+	}
+	return marshalPretty(payload)
+}
+
+func addProjectWorkitemContextBaseSections(ctx context.Context, c *Client, payload map[string]any, params map[string]any, projectPath, category string) error {
+	typeQuery := url.Values{}
+	typeQuery.Set("category", category)
+	types, err := getProjectOverviewSection(ctx, c, "workItemTypes", projectPath+"/workitemTypes", typeQuery)
+	if err != nil {
+		return err
+	}
+	payload["workItemTypes"] = types
+
+	if optionalBoolDefault(params, "includeMembers", true) {
+		members, err := getProjectOverviewSection(ctx, c, "members", projectPath+"/members", nil)
+		if err != nil {
+			return err
+		}
+		payload["members"] = members
+	}
+	if optionalBoolDefault(params, "includeLabels", true) {
+		labels, err := getProjectOverviewSection(ctx, c, "labels", projectPath+"/labels", projectOverviewListQuery(params, false))
+		if err != nil {
+			return err
+		}
+		payload["labels"] = labels
+	}
+	return nil
+}
+
+func addProjectWorkitemTypeContext(ctx context.Context, c *Client, payload map[string]any, params map[string]any, projectPath string) error {
+	workItemTypeID, _ := params["workItemTypeId"].(string)
+	if strings.TrimSpace(workItemTypeID) == "" {
+		return nil
+	}
+	typePath := projectPath + "/workitemTypes/" + url.PathEscape(strings.TrimSpace(workItemTypeID))
+	if optionalBoolDefault(params, "includeFields", true) {
+		fields, err := getProjectOverviewSection(ctx, c, "fields", typePath+"/fields", nil)
+		if err != nil {
+			return err
+		}
+		payload["fields"] = fields
+	}
+	if optionalBoolDefault(params, "includeWorkflow", true) {
+		workflow, err := getProjectOverviewSection(ctx, c, "workflow", typePath+"/workflows", nil)
+		if err != nil {
+			return err
+		}
+		payload["workflow"] = workflow
+	}
+	return nil
+}
+
+func projectWorkitemContextFilters(params map[string]any, category string) map[string]any {
+	return map[string]any{
+		"category":       category,
+		"workItemTypeId": optionalStringDefault(params, "workItemTypeId", ""),
+		"page":           optionalIntDefault(params, "page", 1),
+		"perPage":        optionalIntDefault(params, "perPage", 20),
+	}
+}
+
 func searchProjectWorkitemSummaryCategory(ctx context.Context, c *Client, organizationID, projectID, category string, params map[string]any) (any, error) {
 	body := projectWorkitemSummaryBody(projectID, category, params)
 	path := projexOrganizationPath(organizationID) + "/workitems:search"

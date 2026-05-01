@@ -165,3 +165,74 @@ func TestHandleGetProjectWorkitemSummaryRejectsEmptyCategories(t *testing.T) {
 		t.Fatal("handleGetProjectWorkitemSummary() expected missing categories error")
 	}
 }
+
+func TestHandleGetProjectWorkitemContextBuildsMetadataRequests(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		requestPath := r.URL.EscapedPath()
+		seen[requestPath] = true
+
+		switch requestPath {
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes":
+			if r.URL.Query().Get("category") != "Task" {
+				t.Fatalf("query = %q", r.URL.RawQuery)
+			}
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/members":
+			_, _ = w.Write([]byte(`[{"id":"user-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/labels":
+			if r.URL.Query().Get("page") != "2" || r.URL.Query().Get("perPage") != "10" {
+				t.Fatalf("query = %q", r.URL.RawQuery)
+			}
+			_, _ = w.Write([]byte(`[{"id":"label-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes/type%2F1/fields":
+			_, _ = w.Write([]byte(`[{"fieldIdentifier":"status"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes/type%2F1/workflows":
+			_, _ = w.Write([]byte(`{"id":"workflow-1"}`))
+		default:
+			t.Fatalf("unexpected path = %q", requestPath)
+		}
+	})
+
+	result, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"category":       "Task",
+		"workItemTypeId": "type/1",
+		"page":           float64(2),
+		"perPage":        float64(10),
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemContext() error = %v", err)
+	}
+	for _, path := range []string{
+		"/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes",
+		"/oapi/v1/projex/organizations/org-1/projects/project-1/members",
+		"/oapi/v1/projex/organizations/org-1/projects/project-1/labels",
+		"/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes/type%2F1/fields",
+		"/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes/type%2F1/workflows",
+	} {
+		if !seen[path] {
+			t.Fatalf("missing request to %s", path)
+		}
+	}
+	if !strings.Contains(result, `"workItemTypes"`) || !strings.Contains(result, `"workflow"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleGetProjectWorkitemContextRequiresCategory(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without category")
+	})
+
+	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemContext() expected missing category error")
+	}
+}

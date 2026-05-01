@@ -45,5 +45,22 @@ func projexEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetProjectWorkitemSummary,
 		},
+		{
+			Tool: mcp.NewTool("get_project_workitem_context",
+				mcp.WithDescription("Get project work item metadata context: types, labels, members, and optional fields/workflow for one type."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Req, Task, Bug, or Risk.")),
+				mcp.WithString("workItemTypeId", mcp.Description("Optional work item type ID for field and workflow metadata.")),
+				mcp.WithBoolean("includeMembers", mcp.Description("Whether to include project members. Defaults to true.")),
+				mcp.WithBoolean("includeLabels", mcp.Description("Whether to include project labels. Defaults to true.")),
+				mcp.WithBoolean("includeFields", mcp.Description("Whether to include field configuration when workItemTypeId is set. Defaults to true.")),
+				mcp.WithBoolean("includeWorkflow", mcp.Description("Whether to include workflow metadata when workItemTypeId is set. Defaults to true.")),
+				mcp.WithNumber("page", mcp.Description("Page number for labels. Defaults to 1.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size for labels. Defaults to 20.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetProjectWorkitemContext,
+		},
 	}
 }
