@@ -133,6 +133,7 @@ func expectedProjexToolNames() []string {
 		"search_projects",
 		"get_project",
 		"get_project_overview",
+		"get_project_workitem_summary",
 		"list_project_members",
 		"list_project_templates",
 		"get_project_template_field_config",

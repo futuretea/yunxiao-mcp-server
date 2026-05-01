@@ -101,3 +101,67 @@ func TestHandleGetProjectOverviewHonorsIncludeFlags(t *testing.T) {
 		}
 	}
 }
+
+func TestHandleGetProjectWorkitemSummarySearchesCategories(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems:search" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		category, _ := body["category"].(string)
+		if category != "Task" && category != "Bug" {
+			t.Fatalf("category = %#v", body["category"])
+		}
+		seen[category] = true
+		if body["spaceId"] != "project-1" || body["page"].(float64) != 1 || body["perPage"].(float64) != 3 {
+			t.Fatalf("body = %#v", body)
+		}
+		conditions, _ := body["conditions"].(string)
+		if !strings.Contains(conditions, `"fieldIdentifier":"status"`) ||
+			!strings.Contains(conditions, `"fieldIdentifier":"assignedTo"`) {
+			t.Fatalf("conditions = %q", conditions)
+		}
+		w.Header().Set("x-total", "2")
+		_, _ = w.Write([]byte(`[{"id":"workitem-1"}]`))
+	})
+
+	result, err := handleGetProjectWorkitemSummary(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"categories":     "Task,Bug",
+		"status":         "open,doing",
+		"assignedTo":     "user-1",
+		"sampleLimit":    float64(3),
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemSummary() error = %v", err)
+	}
+	if !seen["Task"] || !seen["Bug"] {
+		t.Fatalf("seen = %#v", seen)
+	}
+	if !strings.Contains(result, `"Task"`) || !strings.Contains(result, `"pagination"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleGetProjectWorkitemSummaryRejectsEmptyCategories(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without categories")
+	})
+
+	if _, err := handleGetProjectWorkitemSummary(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"categories":     ", ,",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemSummary() expected missing categories error")
+	}
+}

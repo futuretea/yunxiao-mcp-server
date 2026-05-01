@@ -41,6 +41,90 @@ func handleGetProjectOverview(ctx context.Context, client any, params map[string
 	return marshalPretty(overview)
 }
 
+func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, projectID, err := requiredOrganizationAndID(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	categories := splitCSV(optionalStringDefault(params, "categories", "Req,Task,Bug,Risk"))
+	if len(categories) == 0 {
+		return "", fmt.Errorf("categories must include at least one category")
+	}
+
+	summary := map[string]any{
+		"filters":    projectWorkitemSummaryFilters(params, categories),
+		"categories": map[string]any{},
+	}
+	categoryPayloads := summary["categories"].(map[string]any)
+	for _, category := range categories {
+		payload, err := searchProjectWorkitemSummaryCategory(ctx, c, organizationID, projectID, category, params)
+		if err != nil {
+			return "", err
+		}
+		categoryPayloads[category] = payload
+	}
+
+	return marshalPretty(summary)
+}
+
+func searchProjectWorkitemSummaryCategory(ctx context.Context, c *Client, organizationID, projectID, category string, params map[string]any) (any, error) {
+	body := projectWorkitemSummaryBody(projectID, category, params)
+	path := projexOrganizationPath(organizationID) + "/workitems:search"
+	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", category, err)
+	}
+	return responsePayload(resp), nil
+}
+
+func projectWorkitemSummaryBody(projectID, category string, params map[string]any) map[string]any {
+	body := map[string]any{
+		"category": category,
+		"spaceId":  projectID,
+		"page":     1,
+		"perPage":  normalizedSampleLimit(params),
+	}
+	setOptionalStringBody(body, params, "conditions")
+	setOptionalStringBody(body, params, "orderBy")
+	setOptionalStringBody(body, params, "sort")
+	if body["conditions"] == nil {
+		if conditions := buildWorkitemConditions(params); conditions != "" {
+			body["conditions"] = conditions
+		}
+	}
+	return body
+}
+
+func projectWorkitemSummaryFilters(params map[string]any, categories []string) map[string]any {
+	return map[string]any{
+		"categories":  categories,
+		"subject":     optionalStringDefault(params, "subject", ""),
+		"status":      optionalStringDefault(params, "status", ""),
+		"assignedTo":  optionalStringDefault(params, "assignedTo", ""),
+		"creator":     optionalStringDefault(params, "creator", ""),
+		"tag":         optionalStringDefault(params, "tag", ""),
+		"orderBy":     optionalStringDefault(params, "orderBy", ""),
+		"sort":        optionalStringDefault(params, "sort", ""),
+		"sampleLimit": normalizedSampleLimit(params),
+	}
+}
+
+func normalizedSampleLimit(params map[string]any) int {
+	limit := optionalIntDefault(params, "sampleLimit", 5)
+	if limit < 0 {
+		return 0
+	}
+	if limit > 200 {
+		return 200
+	}
+	return limit
+}
+
 type projectOverviewSection struct {
 	flag  string
 	name  string
