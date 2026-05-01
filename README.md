@@ -160,6 +160,9 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `get_department_usage`
   - `list_developer_members`
   - `get_developer_usage`
+  - `list_knowledge_bases`
+  - `list_kb_files`
+  - `list_kb_members`
 
 ## 快速开始
 

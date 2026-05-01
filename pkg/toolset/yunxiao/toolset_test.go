@@ -220,5 +220,8 @@ func expectedLingmaToolNames() []string {
 		"get_department_usage",
 		"list_developer_members",
 		"get_developer_usage",
+		"list_knowledge_bases",
+		"list_kb_files",
+		"list_kb_members",
 	}
 }
