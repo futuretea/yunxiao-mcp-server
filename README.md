@@ -67,6 +67,11 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_work_item_comments`
   - `list_applications`
   - `get_application`
+  - `list_change_order_versions`
+  - `get_change_order`
+  - `list_change_order_job_logs`
+  - `find_task_operation_log`
+  - `list_change_orders_by_origin`
 
 ## 快速开始
 

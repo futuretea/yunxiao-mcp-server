@@ -61,6 +61,11 @@ func TestToolsetIncludesBaseReadTools(t *testing.T) {
 		"list_work_item_comments",
 		"list_applications",
 		"get_application",
+		"list_change_order_versions",
+		"get_change_order",
+		"list_change_order_job_logs",
+		"find_task_operation_log",
+		"list_change_orders_by_origin",
 	}
 	if len(tools) != len(wantTools) {
 		t.Fatalf("tool count = %d, want %d", len(tools), len(wantTools))
