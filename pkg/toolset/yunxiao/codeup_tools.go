@@ -7,8 +7,9 @@ import (
 )
 
 func codeupTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 18)
+	tools := make([]toolset.ServerTool, 0, 24)
 	tools = append(tools, codeupRepositoryTools()...)
+	tools = append(tools, codeupRepositoryMetadataTools()...)
 	tools = append(tools, codeupFileAndCommitTools()...)
 	tools = append(tools, codeupChangeRequestTools()...)
 	return tools
