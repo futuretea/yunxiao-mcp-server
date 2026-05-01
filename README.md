@@ -161,6 +161,7 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_release_products`
   - `list_attached_change_requests`
   - `list_release_executions`
+  - `search_releases`
   - `get_appstack_change_request_audit_items`
   - `list_appstack_change_request_executions`
   - `list_appstack_change_request_work_items`
