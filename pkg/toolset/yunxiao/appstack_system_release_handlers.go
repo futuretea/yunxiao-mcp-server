@@ -60,6 +60,50 @@ func handleListReleaseProducts(ctx context.Context, client any, params map[strin
 	return c.GetJSON(ctx, path, nil)
 }
 
+func handleListAttachedChangeRequests(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, systemName, releaseSn, err := requiredSystemReleaseWithKey(params, "releaseSn")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	path := appstackSystemReleasePath(organizationID, systemName, releaseSn) + "/changeRequests"
+	return c.GetJSON(ctx, path, appstackDefaultPageQuery(params))
+}
+
+func handleListReleaseExecutions(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, systemName, sn, err := requiredSystemRelease(params)
+	if err != nil {
+		return "", err
+	}
+	releaseWorkflowSn, err := requiredString(params, "releaseWorkflowSn")
+	if err != nil {
+		return "", err
+	}
+	releaseStageSn, err := requiredString(params, "releaseStageSn")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	query := url.Values{}
+	query.Set("releaseWorkflowSn", releaseWorkflowSn)
+	query.Set("releaseStageSn", releaseStageSn)
+	setOptionalInt(query, params, "perPage")
+	setOptionalInt(query, params, "page")
+	setOptionalString(query, params, "orderBy")
+	setOptionalString(query, params, "sort")
+
+	path := appstackSystemReleasePath(organizationID, systemName, sn) + "/executions"
+	return c.GetJSON(ctx, path, query)
+}
+
 func requiredOrganizationAndSystem(params map[string]any) (string, string, error) {
 	organizationID, err := requiredString(params, "organizationId")
 	if err != nil {
@@ -73,11 +117,15 @@ func requiredOrganizationAndSystem(params map[string]any) (string, string, error
 }
 
 func requiredSystemRelease(params map[string]any) (string, string, string, error) {
+	return requiredSystemReleaseWithKey(params, "sn")
+}
+
+func requiredSystemReleaseWithKey(params map[string]any, releaseKey string) (string, string, string, error) {
 	organizationID, systemName, err := requiredOrganizationAndSystem(params)
 	if err != nil {
 		return "", "", "", err
 	}
-	sn, err := requiredString(params, "sn")
+	sn, err := requiredString(params, releaseKey)
 	if err != nil {
 		return "", "", "", err
 	}
