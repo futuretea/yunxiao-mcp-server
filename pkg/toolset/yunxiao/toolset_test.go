@@ -80,6 +80,8 @@ func expectedCodeUpToolNames() []string {
 		"list_namespaces",
 		"get_namespace",
 		"get_org_namespace",
+		"list_group_members",
+		"get_member_https_clone_username",
 		"list_ssh_keys",
 		"get_ssh_key",
 		"list_user_ssh_keys",
