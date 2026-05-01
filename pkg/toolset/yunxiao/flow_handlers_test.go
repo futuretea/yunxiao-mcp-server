@@ -134,3 +134,79 @@ func TestFlowHandlersRequirePipelineParams(t *testing.T) {
 		t.Fatal("handleGetPipelineRun() expected missing pipelineRunId error")
 	}
 }
+
+func TestHandleListPipelineJobsByCategoryBuildsPath(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/flow/organizations/org-1/pipelines/pipe-1/listTasksByCategory/DEPLOY" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`[{"identifier":"job-1"}]`))
+	})
+
+	if _, err := handleListPipelineJobsByCategory(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"pipelineId":     "pipe-1",
+		"category":       "DEPLOY",
+	}); err != nil {
+		t.Fatalf("handleListPipelineJobsByCategory() error = %v", err)
+	}
+}
+
+func TestHandleListPipelineJobHistorysBuildsPathAndQuery(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/flow/organizations/org-1/pipelines/getComponentsWithoutButtons" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		if r.URL.Query().Get("pipelineId") != "pipe-1" ||
+			r.URL.Query().Get("category") != "DEPLOY" ||
+			r.URL.Query().Get("identifier") != "job-1" ||
+			r.URL.Query().Get("page") != "2" ||
+			r.URL.Query().Get("perPage") != "10" {
+			t.Fatalf("query = %q", r.URL.RawQuery)
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[{"jobId":1}]`))
+	})
+
+	result, err := handleListPipelineJobHistorys(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"pipelineId":     "pipe-1",
+		"category":       "DEPLOY",
+		"identifier":     "job-1",
+		"page":           float64(2),
+		"perPage":        float64(10),
+	})
+	if err != nil {
+		t.Fatalf("handleListPipelineJobHistorys() error = %v", err)
+	}
+	if !strings.Contains(result, `"pagination"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleGetPipelineJobRunLogBuildsPath(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/flow/organizations/org-1/pipelines/pipe-1/runs/run-1/job/job-1/log" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"content":"ok"}`))
+	})
+
+	if _, err := handleGetPipelineJobRunLog(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"pipelineId":     "pipe-1",
+		"pipelineRunId":  "run-1",
+		"jobId":          "job-1",
+	}); err != nil {
+		t.Fatalf("handleGetPipelineJobRunLog() error = %v", err)
+	}
+}

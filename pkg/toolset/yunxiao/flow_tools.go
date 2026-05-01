@@ -7,9 +7,10 @@ import (
 )
 
 func flowTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 5)
+	tools := make([]toolset.ServerTool, 0, 8)
 	tools = append(tools, flowPipelineTools()...)
 	tools = append(tools, flowPipelineRunTools()...)
+	tools = append(tools, flowPipelineJobTools()...)
 	return tools
 }
 
@@ -108,6 +109,45 @@ func flowPipelineRunTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetLatestPipelineRun,
+		},
+	}
+}
+
+func flowPipelineJobTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("list_pipeline_jobs_by_category",
+				mcp.WithDescription("List Flow pipeline jobs by task category."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
+				mcp.WithString("category", mcp.Required(), mcp.Description("Task category, currently DEPLOY.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListPipelineJobsByCategory,
+		},
+		{
+			Tool: mcp.NewTool("list_pipeline_job_historys",
+				mcp.WithDescription("List Flow pipeline job execution history."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
+				mcp.WithString("category", mcp.Required(), mcp.Description("Task category, currently DEPLOY.")),
+				mcp.WithString("identifier", mcp.Required(), mcp.Description("Pipeline job identifier.")),
+				mcp.WithNumber("page", mcp.Description("Page number.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size. Yunxiao supports up to 30.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListPipelineJobHistorys,
+		},
+		{
+			Tool: mcp.NewTool("get_pipeline_job_run_log",
+				mcp.WithDescription("Get a Flow pipeline job run log."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
+				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID.")),
+				mcp.WithString("jobId", mcp.Required(), mcp.Description("Pipeline job ID.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipelineJobRunLog,
 		},
 	}
 }

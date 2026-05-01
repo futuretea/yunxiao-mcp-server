@@ -46,6 +46,9 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_pipeline_runs`
   - `get_pipeline_run`
   - `get_latest_pipeline_run`
+  - `list_pipeline_jobs_by_category`
+  - `list_pipeline_job_historys`
+  - `get_pipeline_job_run_log`
   - `search_projects`
   - `get_project`
   - `search_workitems`
