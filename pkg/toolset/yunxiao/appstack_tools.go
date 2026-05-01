@@ -7,11 +7,12 @@ import (
 )
 
 func appstackTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 22)
+	tools := make([]toolset.ServerTool, 0, 25)
 	tools = append(tools, appstackApplicationTools()...)
 	tools = append(tools, appstackVariableGroupTools()...)
 	tools = append(tools, appstackOrchestrationTools()...)
 	tools = append(tools, appstackAppReleaseWorkflowTools()...)
+	tools = append(tools, appstackChangeRequestTools()...)
 	tools = append(tools, appstackChangeOrderTools()...)
 	return tools
 }
@@ -229,6 +230,48 @@ func appstackAppReleaseStageExecutionTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetAppReleaseStagePipelineJobLog,
+		},
+	}
+}
+
+func appstackChangeRequestTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("get_appstack_change_request_audit_items",
+				mcp.WithDescription("Get audit items for an AppStack change request."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("sn", mcp.Required(), mcp.Description("Change request serial number.")),
+				mcp.WithString("refType", mcp.Required(), mcp.Description("Reference type, such as CR.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppStackChangeRequestAuditItems,
+		},
+		{
+			Tool: mcp.NewTool("list_appstack_change_request_executions",
+				mcp.WithDescription("List execution records for an AppStack change request."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("sn", mcp.Required(), mcp.Description("Change request serial number.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size, up to 100.")),
+				mcp.WithNumber("page", mcp.Description("Page number.")),
+				mcp.WithString("orderBy", mcp.Description("Sort field: id or gmtCreate.")),
+				mcp.WithString("sort", mcp.Description("Sort direction: asc or desc.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppStackChangeRequestExecutions,
+		},
+		{
+			Tool: mcp.NewTool("list_appstack_change_request_work_items",
+				mcp.WithDescription("List work items for an AppStack change request."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("sn", mcp.Required(), mcp.Description("Change request serial number.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListAppStackChangeRequestWorkItems,
 		},
 	}
 }

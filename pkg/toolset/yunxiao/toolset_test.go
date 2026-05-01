@@ -28,6 +28,17 @@ func TestToolsetIncludesBaseReadTools(t *testing.T) {
 }
 
 func expectedToolNames() []string {
+	var names []string
+	names = append(names, expectedPlatformToolNames()...)
+	names = append(names, expectedCodeUpToolNames()...)
+	names = append(names, expectedFlowToolNames()...)
+	names = append(names, expectedProjexToolNames()...)
+	names = append(names, expectedPackageToolNames()...)
+	names = append(names, expectedAppStackToolNames()...)
+	return names
+}
+
+func expectedPlatformToolNames() []string {
 	return []string{
 		"get_current_user",
 		"get_current_organization_info",
@@ -44,6 +55,11 @@ func expectedToolNames() []string {
 		"list_organization_roles",
 		"get_organization_role",
 		"list_users",
+	}
+}
+
+func expectedCodeUpToolNames() []string {
+	return []string{
 		"list_repositories",
 		"get_repository",
 		"list_branches",
@@ -59,6 +75,11 @@ func expectedToolNames() []string {
 		"get_change_request_tree",
 		"list_change_request_comments",
 		"get_change_request_comment",
+	}
+}
+
+func expectedFlowToolNames() []string {
+	return []string{
 		"list_pipelines",
 		"get_pipeline",
 		"list_pipeline_runs",
@@ -67,13 +88,15 @@ func expectedToolNames() []string {
 		"list_pipeline_jobs_by_category",
 		"list_pipeline_job_historys",
 		"get_pipeline_job_run_log",
+	}
+}
+
+func expectedProjexToolNames() []string {
+	return []string{
 		"search_projects",
 		"get_project",
 		"search_workitems",
 		"get_workitem",
-		"list_package_repositories",
-		"list_artifacts",
-		"get_artifact",
 		"get_sprint",
 		"list_sprints",
 		"list_all_work_item_types",
@@ -83,6 +106,19 @@ func expectedToolNames() []string {
 		"get_work_item_type_field_config",
 		"get_work_item_workflow",
 		"list_work_item_comments",
+	}
+}
+
+func expectedPackageToolNames() []string {
+	return []string{
+		"list_package_repositories",
+		"list_artifacts",
+		"get_artifact",
+	}
+}
+
+func expectedAppStackToolNames() []string {
+	return []string{
 		"list_applications",
 		"get_application",
 		"get_env_variable_groups",
@@ -100,6 +136,9 @@ func expectedToolNames() []string {
 		"list_app_release_stage_exec_metadata",
 		"get_app_release_stage_pipeline_run",
 		"get_app_release_stage_pipeline_job_log",
+		"get_appstack_change_request_audit_items",
+		"list_appstack_change_request_executions",
+		"list_appstack_change_request_work_items",
 		"list_change_order_versions",
 		"get_change_order",
 		"list_change_order_job_logs",
