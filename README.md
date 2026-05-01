@@ -91,6 +91,10 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_current_user_effort_records`
   - `list_effort_records`
   - `list_estimated_efforts`
+  - `list_workitem_attachments`
+  - `get_workitem_file`
+  - `list_workitem_relation_records`
+  - `list_labels`
   - `get_work_item_type_field_config`
   - `get_work_item_workflow`
   - `list_work_item_comments`
