@@ -161,18 +161,22 @@ func TestHandleSearchWorkitemsBuildsBody(t *testing.T) {
 			t.Fatalf("unmarshal conditions: %v", err)
 		}
 		assertConditionFormat(t, parsedConditions.ConditionGroups, "tag", "multiList")
+		assertConditionFormat(t, parsedConditions.ConditionGroups, "priority", "list")
+		assertConditionFormat(t, parsedConditions.ConditionGroups, "finishTime", "input")
 		w.Header().Set("x-total", "1")
 		_, _ = w.Write([]byte(`[{"id":"workitem-1"}]`))
 	})
 
 	if _, err := handleSearchWorkitems(context.Background(), client, map[string]any{
-		"organizationId": "org-1",
-		"category":       "Task",
-		"spaceId":        "project-1",
-		"subject":        "demo",
-		"assignedTo":     "user-1,user-2",
-		"tag":            "tag-1,tag-2",
-		"sort":           "desc",
+		"organizationId":   "org-1",
+		"category":         "Task",
+		"spaceId":          "project-1",
+		"subject":          "demo",
+		"assignedTo":       "user-1,user-2",
+		"tag":              "tag-1,tag-2",
+		"priority":         "high",
+		"finishTimeBefore": "2026-05-01",
+		"sort":             "desc",
 	}); err != nil {
 		t.Fatalf("handleSearchWorkitems() error = %v", err)
 	}

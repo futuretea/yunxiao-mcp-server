@@ -7,7 +7,7 @@ import (
 )
 
 func projexEnhancedTools() []toolset.ServerTool {
-	return []toolset.ServerTool{
+	tools := []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("get_project_overview",
 				mcp.WithDescription("Get a compact Projex project overview with common project-management lists in one read-only call."),
@@ -63,4 +63,6 @@ func projexEnhancedTools() []toolset.ServerTool {
 			Handler: handleGetProjectWorkitemContext,
 		},
 	}
+	tools = append(tools, projexInsightTools()...)
+	return tools
 }

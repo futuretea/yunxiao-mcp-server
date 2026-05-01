@@ -7,7 +7,7 @@ import (
 )
 
 func projexTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 39)
+	tools := make([]toolset.ServerTool, 0, 41)
 	tools = append(tools, projexProjectTools()...)
 	tools = append(tools, projexEnhancedTools()...)
 	tools = append(tools, projexProjectMetadataTools()...)
@@ -93,6 +93,19 @@ func projexWorkitemTools() []toolset.ServerTool {
 				mcp.WithString("assignedTo", mcp.Description("Comma-separated assignee user IDs.")),
 				mcp.WithString("creator", mcp.Description("Comma-separated creator user IDs.")),
 				mcp.WithString("tag", mcp.Description("Comma-separated tag IDs.")),
+				mcp.WithString("sprint", mcp.Description("Comma-separated sprint IDs.")),
+				mcp.WithString("workitemType", mcp.Description("Comma-separated work item type IDs.")),
+				mcp.WithString("statusStage", mcp.Description("Comma-separated status stage IDs.")),
+				mcp.WithString("priority", mcp.Description("Comma-separated priority IDs.")),
+				mcp.WithString("subjectDescription", mcp.Description("Subject or description contains filter.")),
+				mcp.WithString("createdAfter", mcp.Description("Created date lower bound, YYYY-MM-DD or datetime.")),
+				mcp.WithString("createdBefore", mcp.Description("Created date upper bound, YYYY-MM-DD or datetime.")),
+				mcp.WithString("updatedAfter", mcp.Description("Updated date lower bound, YYYY-MM-DD or datetime.")),
+				mcp.WithString("updatedBefore", mcp.Description("Updated date upper bound, YYYY-MM-DD or datetime.")),
+				mcp.WithString("finishTimeAfter", mcp.Description("Planned finish date lower bound, YYYY-MM-DD or datetime.")),
+				mcp.WithString("finishTimeBefore", mcp.Description("Planned finish date upper bound, YYYY-MM-DD or datetime.")),
+				mcp.WithString("updateStatusAtAfter", mcp.Description("Status update date lower bound, YYYY-MM-DD or datetime.")),
+				mcp.WithString("updateStatusAtBefore", mcp.Description("Status update date upper bound, YYYY-MM-DD or datetime.")),
 				mcp.WithString("conditions", mcp.Description("Advanced conditions JSON string. Overrides simple filters.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field. Defaults are controlled by Yunxiao.")),
 				mcp.WithString("sort", mcp.Description("Sort direction: asc or desc.")),

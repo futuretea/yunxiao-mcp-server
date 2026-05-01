@@ -95,9 +95,28 @@ func buildWorkitemConditions(params map[string]any) string {
 	if creator, _ := params["creator"].(string); creator != "" {
 		filterConditions = append(filterConditions, listContainsCondition("creator", "user", splitCSV(creator)))
 	}
+	if sprint, _ := params["sprint"].(string); sprint != "" {
+		filterConditions = append(filterConditions, listContainsCondition("sprint", "sprint", splitCSV(sprint)))
+	}
+	if workitemType, _ := params["workitemType"].(string); workitemType != "" {
+		filterConditions = append(filterConditions, listContainsCondition("workitemType", "workitemType", splitCSV(workitemType)))
+	}
+	if statusStage, _ := params["statusStage"].(string); statusStage != "" {
+		filterConditions = append(filterConditions, listContainsCondition("statusStage", "statusStage", splitCSV(statusStage)))
+	}
 	if tag, _ := params["tag"].(string); tag != "" {
 		filterConditions = append(filterConditions, containsCondition("tag", "tag", "multiList", splitCSV(tag)))
 	}
+	if priority, _ := params["priority"].(string); priority != "" {
+		filterConditions = append(filterConditions, listContainsCondition("priority", "option", splitCSV(priority)))
+	}
+	if subjectDescription, _ := params["subjectDescription"].(string); subjectDescription != "" {
+		filterConditions = append(filterConditions, stringContainsCondition("subject-description", subjectDescription))
+	}
+	filterConditions = appendDateRangeCondition(filterConditions, "gmtCreate", "dateTime", params, "createdAfter", "createdBefore")
+	filterConditions = appendDateRangeCondition(filterConditions, "gmtModified", "dateTime", params, "updatedAfter", "updatedBefore")
+	filterConditions = appendDateRangeCondition(filterConditions, "finishTime", "date", params, "finishTimeAfter", "finishTimeBefore")
+	filterConditions = appendDateRangeCondition(filterConditions, "updateStatusAt", "date", params, "updateStatusAtAfter", "updateStatusAtBefore")
 	if len(filterConditions) == 0 {
 		return ""
 	}
@@ -128,6 +147,45 @@ func containsCondition(fieldIdentifier, className, format string, values []strin
 		"toValue":         nil,
 		"value":           values,
 	}
+}
+
+func appendDateRangeCondition(filterConditions []map[string]any, fieldIdentifier, className string, params map[string]any, afterKey, beforeKey string) []map[string]any {
+	after, _ := params[afterKey].(string)
+	before, _ := params[beforeKey].(string)
+	after = strings.TrimSpace(after)
+	before = strings.TrimSpace(before)
+	if after == "" && before == "" {
+		return filterConditions
+	}
+	if after == "" {
+		after = "1970-01-01"
+	}
+	var toValue any
+	if before != "" {
+		toValue = endOfDay(before)
+	}
+	return append(filterConditions, map[string]any{
+		"className":       className,
+		"fieldIdentifier": fieldIdentifier,
+		"format":          "input",
+		"operator":        "BETWEEN",
+		"toValue":         toValue,
+		"value":           []string{startOfDay(after)},
+	})
+}
+
+func startOfDay(value string) string {
+	if len(value) == len("2006-01-02") {
+		return value + " 00:00:00"
+	}
+	return value
+}
+
+func endOfDay(value string) string {
+	if len(value) == len("2006-01-02") {
+		return value + " 23:59:59"
+	}
+	return value
 }
 
 func marshalConditions(filterConditions []map[string]any) string {
