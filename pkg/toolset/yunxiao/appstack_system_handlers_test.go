@@ -47,3 +47,22 @@ func TestHandleListAttachedAppsBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleListAttachedApps() error = %v", err)
 	}
 }
+
+func TestHandleListSystemMembersBuildsPathAndDefaultQuery(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.RequestURI != "/oapi/v1/appstack/organizations/org-1/systems/system%2F1/members?current=1&pageSize=10" {
+			t.Fatalf("RequestURI = %q", r.RequestURI)
+		}
+		_, _ = w.Write([]byte(`{"records":[]}`))
+	})
+
+	if _, err := handleListSystemMembers(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"systemName":     "system/1",
+	}); err != nil {
+		t.Fatalf("handleListSystemMembers() error = %v", err)
+	}
+}

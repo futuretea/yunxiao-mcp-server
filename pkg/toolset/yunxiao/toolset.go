@@ -16,7 +16,7 @@ func (t *Toolset) GetDescription() string {
 }
 
 func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 101)
+	tools := make([]toolset.ServerTool, 0, 102)
 	tools = append(tools, platformTools()...)
 	tools = append(tools, codeupTools()...)
 	tools = append(tools, flowTools()...)

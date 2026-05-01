@@ -33,6 +33,20 @@ func handleListAttachedApps(ctx context.Context, client any, params map[string]a
 	return c.GetJSON(ctx, path, appstackDefaultPageQuery(params))
 }
 
+func handleListSystemMembers(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, systemName, err := requiredOrganizationAndSystem(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	path := appstackSystemPath(organizationID, systemName) + "/members"
+	return c.GetJSON(ctx, path, appstackDefaultPageQuery(params))
+}
+
 func appstackDefaultPageQuery(params map[string]any) url.Values {
 	query := url.Values{}
 	query.Set("current", "1")

@@ -29,5 +29,16 @@ func appstackSystemTools() []toolset.ServerTool {
 			),
 			Handler: handleListAttachedApps,
 		},
+		{
+			Tool: mcp.NewTool("list_system_members",
+				mcp.WithDescription("List members of an AppStack system."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("systemName", mcp.Required(), mcp.Description("System name.")),
+				mcp.WithNumber("current", mcp.Description("Current page number. Defaults to 1.")),
+				mcp.WithNumber("pageSize", mcp.Description("Page size. Defaults to 10.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListSystemMembers,
+		},
 	}
 }

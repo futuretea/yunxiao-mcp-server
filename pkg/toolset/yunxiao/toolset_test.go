@@ -152,6 +152,7 @@ func expectedAppStackToolNames() []string {
 		"get_app_release_stage_pipeline_job_log",
 		"list_systems",
 		"list_attached_apps",
+		"list_system_members",
 		"list_system_release_workflows",
 		"get_release",
 		"list_release_members",
