@@ -214,6 +214,8 @@ docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> yunxiao-mc
 
 MCP client 配置示例见 [docs/mcp-client-config.md](docs/mcp-client-config.md)。
 
+GA 边界、验证门禁和暂缓暴露的 OpenAPI endpoint 见 [docs/ga-readiness.md](docs/ga-readiness.md)。
+
 ## 配置
 
 配置优先级为 programmatic explicit values > flag > environment > config file > defaults。普通运行只会用到 flag 及其之后的层级；programmatic explicit values 用于测试或内嵌调用。
