@@ -106,6 +106,11 @@ func expectedFlowToolNames() []string {
 		"list_pipeline_jobs_by_category",
 		"list_pipeline_job_historys",
 		"get_pipeline_job_run_log",
+		"get_pipeline_scan_report_url",
+		"get_pipeline_artifact_url",
+		"get_pipeline_emas_artifact_url",
+		"list_pipeline_relations",
+		"get_last_instance",
 	}
 }
 
