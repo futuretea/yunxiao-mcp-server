@@ -106,6 +106,7 @@ func TestClientGetJSONWithMetadataIncludesPaginationHeaders(t *testing.T) {
 		w.Header().Set("x-next-page", "3")
 		w.Header().Set("x-total", "45")
 		w.Header().Set("x-total-pages", "3")
+		w.Header().Set("x-next-token", "next-token-1")
 		w.Header().Set("x-request-id", "request-1")
 		_, _ = w.Write([]byte(`[{"name":"repo"}]`))
 	}))
@@ -121,7 +122,7 @@ func TestClientGetJSONWithMetadataIncludesPaginationHeaders(t *testing.T) {
 		t.Fatalf("GetJSONWithMetadata() error = %v", err)
 	}
 
-	for _, want := range []string{`"data"`, `"pagination"`, `"page": 2`, `"nextPage": 3`, `"requestId": "request-1"`} {
+	for _, want := range []string{`"data"`, `"pagination"`, `"page": 2`, `"nextPage": 3`, `"nextToken": "next-token-1"`, `"requestId": "request-1"`} {
 		if !strings.Contains(result, want) {
 			t.Fatalf("result %q does not contain %s", result, want)
 		}

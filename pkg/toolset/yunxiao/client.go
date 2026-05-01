@@ -46,6 +46,7 @@ type APIError struct {
 type Response struct {
 	Body       json.RawMessage `json:"body"`
 	Pagination *Pagination     `json:"pagination,omitempty"`
+	NextToken  string          `json:"nextToken,omitempty"`
 	RequestID  string          `json:"requestId,omitempty"`
 }
 
@@ -190,6 +191,7 @@ func (c *Client) Request(ctx context.Context, method, path string, query url.Val
 	return &Response{
 		Body:       json.RawMessage(responseBody),
 		Pagination: parsePagination(resp.Header),
+		NextToken:  resp.Header.Get("x-next-token"),
 		RequestID:  resp.Header.Get("x-request-id"),
 	}, nil
 }
@@ -242,6 +244,9 @@ func prettyResponseJSON(resp *Response) string {
 	payload := map[string]any{"data": data}
 	if resp.Pagination != nil {
 		payload["pagination"] = resp.Pagination
+	}
+	if resp.NextToken != "" {
+		payload["nextToken"] = resp.NextToken
 	}
 	if resp.RequestID != "" {
 		payload["requestId"] = resp.RequestID
