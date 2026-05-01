@@ -111,6 +111,7 @@ func expectedFlowToolNames() []string {
 		"get_pipeline_emas_artifact_url",
 		"list_pipeline_relations",
 		"get_last_instance",
+		"list_resource_members",
 	}
 }
 
