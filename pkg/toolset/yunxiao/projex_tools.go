@@ -7,6 +7,14 @@ import (
 )
 
 func projexTools() []toolset.ServerTool {
+	tools := make([]toolset.ServerTool, 0, 6)
+	tools = append(tools, projexProjectTools()...)
+	tools = append(tools, projexSprintTools()...)
+	tools = append(tools, projexWorkitemTools()...)
+	return tools
+}
+
+func projexProjectTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("search_projects",
@@ -34,6 +42,39 @@ func projexTools() []toolset.ServerTool {
 			),
 			Handler: handleGetProject,
 		},
+	}
+}
+
+func projexSprintTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("get_sprint",
+				mcp.WithDescription("Get a Projex sprint by ID."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("id", mcp.Required(), mcp.Description("Sprint ID.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetSprint,
+		},
+		{
+			Tool: mcp.NewTool("list_sprints",
+				mcp.WithDescription("List Projex sprints in a project."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("status", mcp.Description("Comma-separated sprint statuses: TODO, DOING, ARCHIVED.")),
+				mcp.WithString("name", mcp.Description("Sprint name filter.")),
+				mcp.WithNumber("page", mcp.Description("Page number.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListSprints,
+		},
+	}
+}
+
+func projexWorkitemTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("search_workitems",
 				mcp.WithDescription("Search work items in one Projex project space."),

@@ -83,6 +83,60 @@ func TestHandleGetProjectBuildsPath(t *testing.T) {
 	}
 }
 
+func TestHandleListSprintsBuildsPathAndQuery(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/projex/organizations/org-1/projects/project-1/sprints" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		if r.URL.Query().Get("status") != "TODO,DOING" ||
+			r.URL.Query().Get("name") != "release" ||
+			r.URL.Query().Get("page") != "2" ||
+			r.URL.Query().Get("perPage") != "20" {
+			t.Fatalf("query = %q", r.URL.RawQuery)
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[{"id":"sprint-1"}]`))
+	})
+
+	result, err := handleListSprints(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"status":         "TODO,DOING",
+		"name":           "release",
+		"page":           float64(2),
+		"perPage":        float64(20),
+	})
+	if err != nil {
+		t.Fatalf("handleListSprints() error = %v", err)
+	}
+	if !strings.Contains(result, `"pagination"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleGetSprintBuildsPath(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/projex/organizations/org-1/projects/project-1/sprints/sprint-1" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"id":"sprint-1"}`))
+	})
+
+	if _, err := handleGetSprint(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"id":             "sprint-1",
+	}); err != nil {
+		t.Fatalf("handleGetSprint() error = %v", err)
+	}
+}
+
 func TestHandleSearchWorkitemsBuildsBody(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems:search" {

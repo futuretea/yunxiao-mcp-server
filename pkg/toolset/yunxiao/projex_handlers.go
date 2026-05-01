@@ -52,6 +52,50 @@ func handleGetProject(ctx context.Context, client any, params map[string]any) (s
 	return c.GetJSON(ctx, path, nil)
 }
 
+func handleListSprints(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "id")
+	if err != nil {
+		return "", err
+	}
+
+	query := url.Values{}
+	setOptionalString(query, params, "status")
+	setOptionalString(query, params, "name")
+	setOptionalInt(query, params, "page")
+	setOptionalInt(query, params, "perPage")
+
+	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/projects/" + url.PathEscape(projectID) + "/sprints"
+	return c.GetJSONWithMetadata(ctx, path, query)
+}
+
+func handleGetSprint(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, err := requiredString(params, "organizationId")
+	if err != nil {
+		return "", err
+	}
+	projectID, err := requiredString(params, "projectId")
+	if err != nil {
+		return "", err
+	}
+	id, err := requiredString(params, "id")
+	if err != nil {
+		return "", err
+	}
+
+	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/projects/" + url.PathEscape(projectID) + "/sprints/" + url.PathEscape(id)
+	return c.GetJSON(ctx, path, nil)
+}
+
 func handleSearchWorkitems(ctx context.Context, client any, params map[string]any) (string, error) {
 	c, err := getClient(client)
 	if err != nil {
