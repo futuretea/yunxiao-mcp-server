@@ -51,6 +51,21 @@ HTTP endpoints：
 - `/message`：SSE message endpoint
 - `/healthz`：readiness check；缺少 access token 或未注册工具时返回 `503`
 
+Docker：
+
+```bash
+docker build -t yunxiao-mcp-server:local .
+docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> yunxiao-mcp-server:local
+```
+
+Docker HTTP 模式：
+
+```bash
+docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> yunxiao-mcp-server:local --port 3000
+```
+
+MCP client 配置示例见 [docs/mcp-client-config.md](docs/mcp-client-config.md)。
+
 ## 配置
 
 配置优先级为 programmatic explicit values > flag > environment > config file > defaults。普通运行只会用到 flag 及其之后的层级；programmatic explicit values 用于测试或内嵌调用。

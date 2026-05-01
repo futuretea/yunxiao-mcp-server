@@ -1,0 +1,12 @@
+.git
+.github
+.auto8
+.auto-runs
+bin
+dist
+third-party-projects
+config.yaml
+config.local.yaml
+coverage.out
+*.test
+
