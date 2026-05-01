@@ -15,10 +15,12 @@ Before treating a build as GA, run:
 
 ```bash
 make ci
+make smoke
 git diff --check
 ```
 
 `make ci` runs `go vet`, verifies module checksums, checks `gofmt`, runs `go test -race ./...`, and builds `bin/yunxiao-mcp-server`.
+`make smoke` requires `curl` and `nc` on `PATH`; it runs the built binary's `version` and `--help` commands, starts local HTTP mode, and checks `/healthz`; it does not call Yunxiao OpenAPI.
 
 ## Deferred OpenAPI Endpoints
 

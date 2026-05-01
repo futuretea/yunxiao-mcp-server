@@ -215,6 +215,7 @@ docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> yunxiao-mc
 MCP client 配置示例见 [docs/mcp-client-config.md](docs/mcp-client-config.md)。
 
 GA 边界、验证门禁和暂缓暴露的 OpenAPI endpoint 见 [docs/ga-readiness.md](docs/ga-readiness.md)。
+本地二进制 smoke 可运行 `make smoke`；默认监听 `39393`，可用 `PORT=<port> make smoke` 覆盖。
 
 ## 配置
 

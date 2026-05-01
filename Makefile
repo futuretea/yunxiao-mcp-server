@@ -6,7 +6,7 @@ LDFLAGS := -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Version=$
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Commit=$(COMMIT) \
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Date=$(DATE)
 
-.PHONY: build test lint format tidy ci clean
+.PHONY: build test lint format tidy ci smoke clean
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o bin/$(BINARY_NAME) ./cmd/yunxiao-mcp-server
@@ -28,6 +28,9 @@ ci: lint
 	go mod verify
 	go test -race ./...
 	$(MAKE) build
+
+smoke: build
+	./scripts/smoke.sh
 
 clean:
 	rm -rf bin coverage.out
