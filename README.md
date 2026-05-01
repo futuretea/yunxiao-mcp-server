@@ -40,6 +40,11 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_namespaces`
   - `get_namespace`
   - `get_org_namespace`
+  - `list_ssh_keys`
+  - `get_ssh_key`
+  - `list_user_ssh_keys`
+  - `list_webhooks`
+  - `get_webhook`
   - `list_files`
   - `get_file_blobs`
   - `list_commits`
