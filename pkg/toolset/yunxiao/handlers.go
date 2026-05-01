@@ -279,6 +279,22 @@ func requiredOrganizationAndRepository(params map[string]any) (string, string, e
 	return organizationID, repositoryID, nil
 }
 
+func requiredOrganizationAndID(params map[string]any) (string, string, error) {
+	return requiredOrganizationAndNamedID(params, "id")
+}
+
+func requiredOrganizationAndNamedID(params map[string]any, key string) (string, string, error) {
+	organizationID, err := requiredString(params, "organizationId")
+	if err != nil {
+		return "", "", err
+	}
+	id, err := requiredString(params, key)
+	if err != nil {
+		return "", "", err
+	}
+	return organizationID, id, nil
+}
+
 func requiredOrganizationRepositoryAndLocalID(params map[string]any) (string, string, string, error) {
 	organizationID, repositoryID, err := requiredOrganizationAndRepository(params)
 	if err != nil {
@@ -424,6 +440,38 @@ func setOptionalIntBody(body map[string]any, params map[string]any, key string) 
 	case string:
 		if value != "" {
 			body[key] = value
+		}
+	}
+}
+
+func setOptionalBoolBody(body map[string]any, params map[string]any, key string) {
+	value, ok := params[key].(bool)
+	if ok {
+		body[key] = value
+	}
+}
+
+func setOptionalStringArrayBody(body map[string]any, params map[string]any, key string) {
+	switch value := params[key].(type) {
+	case []any:
+		values := make([]string, 0, len(value))
+		for _, item := range value {
+			if item, ok := item.(string); ok && strings.TrimSpace(item) != "" {
+				values = append(values, strings.TrimSpace(item))
+			}
+		}
+		if len(values) > 0 {
+			body[key] = values
+		}
+	case []string:
+		values := make([]string, 0, len(value))
+		for _, item := range value {
+			if strings.TrimSpace(item) != "" {
+				values = append(values, strings.TrimSpace(item))
+			}
+		}
+		if len(values) > 0 {
+			body[key] = values
 		}
 	}
 }
