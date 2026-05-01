@@ -87,6 +87,7 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `list_resource_members`
   - `search_projects`
   - `get_project`
+  - `get_project_overview`
   - `list_project_members`
   - `list_project_templates`
   - `get_project_template_field_config`
