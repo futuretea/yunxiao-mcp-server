@@ -101,6 +101,7 @@ HTTP/SSE 模式下，客户端也可以在请求 header `x-yunxiao-token` 或 qu
 ```bash
 make format
 make tidy
+make lint
 make test
 make build
 ```

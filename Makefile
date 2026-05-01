@@ -6,7 +6,7 @@ LDFLAGS := -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Version=$
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Commit=$(COMMIT) \
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Date=$(DATE)
 
-.PHONY: build test format tidy clean
+.PHONY: build test lint format tidy ci clean
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o bin/$(BINARY_NAME) ./cmd/yunxiao-mcp-server
@@ -14,12 +14,20 @@ build:
 test:
 	go test ./...
 
+lint:
+	go vet ./...
+	test -z "$$(gofmt -l cmd internal pkg)"
+
 format:
 	gofmt -w $$(find . -path './third-party-projects' -prune -o -name '*.go' -print)
 
 tidy:
 	go mod tidy
 
+ci: lint
+	go mod verify
+	go test -race ./...
+	$(MAKE) build
+
 clean:
 	rm -rf bin coverage.out
-
