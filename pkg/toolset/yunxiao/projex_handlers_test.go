@@ -210,6 +210,35 @@ func TestHandleGetWorkitemBuildsPath(t *testing.T) {
 	}
 }
 
+func TestHandleListWorkItemCommentsBuildsPathAndQuery(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/workitem-1/comments" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		if r.URL.Query().Get("page") != "2" || r.URL.Query().Get("perPage") != "20" {
+			t.Fatalf("query = %q", r.URL.RawQuery)
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[{"id":"comment-1"}]`))
+	})
+
+	result, err := handleListWorkItemComments(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workItemId":     "workitem-1",
+		"page":           float64(2),
+		"perPage":        float64(20),
+	})
+	if err != nil {
+		t.Fatalf("handleListWorkItemComments() error = %v", err)
+	}
+	if !strings.Contains(result, `"pagination"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
 func TestSearchWorkitemsRequiresCategoryAndSpace(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("handler should not issue request without required params")

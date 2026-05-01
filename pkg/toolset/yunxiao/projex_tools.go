@@ -105,6 +105,17 @@ func projexWorkitemTools() []toolset.ServerTool {
 			),
 			Handler: handleGetWorkitem,
 		},
+		{
+			Tool: mcp.NewTool("list_work_item_comments",
+				mcp.WithDescription("List comments for a Projex work item."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("workItemId", mcp.Required(), mcp.Description("Work item ID.")),
+				mcp.WithNumber("page", mcp.Description("Page number.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleListWorkItemComments,
+		},
 	}
 }
 

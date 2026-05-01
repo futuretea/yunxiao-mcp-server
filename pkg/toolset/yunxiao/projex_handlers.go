@@ -152,3 +152,22 @@ func handleGetWorkitem(ctx context.Context, client any, params map[string]any) (
 	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitems/" + url.PathEscape(id)
 	return c.GetJSON(ctx, path, nil)
 }
+
+func handleListWorkItemComments(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "workItemId")
+	if err != nil {
+		return "", err
+	}
+
+	query := url.Values{}
+	setOptionalInt(query, params, "page")
+	setOptionalInt(query, params, "perPage")
+
+	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitems/" + url.PathEscape(workItemID) + "/comments"
+	return c.GetJSONWithMetadata(ctx, path, query)
+}
