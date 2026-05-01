@@ -5,6 +5,47 @@ import (
 	"net/url"
 )
 
+func handleGetCurrentUser(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+	return c.GetJSON(ctx, "/platform/users:me", nil)
+}
+
+func handleGetCurrentOrganizationInfo(ctx context.Context, client any, params map[string]any) (string, error) {
+	return handleGetCurrentUser(ctx, client, params)
+}
+
+func handleListOrganizations(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	query := url.Values{}
+	setOptionalInt(query, params, "page")
+	setOptionalInt(query, params, "perPage")
+	return c.GetJSON(ctx, "/platform/organizations", query)
+}
+
+func handleGetUserOrganizations(ctx context.Context, client any, params map[string]any) (string, error) {
+	return handleListOrganizations(ctx, client, params)
+}
+
+func handleGetOrganization(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	id, err := requiredString(params, "id")
+	if err != nil {
+		return "", err
+	}
+	return c.GetJSON(ctx, "/platform/organizations/"+url.PathEscape(id), nil)
+}
+
 func handleListOrganizationDepartments(ctx context.Context, client any, params map[string]any) (string, error) {
 	c, err := getClient(client)
 	if err != nil {
