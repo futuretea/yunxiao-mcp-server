@@ -46,5 +46,19 @@ func appstackResourceProxyTools() []toolset.ServerTool {
 			),
 			Handler: handleGetKubernetesObjectInfo,
 		},
+		{
+			Tool: mcp.NewTool("get_deployment_revision_info",
+				mcp.WithDescription("Get AppStack deployment workload revision information."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
+				mcp.WithString("envName", mcp.Required(), mcp.Description("Environment name.")),
+				mcp.WithString("namespace", mcp.Required(), mcp.Description("Kubernetes namespace.")),
+				mcp.WithString("name", mcp.Required(), mcp.Description("Deployment name.")),
+				mcp.WithString("revision", mcp.Required(), mcp.Description("Deployment revision.")),
+				mcp.WithString("taskSn", mcp.Description("Optional task serial number.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetDeploymentRevisionInfo,
+		},
 	}
 }

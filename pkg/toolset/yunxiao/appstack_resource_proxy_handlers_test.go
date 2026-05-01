@@ -106,3 +106,27 @@ func TestHandleGetKubernetesObjectInfoBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleGetKubernetesObjectInfo() error = %v", err)
 	}
 }
+
+func TestHandleGetDeploymentRevisionInfoBuildsPathAndQuery(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.RequestURI != "/oapi/v1/appstack/organizations/org-1/apps/app%2F1/envs/env%2F1/ns/ns%2F1/deployments/deploy%2F1/revisions/rev%2F1?taskSn=task%2F1" {
+			t.Fatalf("RequestURI = %q", r.RequestURI)
+		}
+		_, _ = w.Write([]byte(`{"name":"deploy-1"}`))
+	})
+
+	if _, err := handleGetDeploymentRevisionInfo(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app/1",
+		"envName":        "env/1",
+		"namespace":      "ns/1",
+		"name":           "deploy/1",
+		"revision":       "rev/1",
+		"taskSn":         "task/1",
+	}); err != nil {
+		t.Fatalf("handleGetDeploymentRevisionInfo() error = %v", err)
+	}
+}
