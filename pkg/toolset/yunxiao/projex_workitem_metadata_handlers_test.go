@@ -112,3 +112,52 @@ func TestHandleListLabelsBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("result = %q", result)
 	}
 }
+
+func TestHandleListWorkitemAttachmentsRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListWorkitemAttachments(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleGetWorkitemFileRequiresWorkitemId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetWorkitemFile(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "file-1",
+	}); err == nil {
+		t.Fatal("expected missing workitemId error")
+	}
+}
+
+func TestHandleListWorkitemRelationRecordsRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListWorkitemRelationRecords(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleListLabelsRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListLabels(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestRequiredOrganizationWorkitemAndFileRequiresFileId(t *testing.T) {
+	_, _, _, err := requiredOrganizationWorkitemAndFile(map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "workitem-1",
+	})
+	if err == nil {
+		t.Fatal("expected missing id error")
+	}
+}
