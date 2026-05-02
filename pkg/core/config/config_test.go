@@ -161,6 +161,45 @@ func TestLoadConfigExplicitSetOverridesEnvironment(t *testing.T) {
 	}
 }
 
+func TestValidateRejectsInvalidLogLevel(t *testing.T) {
+	cfg := &StaticConfig{
+		Port:                  0,
+		LogLevel:              "not_a_level",
+		BaseURL:               DefaultBaseURL,
+		RequestTimeoutSeconds: 30,
+	}
+
+	if err := cfg.Validate(); err == nil {
+		t.Fatal("Validate() expected invalid log_level error")
+	}
+}
+
+func TestValidateRejectsNonPositiveTimeout(t *testing.T) {
+	cfg := &StaticConfig{
+		Port:                  0,
+		LogLevel:              "info",
+		BaseURL:               DefaultBaseURL,
+		RequestTimeoutSeconds: 0,
+	}
+
+	if err := cfg.Validate(); err == nil {
+		t.Fatal("Validate() expected non-positive timeout error")
+	}
+}
+
+func TestValidateRejectsInvalidURLScheme(t *testing.T) {
+	cfg := &StaticConfig{
+		Port:                  0,
+		LogLevel:              "info",
+		BaseURL:               "ftp://example.com",
+		RequestTimeoutSeconds: 30,
+	}
+
+	if err := cfg.Validate(); err == nil {
+		t.Fatal("Validate() expected invalid scheme error")
+	}
+}
+
 func TestLoadConfigNormalizesToolFilters(t *testing.T) {
 	v := viper.New()
 	v.Set("enabled_tools", []string{" get_current_user ", "", "list_organizations"})
