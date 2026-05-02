@@ -89,7 +89,10 @@ Simple filters (`status`, `assignedTo`, `sprint`, etc.) are translated into Yunx
 **Parameters**:
 - `sprintId`: required
 - `categories`: defaults to `Task,Bug`
+- `subject`: subject contains filter applied to every category
 - `status`: applied to every category search
+- `assignedTo`: comma-separated assignee user IDs applied to every category
+- `creator`: comma-separated creator user IDs applied to every category
 
 **Note**: The tool first fetches sprint metadata, then searches workitems filtered by that sprint ID.
 
@@ -111,6 +114,10 @@ Simple filters (`status`, `assignedTo`, `sprint`, etc.) are translated into Yunx
 **Parameters**:
 - `category`: required (e.g., `Task`, `Bug`)
 - `sprint`: optional sprint ID filter
+- `subject`: subject contains filter applied to the search
+- `status`: comma-separated status IDs applied to the search
+- `assignedTo`: comma-separated assignee user IDs applied to the search
+- `creator`: comma-separated creator user IDs applied to the search
 - `sampleLimit`: max items returned, default 5
 
 **Output**: `columns` object where each key is a status name and the value is a list of work items in that status.
