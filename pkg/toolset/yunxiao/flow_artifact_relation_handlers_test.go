@@ -126,6 +126,9 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
 	})
 
+	if _, err := handleGetPipelineScanReportURL(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
 	_, err := handleGetPipelineArtifactURL(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 		"filePath":       "/artifacts/build.tgz",
@@ -133,7 +136,6 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 	if err == nil {
 		t.Fatal("handleGetPipelineArtifactURL() expected missing fileName error")
 	}
-
 	_, err = handleGetPipelineEmasArtifactURL(context.Background(), client, map[string]any{
 		"organizationId":    "org-1",
 		"emasJobInstanceId": "emas-1",
@@ -143,5 +145,11 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 	})
 	if err == nil {
 		t.Fatal("handleGetPipelineEmasArtifactURL() expected missing serviceConnectionId error")
+	}
+	if _, err := handleListPipelineRelations(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetLastInstance(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
 	}
 }
