@@ -238,3 +238,95 @@ func TestBuildTestcaseConditions(t *testing.T) {
 		t.Fatalf("buildTestcaseConditions(subject) = %q", got)
 	}
 }
+
+func TestProjexMilestoneTestcaseHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListMilestones(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListMilestones(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListDirectories(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListDirectories(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "r-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListTestcaseRepositories(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListTestcaseRepositories(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetTestcaseFieldConfig(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetTestcaseFieldConfig(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "r-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetTestcase(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetTestcase(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing testRepoId error")
+	}
+	if _, err := handleGetTestcase(context.Background(), client, map[string]any{"organizationId": "org-1", "testRepoId": "r-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetTestcase(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "testRepoId": "r-1", "id": "tc-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleSearchTestcases(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleSearchTestcases(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "testRepoId": "r-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListTestPlans(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListTestPlans(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetTestResultList(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetTestResultList(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing testPlanIdentifier error")
+	}
+	if _, err := handleGetTestResultList(context.Background(), client, map[string]any{"organizationId": "org-1", "testPlanIdentifier": "plan-1"}); err == nil {
+		t.Fatal("expected missing directoryIdentifier error")
+	}
+	if _, err := handleGetTestResultList(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "testPlanIdentifier": "plan-1", "directoryIdentifier": "dir-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestRequiredOrganizationTestRepoAndTestcase(t *testing.T) {
+	if _, _, _, err := requiredOrganizationTestRepoAndTestcase(map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, _, _, err := requiredOrganizationTestRepoAndTestcase(map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing testRepoId error")
+	}
+	if _, _, _, err := requiredOrganizationTestRepoAndTestcase(map[string]any{"organizationId": "org-1", "testRepoId": "r-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	org, repo, id, err := requiredOrganizationTestRepoAndTestcase(map[string]any{"organizationId": "org-1", "testRepoId": "r-1", "id": "tc-1"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if org != "org-1" || repo != "r-1" || id != "tc-1" {
+		t.Fatalf("unexpected values: %q %q %q", org, repo, id)
+	}
+}
+
+func TestProjexTestRepoPath(t *testing.T) {
+	if got := projexTestRepoPath("org-1", "repo/1"); got != "/projex/organizations/org-1/testRepos/repo%2F1" {
+		t.Fatalf("projexTestRepoPath() = %q", got)
+	}
+}
