@@ -1,9 +1,12 @@
 package mcp
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/mark3labs/mcp-go/mcp"
 
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
 	yunxiaoToolset "github.com/futuretea/yunxiao-mcp-server/pkg/toolset/yunxiao"
@@ -373,5 +376,59 @@ func TestNewServerMinimalModeOverridesProjectFocused(t *testing.T) {
 		if name == "list_organization_departments" {
 			t.Fatalf("minimal mode should override project_focused, got %v", enabled)
 		}
+	}
+}
+
+func TestIsHealthy(t *testing.T) {
+	if newTestServer(nil, nil).IsHealthy() {
+		t.Fatal("test server without client should not be healthy")
+	}
+
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		EnabledTools:          []string{"get_current_user"},
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+	if !s.IsHealthy() {
+		t.Fatal("server with client and tools should be healthy")
+	}
+}
+
+func TestNewTextResultReturnsContent(t *testing.T) {
+	result := NewTextResult("hello", nil)
+	if result.IsError {
+		t.Fatal("expected IsError = false")
+	}
+	if len(result.Content) != 1 {
+		t.Fatalf("content count = %d, want 1", len(result.Content))
+	}
+	text, ok := result.Content[0].(mcp.TextContent)
+	if !ok {
+		t.Fatalf("content type = %T, want TextContent", result.Content[0])
+	}
+	if text.Text != "hello" {
+		t.Fatalf("text = %q, want hello", text.Text)
+	}
+}
+
+func TestNewTextResultReturnsError(t *testing.T) {
+	result := NewTextResult("", fmt.Errorf("something went wrong"))
+	if !result.IsError {
+		t.Fatal("expected IsError = true")
+	}
+	if len(result.Content) != 1 {
+		t.Fatalf("content count = %d, want 1", len(result.Content))
+	}
+	text, ok := result.Content[0].(mcp.TextContent)
+	if !ok {
+		t.Fatalf("content type = %T, want TextContent", result.Content[0])
+	}
+	if text.Text != "something went wrong" {
+		t.Fatalf("text = %q, want error message", text.Text)
 	}
 }
