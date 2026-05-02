@@ -147,6 +147,24 @@ func TestCodeupRepositoryMetadataHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetPushRule(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleListTags(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListRepositoryMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListProtectedBranches(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetProtectedBranch(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo", "id": float64(1)}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListPushRules(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetPushRule(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo", "pushRuleId": float64(1)}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 }
 
 func TestHandleGetPushRuleBuildsPath(t *testing.T) {
