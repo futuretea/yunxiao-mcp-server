@@ -219,6 +219,42 @@ func TestHandleFindTaskOperationLogRequiresTaskSn(t *testing.T) {
 	}
 }
 
+func TestHandleListChangeOrdersByOriginRequiresOriginType(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListChangeOrdersByOrigin(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	}); err == nil {
+		t.Fatal("expected missing originType error")
+	}
+}
+
+func TestHandleListChangeOrdersByOriginRequiresOriginId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListChangeOrdersByOrigin(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"originType":     "FLOW",
+	}); err == nil {
+		t.Fatal("expected missing originId error")
+	}
+}
+
+func TestHandleListChangeOrdersByOriginReturnsAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleListChangeOrdersByOrigin(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"originType":     "FLOW",
+		"originId":       "id-1",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+}
+
 func TestAppstackChangeOrderHandlersRequireParams(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
@@ -238,5 +274,20 @@ func TestAppstackChangeOrderHandlersRequireParams(t *testing.T) {
 	}
 	if _, err := handleListChangeOrdersByOrigin(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
+	}
+	if _, err := handleListChangeOrderVersions(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetChangeOrder(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "changeOrderSn": "co-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListChangeOrderJobLogs(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "changeOrderSn": "co-1", "jobSn": "job-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleFindTaskOperationLog(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "changeOrderSn": "co-1", "jobSn": "job-1", "stageSn": "stage-1", "taskSn": "task-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListChangeOrdersByOrigin(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "originType": "FLOW", "originId": "id-1"}); err == nil {
+		t.Fatal("expected getClient error")
 	}
 }
