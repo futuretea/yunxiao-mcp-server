@@ -9,8 +9,8 @@ var minimalToolNames = map[string]struct{}{
 	"get_current_organization_info": {},
 
 	// Projex — Project overview
-	"search_projects":        {},
-	"get_project_overview":   {},
+	"search_projects":            {},
+	"get_project_overview":       {},
 	"get_project_risk_dashboard": {},
 
 	// Projex — Workitem queries
@@ -22,7 +22,7 @@ var minimalToolNames = map[string]struct{}{
 	"get_project_workitem_board":   {},
 
 	// Projex — Sprint
-	"list_sprints":      {},
+	"list_sprints":        {},
 	"get_sprint_overview": {},
 
 	// Projex — Members
