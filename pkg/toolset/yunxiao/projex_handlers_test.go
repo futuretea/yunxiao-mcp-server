@@ -261,3 +261,64 @@ func TestSearchWorkitemsRequiresCategoryAndSpace(t *testing.T) {
 		t.Fatal("handleSearchWorkitems() expected missing projectId error")
 	}
 }
+
+func TestProjexHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleSearchProjects(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleSearchProjects(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetProject(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProject(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetProject(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListSprints(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListSprints(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetSprint(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetSprint(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing projectId error")
+	}
+	if _, err := handleGetSprint(context.Background(), client, map[string]any{"organizationId": "org-1", "projectId": "p-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetSprint(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "p-1", "id": "s-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleSearchWorkitems(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleSearchWorkitems(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "category": "Task", "projectId": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetWorkitem(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetWorkitem(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetWorkitem(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListWorkItemComments(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListWorkItemComments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workItemId": "wi-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
