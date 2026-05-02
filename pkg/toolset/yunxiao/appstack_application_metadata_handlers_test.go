@@ -200,3 +200,10 @@ func TestRequiredAppEnvironmentRequiresEnvName(t *testing.T) {
 		t.Fatal("expected missing envName error")
 	}
 }
+
+func TestRequiredAppEnvironmentRequiresOrganizationId(t *testing.T) {
+	_, _, _, err := requiredAppEnvironment(map[string]any{"appName": "app-1", "envName": "env-1"})
+	if err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
