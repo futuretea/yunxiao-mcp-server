@@ -425,8 +425,12 @@ func mergeConditions(existing, extra string) string {
 		return existing
 	}
 	var existingArr, extraArr []map[string]any
-	_ = json.Unmarshal([]byte(existing), &existingArr)
-	_ = json.Unmarshal([]byte(extra), &extraArr)
+	if err := json.Unmarshal([]byte(existing), &existingArr); err != nil {
+		return existing
+	}
+	if err := json.Unmarshal([]byte(extra), &extraArr); err != nil {
+		return existing
+	}
 	merged := append(existingArr, extraArr...)
 	mergedBytes, _ := json.Marshal(merged)
 	return string(mergedBytes)

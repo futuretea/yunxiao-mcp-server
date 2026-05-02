@@ -495,3 +495,27 @@ func TestHandleGetProjectWorkitemBoardWithSprintFilter(t *testing.T) {
 		t.Fatalf("handleGetProjectWorkitemBoard() error = %v", err)
 	}
 }
+
+func TestMergeConditions(t *testing.T) {
+	tests := []struct {
+		name     string
+		existing string
+		extra    string
+		want     string
+	}{
+		{"both empty", "", "", ""},
+		{"existing empty", "", `[{"field":"a"}]`, `[{"field":"a"}]`},
+		{"extra empty", `[{"field":"a"}]`, "", `[{"field":"a"}]`},
+		{"both arrays", `[{"field":"a"}]`, `[{"field":"b"}]`, `[{"field":"a"},{"field":"b"}]`},
+		{"existing object preserved", `{"conditionGroups":[]}`, `[{"field":"a"}]`, `{"conditionGroups":[]}`},
+		{"extra object preserved existing", `[{"field":"a"}]`, `{"conditionGroups":[]}`, `[{"field":"a"}]`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := mergeConditions(tt.existing, tt.extra)
+			if got != tt.want {
+				t.Fatalf("mergeConditions(%q, %q) = %q, want %q", tt.existing, tt.extra, got, tt.want)
+			}
+		})
+	}
+}
