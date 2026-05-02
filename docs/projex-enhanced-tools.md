@@ -11,6 +11,7 @@ This document describes the enhanced aggregation tools in the Projex (project ma
 | `get_project_workitem_context` | Metadata context for a work item category | 1 + up to 4 |
 | `get_sprint_overview` | Sprint-centric view of work items by category | 1 + 1 per category |
 | `get_my_project_workitems` | Personal work item dashboard (assigned or created) | 1 per category |
+| `get_project_workitem_board` | Kanban-style board view grouped by status | 1 |
 | `get_project_risk_dashboard` | Risk-focused view with overdue, high-priority, stale items | 3 + statusGroups |
 | `get_project_member_task_status` | Per-member workload and overdue tracking | 1 + 2N + statusGroups |
 
@@ -102,6 +103,17 @@ Simple filters (`status`, `assignedTo`, `sprint`, etc.) are translated into Yunx
 - `categories`: defaults to `Task,Bug`
 
 **Tip**: In an MCP conversation, first call `get_current_user` to obtain the user's ID, then call this tool.
+
+### get_project_workitem_board
+
+**When to use**: You want a Kanban-style view of work items grouped by status for a single category.
+
+**Parameters**:
+- `category`: required (e.g., `Task`, `Bug`)
+- `sprint`: optional sprint ID filter
+- `sampleLimit`: max items returned, default 5
+
+**Output**: `columns` object where each key is a status name and the value is a list of work items in that status.
 
 ### get_project_risk_dashboard
 

@@ -440,6 +440,93 @@ func sprintOverviewFilters(params map[string]any, categories []string) map[strin
 	}
 }
 
+func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, projectID, err := requiredOrganizationAndID(params)
+	if err != nil {
+		return "", err
+	}
+	category, err := requiredString(params, "category")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	body := projectWorkitemSummaryBody(projectID, category, params)
+	// sprint filter is already handled by buildWorkitemConditions inside projectWorkitemSummaryBody
+	// when params contains a "sprint" key.
+	sprintID := optionalStringDefault(params, "sprint", "")
+
+	path := projexOrganizationPath(organizationID) + "/workitems:search"
+	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
+	if err != nil {
+		return "", fmt.Errorf("search: %w", err)
+	}
+
+	payload := responsePayload(resp)
+	board := map[string]any{
+		"filters": map[string]any{
+			"category":    category,
+			"sprint":      sprintID,
+			"sampleLimit": normalizedSampleLimit(params),
+		},
+		"columns": map[string]any{},
+	}
+
+	data, total, err := extractWorkitemData(payload)
+	if err != nil {
+		return "", err
+	}
+	board["total"] = total
+
+	columns := board["columns"].(map[string]any)
+	for _, item := range data {
+		statusName := extractStatusName(item)
+		if statusName == "" {
+			statusName = "Unknown"
+		}
+		if columns[statusName] == nil {
+			columns[statusName] = []any{}
+		}
+		columns[statusName] = append(columns[statusName].([]any), item)
+	}
+
+	return marshalPretty(board)
+}
+
+func extractWorkitemData(payload any) ([]any, int, error) {
+	switch p := payload.(type) {
+	case []any:
+		return p, len(p), nil
+	case map[string]any:
+		data, _ := p["data"].([]any)
+		total := 0
+		if pagination, ok := p["pagination"].(map[string]any); ok {
+			if t, ok := pagination["total"].(float64); ok {
+				total = int(t)
+			}
+		}
+		return data, total, nil
+	default:
+		return nil, 0, fmt.Errorf("unexpected payload type %T", payload)
+	}
+}
+
+func extractStatusName(item any) string {
+	m, ok := item.(map[string]any)
+	if !ok {
+		return ""
+	}
+	status, ok := m["status"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	name, _ := status["name"].(string)
+	return name
+}
+
 func marshalPretty(value any) (string, error) {
 	formatted, err := json.MarshalIndent(value, "", "  ")
 	if err != nil {

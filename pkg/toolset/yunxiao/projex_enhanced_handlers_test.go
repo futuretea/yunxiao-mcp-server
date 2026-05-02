@@ -418,3 +418,80 @@ func TestHandleGetMyProjectWorkitemsRejectsMissingUserId(t *testing.T) {
 		t.Fatal("handleGetMyProjectWorkitems() expected missing userId error")
 	}
 }
+
+func TestHandleGetProjectWorkitemBoardGroupsByStatus(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems:search" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if body["category"] != "Task" || body["spaceId"] != "project-1" {
+			t.Fatalf("body = %#v", body)
+		}
+		w.Header().Set("x-total", "3")
+		_, _ = w.Write([]byte(`[
+			{"id":"wi-1","status":{"name":"Doing"}},
+			{"id":"wi-2","status":{"name":"Done"}},
+			{"id":"wi-3","status":{"name":"Doing"}}
+		]`))
+	})
+
+	result, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"category":       "Task",
+		"sampleLimit":    float64(5),
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemBoard() error = %v", err)
+	}
+	if !strings.Contains(result, `"Doing"`) || !strings.Contains(result, `"Done"`) {
+		t.Fatalf("result = %q", result)
+	}
+	if !strings.Contains(result, `"total"`) {
+		t.Fatalf("result missing total: %q", result)
+	}
+}
+
+func TestHandleGetProjectWorkitemBoardRequiresCategory(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without category")
+	})
+
+	if _, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemBoard() expected missing category error")
+	}
+}
+
+func TestHandleGetProjectWorkitemBoardWithSprintFilter(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if !strings.Contains(conditions, `"fieldIdentifier":"sprint"`) {
+			t.Fatalf("conditions = %q", conditions)
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	_, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"category":       "Bug",
+		"sprint":         "sp-1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemBoard() error = %v", err)
+	}
+}

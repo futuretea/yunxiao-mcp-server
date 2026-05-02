@@ -89,6 +89,19 @@ func projexEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetMyProjectWorkitems,
 		},
+		{
+			Tool: mcp.NewTool("get_project_workitem_board",
+				mcp.WithDescription("Get a Kanban-style board view of work items grouped by status for one project."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Task or Bug.")),
+				mcp.WithString("sprint", mcp.Description("Optional sprint ID to filter work items.")),
+				mcp.WithString("status", mcp.Description("Comma-separated status IDs applied to the search.")),
+				mcp.WithNumber("sampleLimit", mcp.Description("Max work items returned. Defaults to 5, clamped to 0-200.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetProjectWorkitemBoard,
+		},
 	}
 	tools = append(tools, projexInsightTools()...)
 	return tools
