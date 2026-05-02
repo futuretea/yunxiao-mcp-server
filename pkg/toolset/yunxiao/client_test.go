@@ -439,3 +439,46 @@ func TestParseHeaderInt(t *testing.T) {
 		})
 	}
 }
+
+func TestEncodeRepositoryIDEmpty(t *testing.T) {
+	if got := EncodeRepositoryID(""); got != "" {
+		t.Fatalf("EncodeRepositoryID(\"\") = %q, want empty", got)
+	}
+}
+
+func TestResolveURLWithInvalidEscapeSequence(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	result, err := client.GetJSON(context.Background(), "/bad%ZZ", nil)
+	if err != nil {
+		t.Fatalf("GetJSON() error = %v", err)
+	}
+	if result != "{}" {
+		t.Fatalf("result = %q, want {}", result)
+	}
+}
+
+func TestClientPostJSONWithMetadataReturnsMarshalError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	_, err = client.PostJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": make(chan int)})
+	if err == nil {
+		t.Fatal("PostJSONWithMetadata() expected marshal error")
+	}
+}

@@ -43,3 +43,10 @@ func TestEndOfDay(t *testing.T) {
 		t.Fatalf("endOfDay(datetime) = %q", got)
 	}
 }
+
+func TestMarshalConditionsReturnsEmptyForUnmarshalableValue(t *testing.T) {
+	got := marshalConditions([]map[string]any{{"key": make(chan int)}})
+	if got != "" {
+		t.Fatalf("marshalConditions() = %q, want empty", got)
+	}
+}
