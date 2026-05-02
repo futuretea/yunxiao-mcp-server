@@ -165,3 +165,56 @@ func TestHandleListChangeOrdersByOriginBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleListChangeOrdersByOrigin() error = %v", err)
 	}
 }
+
+func TestRequiredOrganizationAndAppRequiresAppName(t *testing.T) {
+	_, _, err := requiredOrganizationAndApp(map[string]any{"organizationId": "org-1"})
+	if err == nil {
+		t.Fatal("expected missing appName error")
+	}
+}
+
+func TestRequiredAppChangeOrderRequiresChangeOrderSn(t *testing.T) {
+	_, _, _, err := requiredAppChangeOrder(map[string]any{"organizationId": "org-1", "appName": "app-1"})
+	if err == nil {
+		t.Fatal("expected missing changeOrderSn error")
+	}
+}
+
+func TestRequiredAppChangeOrderJobRequiresJobSn(t *testing.T) {
+	_, _, _, _, err := requiredAppChangeOrderJob(map[string]any{"organizationId": "org-1", "appName": "app-1", "changeOrderSn": "co-1"})
+	if err == nil {
+		t.Fatal("expected missing jobSn error")
+	}
+}
+
+func TestHandleFindTaskOperationLogRequiresStageSn(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	_, err := handleFindTaskOperationLog(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"changeOrderSn":  "co-1",
+		"jobSn":          "job-1",
+		"taskSn":         "task-1",
+	})
+	if err == nil {
+		t.Fatal("expected missing stageSn error")
+	}
+}
+
+func TestHandleFindTaskOperationLogRequiresTaskSn(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	_, err := handleFindTaskOperationLog(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"changeOrderSn":  "co-1",
+		"jobSn":          "job-1",
+		"stageSn":        "stage-1",
+	})
+	if err == nil {
+		t.Fatal("expected missing taskSn error")
+	}
+}
