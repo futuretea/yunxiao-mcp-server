@@ -320,3 +320,68 @@ func TestEncodeRepositoryID(t *testing.T) {
 		})
 	}
 }
+
+func TestJoinEscapedPath(t *testing.T) {
+	tests := []struct {
+		name     string
+		basePath string
+		path     string
+		want     string
+	}{
+		{"both non-empty", "/oapi/v1", "platform/users", "/oapi/v1/platform/users"},
+		{"empty base", "", "platform/users", "/platform/users"},
+		{"empty path", "/oapi/v1", "", "/oapi/v1"},
+		{"both empty", "", "", "/"},
+		{"trailing slash", "/oapi/v1/", "/platform/users", "/oapi/v1/platform/users"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := joinEscapedPath(tt.basePath, tt.path); got != tt.want {
+				t.Fatalf("joinEscapedPath(%q, %q) = %q, want %q", tt.basePath, tt.path, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEncodePathValue(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"empty", "", ""},
+		{"already encoded", "org%2Frepo", "org%2Frepo"},
+		{"normal", "org/repo", "org%2Frepo"},
+		{"whitespace", "  org/repo  ", "org%2Frepo"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := encodePathValue(tt.in); got != tt.want {
+				t.Fatalf("encodePathValue(%q) = %q, want %q", tt.in, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseHeaderInt(t *testing.T) {
+	tests := []struct {
+		name  string
+		value string
+		want  int
+	}{
+		{"empty", "", 0},
+		{"valid", "42", 42},
+		{"invalid", "abc", 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := http.Header{}
+			if tt.value != "" {
+				h.Set("x-test", tt.value)
+			}
+			if got := parseHeaderInt(h, "x-test"); got != tt.want {
+				t.Fatalf("parseHeaderInt() = %d, want %d", got, tt.want)
+			}
+		})
+	}
+}

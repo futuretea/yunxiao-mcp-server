@@ -228,3 +228,13 @@ func TestHandleGetTestcaseBuildsPath(t *testing.T) {
 		t.Fatalf("handleGetTestcase() error = %v", err)
 	}
 }
+
+func TestBuildTestcaseConditions(t *testing.T) {
+	if got := buildTestcaseConditions(map[string]any{}); got != "" {
+		t.Fatalf("buildTestcaseConditions(empty) = %q, want empty", got)
+	}
+	got := buildTestcaseConditions(map[string]any{"subject": "login"})
+	if !strings.Contains(got, `"fieldIdentifier":"subject"`) || !strings.Contains(got, `"value":["login"]`) {
+		t.Fatalf("buildTestcaseConditions(subject) = %q", got)
+	}
+}
