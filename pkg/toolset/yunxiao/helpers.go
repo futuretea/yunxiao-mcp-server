@@ -5,7 +5,7 @@ import "fmt"
 func getClient(client any) (*Client, error) {
 	c, ok := client.(*Client)
 	if !ok || c == nil {
-		return nil, fmt.Errorf("Yunxiao client is not configured")
+		return nil, fmt.Errorf("yunxiao client is not configured")
 	}
 	return c, nil
 }
