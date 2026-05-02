@@ -188,3 +188,45 @@ func TestHandleGetProjectMemberTaskStatusRejectsInvalidStatusGroups(t *testing.T
 		t.Fatal("handleGetProjectMemberTaskStatus() expected invalid statusGroups error")
 	}
 }
+
+func TestHandleGetProjectRiskDashboardWithHighPriorityAndStale(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if strings.Contains(conditions, `"fieldIdentifier":"priority"`) {
+			seen["highPriority"] = true
+		}
+		if strings.Contains(conditions, `"fieldIdentifier":"updateStatusAt"`) {
+			seen["stale"] = true
+		}
+		if strings.Contains(conditions, `"fieldIdentifier":"finishTime"`) {
+			seen["overdue"] = true
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	_, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"categories":     "Task",
+		"highPriority":   "p0",
+		"staleBefore":    "2024-01-01",
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectRiskDashboard() error = %v", err)
+	}
+	if !seen["overdue"] {
+		t.Fatal("expected overdue search")
+	}
+	if !seen["highPriority"] {
+		t.Fatal("expected highPriority search")
+	}
+	if !seen["stale"] {
+		t.Fatal("expected stale search")
+	}
+}
