@@ -77,3 +77,12 @@ func TestHandleListWorkitemActivitiesRequiresOrganizationId(t *testing.T) {
 		t.Fatal("expected missing organizationId error")
 	}
 }
+
+func TestProjexVersionActivityHandlersRequireParams(t *testing.T) {
+	if _, err := handleListVersions(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "project-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListWorkitemActivities(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
