@@ -341,3 +341,25 @@ func TestMiddlewareDoesNotLogQueryString(t *testing.T) {
 		t.Fatalf("status = %d", rec.Code)
 	}
 }
+
+func TestLoggingResponseWriterIsIdempotent(t *testing.T) {
+	rec := httptest.NewRecorder()
+	lrw := &loggingResponseWriter{ResponseWriter: rec, statusCode: http.StatusOK}
+
+	lrw.WriteHeader(http.StatusCreated)
+	if lrw.statusCode != http.StatusCreated {
+		t.Fatalf("statusCode = %d, want %d", lrw.statusCode, http.StatusCreated)
+	}
+
+	// Second call should be ignored
+	lrw.WriteHeader(http.StatusInternalServerError)
+	if lrw.statusCode != http.StatusCreated {
+		t.Fatalf("statusCode = %d, want %d after second WriteHeader", lrw.statusCode, http.StatusCreated)
+	}
+
+	// Write should not override status if already set
+	lrw.Write([]byte("body"))
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("recorder code = %d, want %d", rec.Code, http.StatusCreated)
+	}
+}
