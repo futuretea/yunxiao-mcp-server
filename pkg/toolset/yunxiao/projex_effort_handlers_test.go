@@ -82,3 +82,37 @@ func TestHandleListEstimatedEffortsBuildsPath(t *testing.T) {
 		t.Fatalf("handleListEstimatedEfforts() error = %v", err)
 	}
 }
+
+func TestProjexEffortHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListCurrentUserEffortRecords(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListCurrentUserEffortRecords(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing startDate error")
+	}
+	if _, err := handleListCurrentUserEffortRecords(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "startDate": "2026-01-01", "endDate": "2026-02-01"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListEffortRecords(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListEffortRecords(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListEstimatedEfforts(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListEstimatedEfforts(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestProjexWorkitemPath(t *testing.T) {
+	if got := projexWorkitemPath("org-1", "wi/1"); got != "/projex/organizations/org-1/workitems/wi%2F1" {
+		t.Fatalf("projexWorkitemPath() = %q", got)
+	}
+}
