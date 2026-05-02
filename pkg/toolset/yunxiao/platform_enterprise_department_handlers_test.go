@@ -67,3 +67,12 @@ func TestHandleGetEnterpriseDepartmentRequiresID(t *testing.T) {
 		t.Fatal("handleGetEnterpriseDepartment() expected missing id error")
 	}
 }
+
+func TestPlatformEnterpriseDepartmentHandlersRequireParams(t *testing.T) {
+	if _, err := handleListEnterpriseDepartments(context.Background(), "invalid-client", map[string]any{}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetEnterpriseDepartment(context.Background(), "invalid-client", map[string]any{"id": "dept-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
