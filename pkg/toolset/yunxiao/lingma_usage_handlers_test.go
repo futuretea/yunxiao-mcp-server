@@ -105,6 +105,40 @@ func TestHandleGetDeveloperUsageRequiresUserOrDepartment(t *testing.T) {
 	}
 }
 
+func TestLingmaUsageHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetDepartmentUsage(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetDepartmentUsage(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "departmentId": "dept-1", "startTime": "2026-04-01", "endTime": "2026-04-30"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListDeveloperMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListDeveloperMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetDeveloperUsage(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetDeveloperUsage(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "userId": "user-1", "startTime": "2026-04-01", "endTime": "2026-04-30"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestRequiredLingmaUsageQueryRequiresTimeRange(t *testing.T) {
+	if _, err := requiredLingmaUsageQuery(map[string]any{}); err == nil {
+		t.Fatal("expected missing startTime error")
+	}
+	if _, err := requiredLingmaUsageQuery(map[string]any{"startTime": "2026-04-01"}); err == nil {
+		t.Fatal("expected missing endTime error")
+	}
+}
+
 func TestHandleGetDeveloperUsageBuildsQueryWithUserID(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
