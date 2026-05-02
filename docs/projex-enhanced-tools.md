@@ -12,6 +12,7 @@ This document describes the enhanced aggregation tools in the Projex (project ma
 | `get_sprint_overview` | Sprint-centric view of work items by category | 1 + 1 per category |
 | `get_my_project_workitems` | Personal work item dashboard (assigned or created) | 1 per category |
 | `get_project_workitem_board` | Kanban-style board view grouped by status | 1 |
+| `get_project_workitem_detail` | Comprehensive single work item with activities, attachments, comments, relations | 1 + up to 2 + relationTypes |
 | `get_project_risk_dashboard` | Risk-focused view with overdue, high-priority, stale items | 3 + statusGroups |
 | `get_project_member_task_status` | Per-member workload and overdue tracking | 1 + 2N + statusGroups |
 
@@ -49,7 +50,7 @@ Simple filters (`status`, `assignedTo`, `sprint`, etc.) are translated into Yunx
 **When to use**: You need a quick snapshot of a project — its basic info plus active sprints, milestones, versions, members, and labels.
 
 **Parameters**:
-- `organizationId`, `id` (project ID): required
+- `organizationId`, `projectId`: required
 - `includeMembers`, `includeSprints`, `includeMilestones`, `includeVersions`, `includeLabels`: toggle sections, default true
 - `activeOnly`: when true, sprints/milestones/versions use `status=TODO,DOING`
 - `page`, `perPage`: control list sections
@@ -58,7 +59,7 @@ Simple filters (`status`, `assignedTo`, `sprint`, etc.) are translated into Yunx
 ```json
 {
   "organizationId": "org-1",
-  "id": "project-1",
+  "projectId": "project-1",
   "includeVersions": false,
   "page": 1,
   "perPage": 10
