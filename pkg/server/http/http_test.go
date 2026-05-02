@@ -123,6 +123,11 @@ func TestStreamableMCPUsesRequestAccessTokenForToolCall(t *testing.T) {
 	tokenCh := make(chan string, 1)
 	pathCh := make(chan string, 1)
 	apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/platform/organizations" {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`[{"id":"org-1","name":"Test Org"}]`))
+			return
+		}
 		tokenCh <- r.Header.Get("x-yunxiao-token")
 		pathCh <- r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
@@ -196,6 +201,11 @@ func TestStreamableMCPUsesRequestAccessTokenForToolCall(t *testing.T) {
 func TestSSEMessageUsesQueryAccessTokenForToolCall(t *testing.T) {
 	tokenCh := make(chan string, 1)
 	apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/platform/organizations" {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`[{"id":"org-1","name":"Test Org"}]`))
+			return
+		}
 		tokenCh <- r.Header.Get("x-yunxiao-token")
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"id":"user-1"}`))

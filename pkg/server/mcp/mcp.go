@@ -46,6 +46,10 @@ func NewServer(configuration Configuration) (*Server, error) {
 		return nil, fmt.Errorf("create Yunxiao client: %w", err)
 	}
 
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		log.Warn().Err(err).Msg("failed to resolve default organization")
+	}
+
 	s := &Server{
 		configuration: &configuration,
 		server: server.NewMCPServer(
@@ -125,6 +129,12 @@ func (s *Server) registerTool(tool toolset.ServerTool) {
 		params, _ := request.Params.Arguments.(map[string]any)
 		if params == nil {
 			params = map[string]any{}
+		}
+
+		if orgID, ok := params["organizationId"].(string); !ok || orgID == "" {
+			if s.client.DefaultOrgID != "" {
+				params["organizationId"] = s.client.DefaultOrgID
+			}
 		}
 
 		result, err := tool.Handler(ctx, s.client, params)

@@ -200,6 +200,85 @@ func TestClientReturnsAPIError(t *testing.T) {
 	}
 }
 
+func TestClientResolveDefaultOrgIDWithSingleOrganization(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/oapi/v1/platform/organizations" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`[{"id":"org-1","name":"My Org"}]`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
+	if client.DefaultOrgID != "org-1" {
+		t.Fatalf("DefaultOrgID = %q, want org-1", client.DefaultOrgID)
+	}
+}
+
+func TestClientResolveDefaultOrgIDWithWrappedData(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"data":[{"id":"org-wrapped","name":"Wrapped Org"}]}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
+	if client.DefaultOrgID != "org-wrapped" {
+		t.Fatalf("DefaultOrgID = %q, want org-wrapped", client.DefaultOrgID)
+	}
+}
+
+func TestClientResolveDefaultOrgIDWithMultipleOrganizations(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`[{"id":"org-1","name":"Org 1"},{"id":"org-2","name":"Org 2"}]`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
+	if client.DefaultOrgID != "" {
+		t.Fatalf("DefaultOrgID = %q, want empty for multiple orgs", client.DefaultOrgID)
+	}
+}
+
+func TestClientResolveDefaultOrgIDWithZeroOrganizations(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`[]`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
+	if client.DefaultOrgID != "" {
+		t.Fatalf("DefaultOrgID = %q, want empty for zero orgs", client.DefaultOrgID)
+	}
+}
+
 func TestEncodeRepositoryID(t *testing.T) {
 	tests := []struct {
 		name string

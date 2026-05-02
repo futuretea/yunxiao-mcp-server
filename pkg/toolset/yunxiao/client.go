@@ -28,10 +28,11 @@ type accessTokenContextKey struct{}
 
 // Client is a minimal Yunxiao OpenAPI client.
 type Client struct {
-	baseURL     *url.URL
-	accessToken string
-	httpClient  *http.Client
-	userAgent   string
+	baseURL      *url.URL
+	accessToken  string
+	httpClient   *http.Client
+	userAgent    string
+	DefaultOrgID string
 }
 
 // APIError includes response context from a failed Yunxiao API call.
@@ -99,6 +100,39 @@ func NewClient(baseURL, accessToken string, timeout time.Duration) (*Client, err
 		httpClient:  &http.Client{Timeout: timeout},
 		userAgent:   fmt.Sprintf("modelcontextprotocol/%s/%s", version.BinaryName, version.Version),
 	}, nil
+}
+
+// ResolveDefaultOrgID fetches the user's organizations and, if exactly one exists,
+// caches its ID as the default organization for automatic parameter filling.
+func (c *Client) ResolveDefaultOrgID(ctx context.Context) error {
+	resp, err := c.Request(ctx, http.MethodGet, "/platform/organizations", nil, nil)
+	if err != nil {
+		return fmt.Errorf("list organizations: %w", err)
+	}
+
+	// Try array format first
+	var orgList []struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	if err := json.Unmarshal(resp.Body, &orgList); err == nil && len(orgList) == 1 {
+		c.DefaultOrgID = orgList[0].ID
+		return nil
+	}
+
+	// Try { data: [...] } format
+	var wrapped struct {
+		Data []struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(resp.Body, &wrapped); err == nil && len(wrapped.Data) == 1 {
+		c.DefaultOrgID = wrapped.Data[0].ID
+		return nil
+	}
+
+	return nil
 }
 
 func normalizeAPIBaseURL(raw string) (*url.URL, error) {
