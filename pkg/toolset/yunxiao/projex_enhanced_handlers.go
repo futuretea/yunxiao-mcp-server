@@ -300,6 +300,56 @@ func responsePayload(resp *Response) any {
 	return payload
 }
 
+func handleGetMyProjectWorkitems(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, projectID, err := requiredOrganizationAndID(params)
+	if err != nil {
+		return "", err
+	}
+	userID, err := requiredString(params, "userId")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	categories := splitCSV(optionalStringDefault(params, "categories", "Task,Bug"))
+	if len(categories) == 0 {
+		return "", fmt.Errorf("categories must include at least one category")
+	}
+
+	relation := optionalStringDefault(params, "relation", "assigned")
+	searchParams := copyParams(params)
+	switch relation {
+	case "assigned":
+		searchParams["assignedTo"] = userID
+	case "created":
+		searchParams["creator"] = userID
+	default:
+		return "", fmt.Errorf("relation must be assigned or created")
+	}
+
+	result, err := buildCategoryResult(ctx, categories, myProjectWorkitemFilters(params, userID, relation, categories),
+		func(cat string) (any, error) {
+			return searchProjectWorkitemSummaryCategory(ctx, c, organizationID, projectID, cat, searchParams)
+		})
+	if err != nil {
+		return "", err
+	}
+	return marshalPretty(result)
+}
+
+func myProjectWorkitemFilters(params map[string]any, userID, relation string, categories []string) map[string]any {
+	return map[string]any{
+		"userId":      userID,
+		"relation":    relation,
+		"categories":  categories,
+		"status":      optionalStringDefault(params, "status", ""),
+		"sampleLimit": normalizedSampleLimit(params),
+	}
+}
+
 func handleGetSprintOverview(ctx context.Context, client any, params map[string]any) (string, error) {
 	organizationID, projectID, err := requiredOrganizationAndID(params)
 	if err != nil {

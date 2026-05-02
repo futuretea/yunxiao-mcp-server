@@ -318,3 +318,103 @@ func TestHandleGetSprintOverviewRejectsEmptyCategories(t *testing.T) {
 		t.Fatal("handleGetSprintOverview() expected missing categories error")
 	}
 }
+
+func TestHandleGetMyProjectWorkitemsBuildsAssignedSearch(t *testing.T) {
+	seen := map[string]int{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems:search" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		category, _ := body["category"].(string)
+		seen["cat:"+category]++
+		conditions, _ := body["conditions"].(string)
+		if !strings.Contains(conditions, `"fieldIdentifier":"assignedTo"`) {
+			t.Fatalf("conditions = %q", conditions)
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[{"id":"wi-1"}]`))
+	})
+
+	result, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"userId":         "user-1",
+		"relation":       "assigned",
+		"categories":     "Task,Bug",
+		"sampleLimit":    float64(3),
+	})
+	if err != nil {
+		t.Fatalf("handleGetMyProjectWorkitems() error = %v", err)
+	}
+	if seen["cat:Task"] != 1 || seen["cat:Bug"] != 1 {
+		t.Fatalf("seen = %#v", seen)
+	}
+	if !strings.Contains(result, `"assigned"`) || !strings.Contains(result, `"userId"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleGetMyProjectWorkitemsBuildsCreatedSearch(t *testing.T) {
+	seen := map[string]int{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if !strings.Contains(conditions, `"fieldIdentifier":"creator"`) {
+			t.Fatalf("conditions = %q", conditions)
+		}
+		seen["search"]++
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	_, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"userId":         "user-1",
+		"relation":       "created",
+		"categories":     "Task",
+	})
+	if err != nil {
+		t.Fatalf("handleGetMyProjectWorkitems() error = %v", err)
+	}
+	if seen["search"] != 1 {
+		t.Fatalf("seen = %#v", seen)
+	}
+}
+
+func TestHandleGetMyProjectWorkitemsRejectsInvalidRelation(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request with invalid relation")
+	})
+
+	if _, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"userId":         "user-1",
+		"relation":       "invalid",
+	}); err == nil {
+		t.Fatal("handleGetMyProjectWorkitems() expected invalid relation error")
+	}
+}
+
+func TestHandleGetMyProjectWorkitemsRejectsMissingUserId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without userId")
+	})
+
+	if _, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+	}); err == nil {
+		t.Fatal("handleGetMyProjectWorkitems() expected missing userId error")
+	}
+}

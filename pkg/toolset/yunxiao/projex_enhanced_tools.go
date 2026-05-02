@@ -75,6 +75,20 @@ func projexEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetSprintOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_my_project_workitems",
+				mcp.WithDescription("Get work items assigned to or created by a specific user for one project, grouped by category."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("userId", mcp.Required(), mcp.Description("User ID to filter work items by.")),
+				mcp.WithString("relation", mcp.Description("Filter relation: assigned or created. Defaults to assigned.")),
+				mcp.WithString("categories", mcp.Description("Comma-separated work item categories. Defaults to Task,Bug.")),
+				mcp.WithString("status", mcp.Description("Comma-separated status IDs applied to every category.")),
+				mcp.WithNumber("sampleLimit", mcp.Description("Samples returned per category. Defaults to 5, clamped to 0-200.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetMyProjectWorkitems,
+		},
 	}
 	tools = append(tools, projexInsightTools()...)
 	return tools
