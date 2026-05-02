@@ -59,3 +59,21 @@ func TestHandleListWorkitemActivitiesBuildsPath(t *testing.T) {
 		t.Fatalf("handleListWorkitemActivities() error = %v", err)
 	}
 }
+
+func TestHandleListVersionsRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListVersions(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleListWorkitemActivitiesRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListWorkitemActivities(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}

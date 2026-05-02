@@ -123,3 +123,57 @@ func TestHandleListAllProjectRolesBuildsPath(t *testing.T) {
 		t.Fatalf("handleListAllProjectRoles() error = %v", err)
 	}
 }
+
+func TestHandleListProjectMembersRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListProjectMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleListProjectTemplatesRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListProjectTemplates(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleGetProjectTemplateFieldConfigRequiresId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetProjectTemplateFieldConfig(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+}
+
+func TestHandleListProjectProgramRequiresProgramIdentifier(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListProjectProgram(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing programIdentifier error")
+	}
+}
+
+func TestHandleListProjectRolesRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListProjectRoles(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleListAllProjectRolesRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListAllProjectRoles(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
