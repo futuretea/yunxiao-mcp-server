@@ -338,8 +338,17 @@ func TestPlatformHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetOrganizationDepartmentInfo(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing organizationId error")
 	}
+	if _, err := handleGetOrganizationDepartmentInfo(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetOrganizationDepartmentInfo(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "dept-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 	if _, err := handleGetOrganizationDepartmentAncestors(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetOrganizationDepartmentAncestors(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "dept-1"}); err == nil {
+		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListOrganizationMembers(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing organizationId error")

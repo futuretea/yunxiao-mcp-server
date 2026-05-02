@@ -99,6 +99,17 @@ func TestAppstackGlobalVarHandlersRequireParams(t *testing.T) {
 	}
 }
 
+func TestAppstackGlobalVarHandlersReturnAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleListGlobalVars(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+}
+
 func TestAppstackGlobalVarPath(t *testing.T) {
 	if got := appstackGlobalVarPath("org-1", "group/1"); got != "/appstack/organizations/org-1/globalVars/group%2F1" {
 		t.Fatalf("appstackGlobalVarPath() = %q", got)

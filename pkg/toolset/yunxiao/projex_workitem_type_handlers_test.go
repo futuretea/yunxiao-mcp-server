@@ -238,8 +238,21 @@ func TestRequiredOrganizationProjectAndWorkItemTypeRequiresOrganizationId(t *tes
 }
 
 func TestProjexWorkitemTypeHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
 	if _, err := handleListAllWorkItemTypes(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
 		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListWorkItemTypes(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleListWorkItemTypes(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing projectId error")
+	}
+	if _, err := handleListWorkItemTypes(context.Background(), client, map[string]any{"organizationId": "org-1", "projectId": "project-1"}); err == nil {
+		t.Fatal("expected missing category error")
 	}
 	if _, err := handleListWorkItemTypes(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "category": "Task"}); err == nil {
 		t.Fatal("expected getClient error")

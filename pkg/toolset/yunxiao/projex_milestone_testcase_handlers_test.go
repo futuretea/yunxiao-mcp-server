@@ -325,6 +325,17 @@ func TestRequiredOrganizationTestRepoAndTestcase(t *testing.T) {
 	}
 }
 
+func TestHandleListTestcaseRepositoriesReturnsAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleListTestcaseRepositories(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+}
+
 func TestProjexTestRepoPath(t *testing.T) {
 	if got := projexTestRepoPath("org-1", "repo/1"); got != "/projex/organizations/org-1/testRepos/repo%2F1" {
 		t.Fatalf("projexTestRepoPath() = %q", got)

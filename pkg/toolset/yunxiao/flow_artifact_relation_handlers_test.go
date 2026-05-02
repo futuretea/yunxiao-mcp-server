@@ -129,6 +129,9 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetPipelineScanReportURL(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleGetPipelineScanReportURL(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing reportPath error")
+	}
 	if _, err := handleGetPipelineScanReportURL(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "reportPath": "/r"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
@@ -164,6 +167,9 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 	if _, err := handleListPipelineRelations(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleListPipelineRelations(context.Background(), client, map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected missing relObjectType error")
+	}
 	if _, err := handleListPipelineRelations(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "relObjectType": "VARIABLE_GROUP"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
@@ -172,6 +178,38 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 	}
 	if _, err := handleGetLastInstance(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
 		t.Fatal("expected getClient error")
+	}
+}
+
+func TestFlowArtifactRelationHandlersReturnAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetPipelineScanReportURL(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "reportPath": "/r",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetPipelineArtifactURL(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "filePath": "/a", "fileName": "a",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetPipelineEmasArtifactURL(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "emasJobInstanceId": "emas-1", "md5": "abc123",
+		"pipelineId": "1", "pipelineRunId": "1", "serviceConnectionId": "1",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleListPipelineRelations(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "pipelineId": "p-1", "relObjectType": "VARIABLE_GROUP",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetLastInstance(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "pipelineId": "p-1",
+	}); err == nil {
+		t.Fatal("expected API error")
 	}
 }
 

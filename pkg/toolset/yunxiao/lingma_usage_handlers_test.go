@@ -125,6 +125,12 @@ func TestLingmaUsageHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetDeveloperUsage(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing organizationId error")
 	}
+	if _, err := handleGetDeveloperUsage(context.Background(), client, map[string]any{"organizationId": "org-1", "userId": "user-1"}); err == nil {
+		t.Fatal("expected missing startTime error")
+	}
+	if _, err := handleGetDeveloperUsage(context.Background(), client, map[string]any{"organizationId": "org-1", "userId": "user-1", "startTime": "2026-04-01"}); err == nil {
+		t.Fatal("expected missing endTime error")
+	}
 	if _, err := handleGetDeveloperUsage(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "userId": "user-1", "startTime": "2026-04-01", "endTime": "2026-04-30"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
@@ -168,5 +174,48 @@ func TestHandleGetDeveloperUsageBuildsQueryWithUserID(t *testing.T) {
 	}
 	if !strings.Contains(result, `"pagination"`) {
 		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleGetDeveloperUsageBuildsQueryWithDepartmentID(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/lingma/organizations/org-1/developerUsage" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		if r.URL.Query().Get("userId") != "" ||
+			r.URL.Query().Get("departmentId") != "dept-1" ||
+			r.URL.Query().Get("startTime") != "2026-04-01" ||
+			r.URL.Query().Get("endTime") != "2026-04-30" {
+			t.Fatalf("query = %q", r.URL.RawQuery)
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[{"departmentId":"dept-1"}]`))
+	})
+
+	result, err := handleGetDeveloperUsage(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"departmentId":   "dept-1",
+		"startTime":      "2026-04-01",
+		"endTime":        "2026-04-30",
+	})
+	if err != nil {
+		t.Fatalf("handleGetDeveloperUsage() error = %v", err)
+	}
+	if !strings.Contains(result, `"pagination"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestLingmaUsageHandlersReturnAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetDeveloperUsage(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "userId": "user-1", "startTime": "2026-04-01", "endTime": "2026-04-30",
+	}); err == nil {
+		t.Fatal("expected API error")
 	}
 }

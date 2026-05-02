@@ -147,6 +147,12 @@ func TestCodeupRepositoryMetadataHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetPushRule(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleGetProtectedBranch(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetPushRule(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
+		t.Fatal("expected missing pushRuleId error")
+	}
 	if _, err := handleListTags(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
@@ -164,6 +170,42 @@ func TestCodeupRepositoryMetadataHandlersRequireParams(t *testing.T) {
 	}
 	if _, err := handleGetPushRule(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo", "pushRuleId": float64(1)}); err == nil {
 		t.Fatal("expected getClient error")
+	}
+}
+
+func TestCodeupRepositoryMetadataHandlersReturnAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleListTags(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "repositoryId": "group/repo",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleListRepositoryMembers(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "repositoryId": "group/repo",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleListProtectedBranches(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "repositoryId": "group/repo",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetProtectedBranch(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "repositoryId": "group/repo", "id": float64(1),
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleListPushRules(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "repositoryId": "group/repo",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetPushRule(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "repositoryId": "group/repo", "pushRuleId": float64(1),
+	}); err == nil {
+		t.Fatal("expected API error")
 	}
 }
 

@@ -181,6 +181,9 @@ func TestAppstackResourceProxyHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetPodContainerLog(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleGetPodContainerLog(context.Background(), client, map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "pod-1"}); err == nil {
+		t.Fatal("expected missing container error")
+	}
 	if _, err := handleGetPodContainerLog(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "pod-1", "container": "app"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
@@ -193,6 +196,9 @@ func TestAppstackResourceProxyHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetKubernetesObjectInfo(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleGetKubernetesObjectInfo(context.Background(), client, map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "obj-1"}); err == nil {
+		t.Fatal("expected missing kind error")
+	}
 	if _, err := handleGetKubernetesObjectInfo(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "obj-1", "kind": "Deployment"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
@@ -201,6 +207,32 @@ func TestAppstackResourceProxyHandlersRequireParams(t *testing.T) {
 	}
 	if _, err := handleGetDeploymentRevisionInfo(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "env-1", "namespace": "ns-1", "name": "deploy-1", "revision": "rev-1"}); err == nil {
 		t.Fatal("expected getClient error")
+	}
+}
+
+func TestAppstackResourceProxyHandlersReturnAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetPodContainerLog(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "pod-1", "container": "app",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetPodInfo(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "pod-1",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetKubernetesObjectInfo(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "obj-1", "kind": "Deployment",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetDeploymentRevisionInfo(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "envName": "env-1", "namespace": "ns-1", "name": "deploy-1", "revision": "rev-1",
+	}); err == nil {
+		t.Fatal("expected API error")
 	}
 }
 

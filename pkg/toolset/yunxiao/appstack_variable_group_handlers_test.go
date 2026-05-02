@@ -80,6 +80,9 @@ func TestAppstackVariableGroupHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetEnvVariableGroups(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleGetEnvVariableGroups(context.Background(), client, map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected missing envName error")
+	}
 	if _, err := handleGetVariableGroup(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
@@ -107,6 +110,32 @@ func TestRequiredAppVariableGroupRequiresVariableGroupName(t *testing.T) {
 	_, _, _, err := requiredAppVariableGroup(map[string]any{"organizationId": "org-1", "appName": "app-1"})
 	if err == nil {
 		t.Fatal("expected missing variableGroupName error")
+	}
+}
+
+func TestAppstackVariableGroupHandlersReturnAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetEnvVariableGroups(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "envName": "dev",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetVariableGroup(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "variableGroupName": "vg-1",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetAppVariableGroups(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+	if _, err := handleGetAppVariableGroupsRevision(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1",
+	}); err == nil {
+		t.Fatal("expected API error")
 	}
 }
 

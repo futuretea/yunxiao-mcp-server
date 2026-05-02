@@ -260,6 +260,22 @@ func TestClientResolveDefaultOrgIDWithMultipleOrganizations(t *testing.T) {
 	}
 }
 
+func TestClientResolveDefaultOrgIDReturnsErrorOnRequestFailure(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	if err := client.ResolveDefaultOrgID(context.Background()); err == nil {
+		t.Fatal("ResolveDefaultOrgID() expected error")
+	}
+}
+
 func TestClientResolveDefaultOrgIDWithZeroOrganizations(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`[]`))
