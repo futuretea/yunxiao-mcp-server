@@ -148,3 +148,55 @@ func TestHandleListApplicationSourcesBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleListApplicationSources() error = %v", err)
 	}
 }
+
+func TestHandleSearchAppTemplatesRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleSearchAppTemplates(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleListEnvironmentsRequiresAppName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListEnvironments(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing appName error")
+	}
+}
+
+func TestHandleGetEnvironmentRequiresEnvName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetEnvironment(context.Background(), client, map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected missing envName error")
+	}
+}
+
+func TestHandleListApplicationMembersRequiresAppName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListApplicationMembers(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing appName error")
+	}
+}
+
+func TestHandleListApplicationSourcesRequiresAppName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListApplicationSources(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing appName error")
+	}
+}
+
+func TestRequiredAppEnvironmentRequiresEnvName(t *testing.T) {
+	_, _, _, err := requiredAppEnvironment(map[string]any{"organizationId": "org-1", "appName": "app-1"})
+	if err == nil {
+		t.Fatal("expected missing envName error")
+	}
+}
