@@ -137,10 +137,44 @@ func TestLingmaKnowledgeBaseHandlersRequireParams(t *testing.T) {
 		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
 	})
 
-	_, err := handleListKbFiles(context.Background(), client, map[string]any{
-		"organizationId": "org-1",
-	})
-	if err == nil {
+	if _, err := handleListKnowledgeBases(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListKnowledgeBases(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListKbFiles(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
 		t.Fatal("handleListKbFiles() expected missing kbId error")
+	}
+	if _, err := handleListKbFiles(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "kbId": "kb-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListKbMembers(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing kbId error")
+	}
+	if _, err := handleListKbMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "kbId": "kb-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestLingmaKnowledgeBaseHelpers(t *testing.T) {
+	q := lingmaKnowledgeBaseListQuery(map[string]any{
+		"query":     "docs",
+		"sceneType": "chat",
+		"userId":    "user-1",
+		"page":      float64(2),
+		"perPage":   float64(20),
+	})
+	if q.Get("query") != "docs" || q.Get("sceneType") != "chat" || q.Get("userId") != "user-1" || q.Get("page") != "2" || q.Get("perPage") != "20" {
+		t.Fatalf("lingmaKnowledgeBaseListQuery() = %v", q)
+	}
+
+	cq := lingmaKnowledgeBaseChildListQuery(map[string]any{"query": "readme", "orderBy": "id", "sort": "asc", "page": float64(1)})
+	if cq.Get("query") != "readme" || cq.Get("orderBy") != "id" || cq.Get("sort") != "asc" || cq.Get("page") != "1" {
+		t.Fatalf("lingmaKnowledgeBaseChildListQuery() = %v", cq)
+	}
+
+	if got := lingmaKnowledgeBasePath("org-1", "kb/1"); got != "/lingma/organizations/org-1/knowledgeBases/kb%2F1" {
+		t.Fatalf("lingmaKnowledgeBasePath() = %q", got)
 	}
 }
