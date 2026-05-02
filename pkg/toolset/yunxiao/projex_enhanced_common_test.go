@@ -1,6 +1,8 @@
 package yunxiao
 
 import (
+	"context"
+	"fmt"
 	"testing"
 )
 
@@ -74,6 +76,61 @@ func TestNormalizedSampleLimit(t *testing.T) {
 				t.Fatalf("normalizedSampleLimit(%v) = %d, want %d", tt.val, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestBuildCategoryResultReturnsErrorOnSearchFailure(t *testing.T) {
+	_, err := buildCategoryResult(context.Background(), []string{"Bug"}, map[string]any{}, func(string) (any, error) {
+		return nil, fmt.Errorf("search failed")
+	})
+	if err == nil {
+		t.Fatal("buildCategoryResult() expected error")
+	}
+}
+
+func TestExtractStatusName(t *testing.T) {
+	tests := []struct {
+		name string
+		item any
+		want string
+	}{
+		{"nil", nil, ""},
+		{"string", "not-a-map", ""},
+		{"map without status", map[string]any{"id": "1"}, ""},
+		{"map with string status", map[string]any{"status": "TODO"}, ""},
+		{"map with status missing name", map[string]any{"status": map[string]any{"id": "1"}}, ""},
+		{"map with valid status", map[string]any{"status": map[string]any{"name": "TODO"}}, "TODO"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := extractStatusName(tt.item); got != tt.want {
+				t.Fatalf("extractStatusName(%v) = %q, want %q", tt.item, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGroupWorkitemsByStatus(t *testing.T) {
+	data := []any{
+		map[string]any{"status": map[string]any{"name": "TODO"}},
+		map[string]any{"status": map[string]any{"name": "TODO"}},
+		map[string]any{"status": map[string]any{"name": "DOING"}},
+		map[string]any{"id": "no-status"},
+	}
+
+	columns, counts := groupWorkitemsByStatus(data)
+
+	if len(columns["TODO"].([]any)) != 2 {
+		t.Fatalf("TODO column = %v", columns["TODO"])
+	}
+	if len(columns["DOING"].([]any)) != 1 {
+		t.Fatalf("DOING column = %v", columns["DOING"])
+	}
+	if len(columns["Unknown"].([]any)) != 1 {
+		t.Fatalf("Unknown column = %v", columns["Unknown"])
+	}
+	if counts["TODO"] != 2 || counts["DOING"] != 1 || counts["Unknown"] != 1 {
+		t.Fatalf("counts = %v", counts)
 	}
 }
 
