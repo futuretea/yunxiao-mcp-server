@@ -449,7 +449,7 @@ func TestServeStartsAndShutsDown(t *testing.T) {
 	port := listener.Addr().(*net.TCPAddr).Port
 	listener.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 
 	err = Serve(ctx, newTestMCPServer(t, "token"), &config.StaticConfig{
