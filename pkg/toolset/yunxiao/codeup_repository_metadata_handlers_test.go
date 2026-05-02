@@ -124,6 +124,31 @@ func TestHandleListPushRulesBuildsPath(t *testing.T) {
 	}
 }
 
+func TestCodeupRepositoryMetadataHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListTags(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleListRepositoryMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleListProtectedBranches(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetProtectedBranch(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleListPushRules(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetPushRule(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+}
+
 func TestHandleGetPushRuleBuildsPath(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
