@@ -343,6 +343,25 @@ func TestMiddlewareDoesNotLogQueryString(t *testing.T) {
 	}
 }
 
+func TestMiddlewareSkipsLoggingForHealthEndpoint(t *testing.T) {
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, HealthEndpoint, nil)
+	called := false
+	handler := RequestMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	handler.ServeHTTP(rec, req)
+
+	if !called {
+		t.Fatal("handler was not called for health endpoint")
+	}
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d", rec.Code)
+	}
+}
+
 func TestLoggingResponseWriterIsIdempotent(t *testing.T) {
 	rec := httptest.NewRecorder()
 	lrw := &loggingResponseWriter{ResponseWriter: rec, statusCode: http.StatusOK}
