@@ -80,3 +80,48 @@ func TestHandleListAppStackChangeRequestWorkItemsBuildsPath(t *testing.T) {
 		t.Fatalf("handleListAppStackChangeRequestWorkItems() error = %v", err)
 	}
 }
+
+func TestHandleGetAppStackChangeRequestAuditItemsRequiresRefType(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetAppStackChangeRequestAuditItems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"sn":             "cr-1",
+	}); err == nil {
+		t.Fatal("expected missing refType error")
+	}
+}
+
+func TestHandleListAppStackChangeRequestExecutionsRequiresReleaseWorkflowSn(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListAppStackChangeRequestExecutions(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"sn":             "cr-1",
+	}); err == nil {
+		t.Fatal("expected missing releaseWorkflowSn error")
+	}
+}
+
+func TestHandleListAppStackChangeRequestWorkItemsRequiresSn(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListAppStackChangeRequestWorkItems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+	}); err == nil {
+		t.Fatal("expected missing sn error")
+	}
+}
+
+func TestRequiredAppStackChangeRequestRequiresSn(t *testing.T) {
+	_, _, _, err := requiredAppStackChangeRequest(map[string]any{"organizationId": "org-1", "appName": "app-1"})
+	if err == nil {
+		t.Fatal("expected missing sn error")
+	}
+}
