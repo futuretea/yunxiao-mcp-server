@@ -340,3 +340,30 @@ func TestHandleGetProjectRiskDashboardWithHighPriorityAndStale(t *testing.T) {
 		t.Fatal("expected stale search")
 	}
 }
+
+func TestHandleGetProjectRiskDashboardReturnsSearchError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("expected search error")
+	}
+}
+
+func TestHandleGetProjectMemberTaskStatusReturnsSearchError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"assigneeIds":    "user-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("expected search error")
+	}
+}
