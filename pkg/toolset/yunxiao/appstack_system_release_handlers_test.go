@@ -145,3 +145,106 @@ func TestHandleListReleaseExecutionsBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleListReleaseExecutions() error = %v", err)
 	}
 }
+
+func TestAppstackSystemReleaseHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListSystemReleaseWorkflows(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListSystemReleaseWorkflows(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetRelease(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetRelease(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1", "sn": "rel-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListReleaseMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListReleaseMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1", "sn": "rel-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListReleaseProducts(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListReleaseProducts(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1", "sn": "rel-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAttachedChangeRequests(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAttachedChangeRequests(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1", "releaseSn": "rel-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListReleaseExecutions(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListReleaseExecutions(context.Background(), client, map[string]any{"organizationId": "org-1", "systemName": "sys-1", "sn": "rel-1"}); err == nil {
+		t.Fatal("expected missing releaseWorkflowSn error")
+	}
+	if _, err := handleListReleaseExecutions(context.Background(), client, map[string]any{"organizationId": "org-1", "systemName": "sys-1", "sn": "rel-1", "releaseWorkflowSn": "rw-1"}); err == nil {
+		t.Fatal("expected missing releaseStageSn error")
+	}
+	if _, err := handleListReleaseExecutions(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1", "sn": "rel-1", "releaseWorkflowSn": "rw-1", "releaseStageSn": "rs-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestRequiredOrganizationAndSystem(t *testing.T) {
+	if _, _, err := requiredOrganizationAndSystem(map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, _, err := requiredOrganizationAndSystem(map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing systemName error")
+	}
+	org, sys, err := requiredOrganizationAndSystem(map[string]any{"organizationId": "org-1", "systemName": "sys/1"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if org != "org-1" || sys != "sys/1" {
+		t.Fatalf("unexpected values: %q %q", org, sys)
+	}
+}
+
+func TestRequiredSystemRelease(t *testing.T) {
+	if _, _, _, err := requiredSystemRelease(map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, _, _, err := requiredSystemRelease(map[string]any{"organizationId": "org-1", "systemName": "sys-1"}); err == nil {
+		t.Fatal("expected missing sn error")
+	}
+	org, sys, sn, err := requiredSystemRelease(map[string]any{"organizationId": "org-1", "systemName": "sys-1", "sn": "rel-1"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if org != "org-1" || sys != "sys-1" || sn != "rel-1" {
+		t.Fatalf("unexpected values: %q %q %q", org, sys, sn)
+	}
+}
+
+func TestRequiredSystemReleaseWithKey(t *testing.T) {
+	if _, _, _, err := requiredSystemReleaseWithKey(map[string]any{"organizationId": "org-1", "systemName": "sys-1"}, "releaseSn"); err == nil {
+		t.Fatal("expected missing releaseSn error")
+	}
+	org, sys, sn, err := requiredSystemReleaseWithKey(map[string]any{"organizationId": "org-1", "systemName": "sys-1", "releaseSn": "rel-1"}, "releaseSn")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if org != "org-1" || sys != "sys-1" || sn != "rel-1" {
+		t.Fatalf("unexpected values: %q %q %q", org, sys, sn)
+	}
+}
+
+func TestAppstackSystemReleasePaths(t *testing.T) {
+	if got := appstackSystemPath("org-1", "sys/1"); got != "/appstack/organizations/org-1/systems/sys%2F1" {
+		t.Fatalf("appstackSystemPath() = %q", got)
+	}
+	if got := appstackSystemReleasePath("org-1", "sys/1", "rel/1"); got != "/appstack/organizations/org-1/systems/sys%2F1/releases/rel%2F1" {
+		t.Fatalf("appstackSystemReleasePath() = %q", got)
+	}
+}
