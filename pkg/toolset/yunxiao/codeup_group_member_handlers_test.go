@@ -86,4 +86,10 @@ func TestCodeUpGroupMemberHandlersRequireParams(t *testing.T) {
 	if err == nil {
 		t.Fatal("handleGetMemberHTTPSCloneUsername() expected missing userId error")
 	}
+	if _, err := handleListGroupMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "groupId": "g-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetMemberHTTPSCloneUsername(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "userId": "u-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 }
