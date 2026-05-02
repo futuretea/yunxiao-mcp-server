@@ -130,3 +130,45 @@ func TestHandleGetDeploymentRevisionInfoBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleGetDeploymentRevisionInfo() error = %v", err)
 	}
 }
+
+func TestRequiredResourceProxyObjectRequiresResourcePath(t *testing.T) {
+	_, _, _, _, err := requiredResourceProxyObject(map[string]any{"organizationId": "org-1"})
+	if err == nil {
+		t.Fatal("expected missing resourcePath error")
+	}
+}
+
+func TestRequiredResourceProxyObjectRequiresNamespace(t *testing.T) {
+	_, _, _, _, err := requiredResourceProxyObject(map[string]any{"organizationId": "org-1", "resourcePath": "rp-1"})
+	if err == nil {
+		t.Fatal("expected missing namespace error")
+	}
+}
+
+func TestRequiredResourceProxyObjectRequiresName(t *testing.T) {
+	_, _, _, _, err := requiredResourceProxyObject(map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1"})
+	if err == nil {
+		t.Fatal("expected missing name error")
+	}
+}
+
+func TestRequiredDeploymentRevisionRequiresNamespace(t *testing.T) {
+	_, _, _, _, _, _, err := requiredDeploymentRevision(map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "env-1"})
+	if err == nil {
+		t.Fatal("expected missing namespace error")
+	}
+}
+
+func TestRequiredDeploymentRevisionRequiresName(t *testing.T) {
+	_, _, _, _, _, _, err := requiredDeploymentRevision(map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "env-1", "namespace": "ns-1"})
+	if err == nil {
+		t.Fatal("expected missing name error")
+	}
+}
+
+func TestRequiredDeploymentRevisionRequiresRevision(t *testing.T) {
+	_, _, _, _, _, _, err := requiredDeploymentRevision(map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "env-1", "namespace": "ns-1", "name": "deploy-1"})
+	if err == nil {
+		t.Fatal("expected missing revision error")
+	}
+}
