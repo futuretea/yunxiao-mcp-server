@@ -8,6 +8,93 @@ import (
 	"testing"
 )
 
+func TestHandleGetCurrentUserBuildsPath(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/platform/users:me" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"id":"user-1"}`))
+	})
+
+	result, err := handleGetCurrentUser(context.Background(), client, nil)
+	if err != nil {
+		t.Fatalf("handleGetCurrentUser() error = %v", err)
+	}
+	if !strings.Contains(result, `"id"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleGetCurrentOrganizationInfoBuildsPath(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/oapi/v1/platform/users:me" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"id":"user-1"}`))
+	})
+
+	if _, err := handleGetCurrentOrganizationInfo(context.Background(), client, nil); err != nil {
+		t.Fatalf("handleGetCurrentOrganizationInfo() error = %v", err)
+	}
+}
+
+func TestHandleListOrganizationsBuildsQuery(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/platform/organizations" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		if r.URL.Query().Get("page") != "2" || r.URL.Query().Get("perPage") != "50" {
+			t.Fatalf("query = %q", r.URL.RawQuery)
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[{"id":"org-1"}]`))
+	})
+
+	if _, err := handleListOrganizations(context.Background(), client, map[string]any{
+		"page":    float64(2),
+		"perPage": float64(50),
+	}); err != nil {
+		t.Fatalf("handleListOrganizations() error = %v", err)
+	}
+}
+
+func TestHandleGetUserOrganizationsBuildsQuery(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/oapi/v1/platform/organizations" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`[{"id":"org-1"}]`))
+	})
+
+	if _, err := handleGetUserOrganizations(context.Background(), client, nil); err != nil {
+		t.Fatalf("handleGetUserOrganizations() error = %v", err)
+	}
+}
+
+func TestHandleGetOrganizationBuildsPath(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/platform/organizations/org-1" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"id":"org-1"}`))
+	})
+
+	if _, err := handleGetOrganization(context.Background(), client, map[string]any{
+		"id": "org-1",
+	}); err != nil {
+		t.Fatalf("handleGetOrganization() error = %v", err)
+	}
+}
+
 func TestHandleListOrganizationDepartmentsBuildsPathAndQuery(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
