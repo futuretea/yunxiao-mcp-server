@@ -144,3 +144,53 @@ func TestHandleGetWebHookBuildsPath(t *testing.T) {
 		t.Fatalf("handleGetWebHook() error = %v", err)
 	}
 }
+
+func TestCodeupAccessHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListSSHKeys(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListSSHKeys(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetSSHKey(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetSSHKey(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing keyId error")
+	}
+	if _, err := handleGetSSHKey(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "keyId": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListUserSSHKeys(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListUserSSHKeys(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "userId": "u-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListWebHooks(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListWebHooks(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetWebHook(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetWebHook(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing hookId error")
+	}
+	if _, err := handleGetWebHook(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "hookId": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestCodeupKeyListQuery(t *testing.T) {
+	q := codeupKeyListQuery(map[string]any{"page": float64(2), "perPage": float64(20), "orderBy": "id", "sort": "asc"})
+	if q.Get("page") != "2" || q.Get("perPage") != "20" || q.Get("orderBy") != "id" || q.Get("sort") != "asc" {
+		t.Fatalf("codeupKeyListQuery() = %v", q)
+	}
+}
