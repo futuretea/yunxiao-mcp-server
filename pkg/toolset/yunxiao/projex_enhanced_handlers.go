@@ -242,6 +242,10 @@ func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[s
 		"filters": map[string]any{
 			"category":    category,
 			"sprint":      sprintID,
+			"subject":     optionalStringDefault(params, "subject", ""),
+			"status":      optionalStringDefault(params, "status", ""),
+			"assignedTo":  optionalStringDefault(params, "assignedTo", ""),
+			"creator":     optionalStringDefault(params, "creator", ""),
 			"sampleLimit": normalizedSampleLimit(params),
 		},
 		"columns": map[string]any{},

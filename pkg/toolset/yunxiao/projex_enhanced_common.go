@@ -144,7 +144,10 @@ func mergeConditions(existing, extra string) string {
 func sprintOverviewFilters(params map[string]any, categories []string) map[string]any {
 	return map[string]any{
 		"categories":  categories,
+		"subject":     optionalStringDefault(params, "subject", ""),
 		"status":      optionalStringDefault(params, "status", ""),
+		"assignedTo":  optionalStringDefault(params, "assignedTo", ""),
+		"creator":     optionalStringDefault(params, "creator", ""),
 		"sampleLimit": normalizedSampleLimit(params),
 	}
 }
