@@ -193,6 +193,23 @@ func extractStatusName(item any) string {
 	return name
 }
 
+func groupWorkitemsByStatus(data []any) (map[string]any, map[string]int) {
+	columns := map[string]any{}
+	counts := map[string]int{}
+	for _, item := range data {
+		statusName := extractStatusName(item)
+		if statusName == "" {
+			statusName = "Unknown"
+		}
+		if columns[statusName] == nil {
+			columns[statusName] = []any{}
+		}
+		columns[statusName] = append(columns[statusName].([]any), item)
+		counts[statusName]++
+	}
+	return columns, counts
+}
+
 func marshalPretty(value any) (string, error) {
 	formatted, err := json.MarshalIndent(value, "", "  ")
 	if err != nil {
