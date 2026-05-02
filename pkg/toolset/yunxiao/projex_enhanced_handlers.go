@@ -56,20 +56,14 @@ func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map
 		return "", fmt.Errorf("categories must include at least one category")
 	}
 
-	summary := map[string]any{
-		"filters":    projectWorkitemSummaryFilters(params, categories),
-		"categories": map[string]any{},
+	result, err := buildCategoryResult(ctx, categories, projectWorkitemSummaryFilters(params, categories),
+		func(cat string) (any, error) {
+			return searchProjectWorkitemSummaryCategory(ctx, c, organizationID, projectID, cat, params)
+		})
+	if err != nil {
+		return "", err
 	}
-	categoryPayloads := summary["categories"].(map[string]any)
-	for _, category := range categories {
-		payload, err := searchProjectWorkitemSummaryCategory(ctx, c, organizationID, projectID, category, params)
-		if err != nil {
-			return "", err
-		}
-		categoryPayloads[category] = payload
-	}
-
-	return marshalPretty(summary)
+	return marshalPretty(result)
 }
 
 func handleGetProjectWorkitemContext(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -331,39 +325,39 @@ func handleGetSprintOverview(ctx context.Context, client any, params map[string]
 		return "", fmt.Errorf("sprint: %w", err)
 	}
 
-	overview := map[string]any{
-		"sprint":     responsePayload(sprintResp),
-		"filters":    sprintOverviewFilters(params, categories),
+	result, err := buildCategoryResult(ctx, categories, sprintOverviewFilters(params, categories),
+		func(cat string) (any, error) {
+			return searchSprintWorkitems(ctx, c, organizationID, projectID, sprintID, cat, params)
+		})
+	if err != nil {
+		return "", err
+	}
+	result["sprint"] = responsePayload(sprintResp)
+	return marshalPretty(result)
+}
+
+func buildCategoryResult(ctx context.Context, categories []string, filters map[string]any, searchFn func(string) (any, error)) (map[string]any, error) {
+	result := map[string]any{
+		"filters":    filters,
 		"categories": map[string]any{},
 	}
-	categoryPayloads := overview["categories"].(map[string]any)
+	payloads := result["categories"].(map[string]any)
 	for _, category := range categories {
-		payload, err := searchSprintWorkitems(ctx, c, organizationID, projectID, sprintID, category, params)
+		payload, err := searchFn(category)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
-		categoryPayloads[category] = payload
+		payloads[category] = payload
 	}
-	return marshalPretty(overview)
+	return result, nil
 }
 
 func searchSprintWorkitems(ctx context.Context, c *Client, organizationID, projectID, sprintID, category string, params map[string]any) (any, error) {
 	body := projectWorkitemSummaryBody(projectID, category, params)
-	conditions := buildWorkitemConditions(map[string]any{
-		"sprint": sprintID,
-	})
-	if conditions != "" {
-		if existing, ok := body["conditions"].(string); ok && existing != "" {
-			var existingArr []map[string]any
-			var newArr []map[string]any
-			_ = json.Unmarshal([]byte(existing), &existingArr)
-			_ = json.Unmarshal([]byte(conditions), &newArr)
-			merged := append(existingArr, newArr...)
-			mergedBytes, _ := json.Marshal(merged)
-			body["conditions"] = string(mergedBytes)
-		} else {
-			body["conditions"] = conditions
-		}
+	sprintConditions := buildWorkitemConditions(map[string]any{"sprint": sprintID})
+	if sprintConditions != "" {
+		existing, _ := body["conditions"].(string)
+		body["conditions"] = mergeConditions(existing, sprintConditions)
 	}
 	path := projexOrganizationPath(organizationID) + "/workitems:search"
 	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
@@ -371,6 +365,21 @@ func searchSprintWorkitems(ctx context.Context, c *Client, organizationID, proje
 		return nil, fmt.Errorf("%s: %w", category, err)
 	}
 	return responsePayload(resp), nil
+}
+
+func mergeConditions(existing, extra string) string {
+	if existing == "" {
+		return extra
+	}
+	if extra == "" {
+		return existing
+	}
+	var existingArr, extraArr []map[string]any
+	_ = json.Unmarshal([]byte(existing), &existingArr)
+	_ = json.Unmarshal([]byte(extra), &extraArr)
+	merged := append(existingArr, extraArr...)
+	mergedBytes, _ := json.Marshal(merged)
+	return string(mergedBytes)
 }
 
 func sprintOverviewFilters(params map[string]any, categories []string) map[string]any {
