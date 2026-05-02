@@ -172,3 +172,55 @@ func TestRequiredDeploymentRevisionRequiresRevision(t *testing.T) {
 		t.Fatal("expected missing revision error")
 	}
 }
+
+func TestAppstackResourceProxyHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetPodContainerLog(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetPodContainerLog(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "pod-1", "container": "app"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetPodInfo(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetPodInfo(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "pod-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetKubernetesObjectInfo(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetKubernetesObjectInfo(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "resourcePath": "rp-1", "namespace": "ns-1", "name": "obj-1", "kind": "Deployment"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetDeploymentRevisionInfo(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetDeploymentRevisionInfo(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "env-1", "namespace": "ns-1", "name": "deploy-1", "revision": "rev-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestRequiredResourceProxyObjectRequiresOrganizationId(t *testing.T) {
+	_, _, _, _, err := requiredResourceProxyObject(map[string]any{})
+	if err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestRequiredResourceProxyObjectRequiresResourcePathOnly(t *testing.T) {
+	_, _, _, _, err := requiredResourceProxyObject(map[string]any{"organizationId": "org-1"})
+	if err == nil {
+		t.Fatal("expected missing resourcePath error")
+	}
+}
+
+func TestRequiredDeploymentRevisionRequiresAppEnvironment(t *testing.T) {
+	_, _, _, _, _, _, err := requiredDeploymentRevision(map[string]any{})
+	if err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
