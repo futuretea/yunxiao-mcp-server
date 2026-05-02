@@ -236,3 +236,12 @@ func TestLoadConfigReturnsErrorForMissingConfigFile(t *testing.T) {
 		t.Fatal("LoadConfig() expected error for missing config file")
 	}
 }
+
+func TestLoadConfigReturnsErrorForInvalidValidation(t *testing.T) {
+	v := viper.New()
+	v.Set("port", -1)
+	_, err := LoadConfig("", v)
+	if err == nil {
+		t.Fatal("LoadConfig() expected validation error")
+	}
+}

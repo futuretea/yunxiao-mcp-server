@@ -402,6 +402,17 @@ func TestNewServerMinimalModeOverridesProjectFocused(t *testing.T) {
 	}
 }
 
+func TestFilterToolsByDomainsNoFilterReturnsAll(t *testing.T) {
+	tools := []toolset.ServerTool{
+		{Tool: mcp.NewTool("a"), Domain: "platform"},
+		{Tool: mcp.NewTool("b"), Domain: "projex"},
+	}
+	got := filterToolsByDomains(tools, nil, nil)
+	if len(got) != 2 {
+		t.Fatalf("len = %d, want 2", len(got))
+	}
+}
+
 func TestIsHealthy(t *testing.T) {
 	if newTestServer(nil, nil).IsHealthy() {
 		t.Fatal("test server without client should not be healthy")
