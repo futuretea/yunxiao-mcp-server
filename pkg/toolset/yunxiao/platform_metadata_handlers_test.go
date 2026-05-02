@@ -73,11 +73,17 @@ func TestPlatformMetadataHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetUser(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("handleGetUser() expected missing idOrUsername error")
 	}
+	if _, err := handleGetUser(context.Background(), "invalid-client", map[string]any{"idOrUsername": "user-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 
 	_, err := handleListAppExtensionFeatures(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 	})
 	if err == nil {
 		t.Fatal("handleListAppExtensionFeatures() expected missing type error")
+	}
+	if _, err := handleListAppExtensionFeatures(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "type": "ext-1"}); err == nil {
+		t.Fatal("expected getClient error")
 	}
 }
