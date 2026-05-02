@@ -207,3 +207,21 @@ func TestRequiredAppEnvironmentRequiresOrganizationId(t *testing.T) {
 		t.Fatal("expected missing organizationId error")
 	}
 }
+
+func TestAppstackApplicationMetadataHandlersRequireParams(t *testing.T) {
+	if _, err := handleSearchAppTemplates(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListEnvironments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetEnvironment(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "env-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListApplicationMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListApplicationSources(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
