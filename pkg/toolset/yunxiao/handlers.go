@@ -86,29 +86,27 @@ func buildWorkitemConditions(params map[string]any) string {
 	if subject, _ := params["subject"].(string); subject != "" {
 		filterConditions = append(filterConditions, stringContainsCondition("subject", subject))
 	}
-	if status, _ := params["status"].(string); status != "" {
-		filterConditions = append(filterConditions, listContainsCondition("status", "status", splitCSV(status)))
+
+	type listCondition struct {
+		key, field, className string
 	}
-	if assignedTo, _ := params["assignedTo"].(string); assignedTo != "" {
-		filterConditions = append(filterConditions, listContainsCondition("assignedTo", "user", splitCSV(assignedTo)))
+	listConditions := []listCondition{
+		{"status", "status", "status"},
+		{"assignedTo", "assignedTo", "user"},
+		{"creator", "creator", "user"},
+		{"sprint", "sprint", "sprint"},
+		{"workitemType", "workitemType", "workitemType"},
+		{"statusStage", "statusStage", "statusStage"},
+		{"priority", "priority", "option"},
 	}
-	if creator, _ := params["creator"].(string); creator != "" {
-		filterConditions = append(filterConditions, listContainsCondition("creator", "user", splitCSV(creator)))
+	for _, lc := range listConditions {
+		if value, _ := params[lc.key].(string); value != "" {
+			filterConditions = append(filterConditions, listContainsCondition(lc.field, lc.className, splitCSV(value)))
+		}
 	}
-	if sprint, _ := params["sprint"].(string); sprint != "" {
-		filterConditions = append(filterConditions, listContainsCondition("sprint", "sprint", splitCSV(sprint)))
-	}
-	if workitemType, _ := params["workitemType"].(string); workitemType != "" {
-		filterConditions = append(filterConditions, listContainsCondition("workitemType", "workitemType", splitCSV(workitemType)))
-	}
-	if statusStage, _ := params["statusStage"].(string); statusStage != "" {
-		filterConditions = append(filterConditions, listContainsCondition("statusStage", "statusStage", splitCSV(statusStage)))
-	}
+
 	if tag, _ := params["tag"].(string); tag != "" {
 		filterConditions = append(filterConditions, containsCondition("tag", "tag", "multiList", splitCSV(tag)))
-	}
-	if priority, _ := params["priority"].(string); priority != "" {
-		filterConditions = append(filterConditions, listContainsCondition("priority", "option", splitCSV(priority)))
 	}
 	if subjectDescription, _ := params["subjectDescription"].(string); subjectDescription != "" {
 		filterConditions = append(filterConditions, stringContainsCondition("subject-description", subjectDescription))
