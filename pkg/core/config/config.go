@@ -24,6 +24,7 @@ type StaticConfig struct {
 	ReadOnly              bool     `mapstructure:"read_only"`
 	EnabledTools          []string `mapstructure:"enabled_tools"`
 	DisabledTools         []string `mapstructure:"disabled_tools"`
+	ProjectFocused        bool     `mapstructure:"project_focused"`
 	RequestTimeoutSeconds int      `mapstructure:"request_timeout_seconds"`
 }
 
@@ -69,6 +70,7 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	v.SetDefault("read_only", true)
 	v.SetDefault("enabled_tools", []string{})
 	v.SetDefault("disabled_tools", []string{})
+	v.SetDefault("project_focused", false)
 	v.SetDefault("request_timeout_seconds", 30)
 
 	if configPath != "" {

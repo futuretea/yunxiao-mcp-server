@@ -68,7 +68,13 @@ func NewServer(configuration Configuration) (*Server, error) {
 }
 
 func (s *Server) registerTools() error {
-	yunxiaoTools := (&yunxiaoToolset.Toolset{ReadOnly: s.configuration.ReadOnly}).GetTools(s.client)
+	toolsetBuilder := &yunxiaoToolset.Toolset{ReadOnly: s.configuration.ReadOnly}
+	var yunxiaoTools []toolset.ServerTool
+	if s.configuration.ProjectFocused {
+		yunxiaoTools = toolsetBuilder.GetProjectFocusedTools(s.client)
+	} else {
+		yunxiaoTools = toolsetBuilder.GetTools(s.client)
+	}
 	if err := validateToolFilters(yunxiaoTools, s.configuration.EnabledTools, s.configuration.DisabledTools); err != nil {
 		return err
 	}

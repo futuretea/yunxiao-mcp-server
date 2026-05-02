@@ -122,3 +122,75 @@ func TestRequestAccessTokenUsesQueryParam(t *testing.T) {
 		t.Fatalf("access token = %q", got)
 	}
 }
+
+func TestNewServerProjectFocusedMode(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		ProjectFocused:        true,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+
+	// Should include platform tools
+	hasCurrentUser := false
+	for _, name := range enabled {
+		if name == "get_current_user" {
+			hasCurrentUser = true
+			break
+		}
+	}
+	if !hasCurrentUser {
+		t.Fatalf("project-focused mode should include platform tools, got %v", enabled)
+	}
+
+	// Should include projex tools
+	hasProjectOverview := false
+	for _, name := range enabled {
+		if name == "get_project_overview" {
+			hasProjectOverview = true
+			break
+		}
+	}
+	if !hasProjectOverview {
+		t.Fatalf("project-focused mode should include projex enhanced tools, got %v", enabled)
+	}
+
+	// Should NOT include codeup tools
+	for _, name := range enabled {
+		if name == "list_repositories" {
+			t.Fatalf("project-focused mode should not include codeup tools, got %v", enabled)
+		}
+	}
+
+	// Should NOT include superseded raw projex tools
+	for _, name := range enabled {
+		if name == "get_project" {
+			t.Fatalf("project-focused mode should hide superseded raw tool get_project, got %v", enabled)
+		}
+	}
+}
+
+func TestNewServerProjectFocusedModeAllowsExplicitEnable(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		ProjectFocused:        true,
+		EnabledTools:          []string{"get_current_user"},
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+	if len(enabled) != 1 || enabled[0] != "get_current_user" {
+		t.Fatalf("explicit enabled tools should override project-focused defaults, got %v", enabled)
+	}
+}

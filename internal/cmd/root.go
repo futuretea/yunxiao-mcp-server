@@ -53,6 +53,7 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 	command.Flags().Bool("read-only", true, "run in read-only mode")
 	command.Flags().StringSlice("enabled-tools", []string{}, "comma-separated list of tool names to enable")
 	command.Flags().StringSlice("disabled-tools", []string{}, "comma-separated list of tool names to disable")
+	command.Flags().Bool("project-focused", false, "only register project-focused tools (platform + projex) by default")
 	command.Flags().Int("request-timeout-seconds", 30, "Yunxiao API request timeout in seconds")
 
 	command.AddCommand(newVersionCommand(streams))
@@ -69,6 +70,7 @@ func bindFlags(v *viper.Viper, cmd *cobra.Command) error {
 		"read_only":               "read-only",
 		"enabled_tools":           "enabled-tools",
 		"disabled_tools":          "disabled-tools",
+		"project_focused":         "project-focused",
 		"request_timeout_seconds": "request-timeout-seconds",
 	}
 

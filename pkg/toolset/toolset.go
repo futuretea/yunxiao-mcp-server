@@ -17,6 +17,7 @@ type Toolset interface {
 type ServerTool struct {
 	Tool    mcp.Tool
 	Handler ToolHandler
+	Domain  string
 }
 
 // ToolHandler handles a tool call.
