@@ -66,3 +66,39 @@ func TestHandleListSystemMembersBuildsPathAndDefaultQuery(t *testing.T) {
 		t.Fatalf("handleListSystemMembers() error = %v", err)
 	}
 }
+
+func TestAppstackSystemHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListSystems(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListSystems(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAttachedApps(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAttachedApps(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListSystemMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListSystemMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "systemName": "sys-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestAppstackDefaultPageQuery(t *testing.T) {
+	q := appstackDefaultPageQuery(map[string]any{"current": float64(2), "pageSize": float64(20)})
+	if q.Get("current") != "2" || q.Get("pageSize") != "20" {
+		t.Fatalf("appstackDefaultPageQuery() = %v", q)
+	}
+	q2 := appstackDefaultPageQuery(map[string]any{})
+	if q2.Get("current") != "1" || q2.Get("pageSize") != "10" {
+		t.Fatalf("appstackDefaultPageQuery(defaults) = %v", q2)
+	}
+}
