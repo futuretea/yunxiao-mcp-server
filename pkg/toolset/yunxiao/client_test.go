@@ -301,6 +301,45 @@ func TestAccessTokenFromContext(t *testing.T) {
 	}
 }
 
+func TestWithAccessTokenReturnsOriginalContextForEmptyToken(t *testing.T) {
+	ctx := context.Background()
+	got := WithAccessToken(ctx, "")
+	if got != ctx {
+		t.Fatal("WithAccessToken(ctx, \"\") should return original context")
+	}
+}
+
+func TestNewClientReturnsErrorForInvalidBaseURL(t *testing.T) {
+	_, err := NewClient("://invalid-url", "token", time.Second)
+	if err == nil {
+		t.Fatal("NewClient() expected error for invalid base URL")
+	}
+}
+
+func TestClientGetJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
+	client, err := NewClient("https://example.com", "token-1", time.Millisecond)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	_, err = client.GetJSONWithMetadata(context.Background(), "/platform/users:me", nil)
+	if err == nil {
+		t.Fatal("GetJSONWithMetadata() expected request error")
+	}
+}
+
+func TestClientPostJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
+	client, err := NewClient("https://example.com", "token-1", time.Millisecond)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	_, err = client.PostJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": "value"})
+	if err == nil {
+		t.Fatal("PostJSONWithMetadata() expected request error")
+	}
+}
+
 func TestEncodeRepositoryID(t *testing.T) {
 	tests := []struct {
 		name string
