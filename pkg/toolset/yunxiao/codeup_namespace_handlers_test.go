@@ -127,3 +127,46 @@ func TestHandleGetOrgNamespaceBuildsPath(t *testing.T) {
 		t.Fatalf("handleGetOrgNamespace() error = %v", err)
 	}
 }
+
+func TestCodeupNamespaceHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListTemplateRepositories(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListTemplateRepositories(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing templateType error")
+	}
+	if _, err := handleListTemplateRepositories(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "templateType": float64(1)}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListNamespaces(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListNamespaces(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetNamespace(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetNamespace(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing namespaceId error")
+	}
+	if _, err := handleGetNamespace(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "namespaceId": "ns-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetOrgNamespace(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetOrgNamespace(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestCodeupOrganizationPath(t *testing.T) {
+	if got := codeupOrganizationPath("org-1"); got != "/codeup/organizations/org-1" {
+		t.Fatalf("codeupOrganizationPath() = %q", got)
+	}
+}
