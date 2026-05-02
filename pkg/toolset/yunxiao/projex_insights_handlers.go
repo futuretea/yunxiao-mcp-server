@@ -248,9 +248,11 @@ func parseStatusGroups(params map[string]any) (map[string]string, error) {
 func riskDashboardFilters(params map[string]any, categories []string) map[string]any {
 	return map[string]any{
 		"categories":    categories,
+		"subject":       optionalStringDefault(params, "subject", ""),
 		"status":        optionalStringDefault(params, "status", ""),
 		"statusStage":   optionalStringDefault(params, "statusStage", ""),
 		"assignedTo":    optionalStringDefault(params, "assignedTo", ""),
+		"creator":       optionalStringDefault(params, "creator", ""),
 		"sprint":        optionalStringDefault(params, "sprint", ""),
 		"workitemType":  optionalStringDefault(params, "workitemType", ""),
 		"tag":           optionalStringDefault(params, "tag", ""),
@@ -265,8 +267,11 @@ func projectTaskStatusFilters(params map[string]any, assigneeIDs []string, group
 	return map[string]any{
 		"assigneeIds":   assigneeIDs,
 		"categories":    splitCSV(optionalStringDefault(params, "categories", "Task,Bug")),
+		"subject":       optionalStringDefault(params, "subject", ""),
 		"status":        optionalStringDefault(params, "status", ""),
 		"statusStage":   optionalStringDefault(params, "statusStage", ""),
+		"assignedTo":    optionalStringDefault(params, "assignedTo", ""),
+		"creator":       optionalStringDefault(params, "creator", ""),
 		"sprint":        optionalStringDefault(params, "sprint", ""),
 		"workitemType":  optionalStringDefault(params, "workitemType", ""),
 		"tag":           optionalStringDefault(params, "tag", ""),
