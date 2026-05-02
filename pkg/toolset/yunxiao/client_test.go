@@ -309,6 +309,21 @@ func TestWithAccessTokenReturnsOriginalContextForEmptyToken(t *testing.T) {
 	}
 }
 
+func TestPrettyJSONReturnsRawForInvalidJSON(t *testing.T) {
+	invalid := []byte(`{invalid`)
+	if got := prettyJSON(invalid); got != string(invalid) {
+		t.Fatalf("prettyJSON() = %q, want raw", got)
+	}
+}
+
+func TestPrettyResponseJSONWrapsInvalidBodyAsString(t *testing.T) {
+	resp := &Response{Body: []byte(`{invalid`)}
+	got := prettyResponseJSON(resp)
+	if !strings.Contains(got, `"data"`) || !strings.Contains(got, "{invalid") {
+		t.Fatalf("prettyResponseJSON() = %q", got)
+	}
+}
+
 func TestNewClientReturnsErrorForInvalidBaseURL(t *testing.T) {
 	_, err := NewClient("://invalid-url", "token", time.Second)
 	if err == nil {
