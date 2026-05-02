@@ -24,6 +24,8 @@ type StaticConfig struct {
 	ReadOnly              bool     `mapstructure:"read_only"`
 	EnabledTools          []string `mapstructure:"enabled_tools"`
 	DisabledTools         []string `mapstructure:"disabled_tools"`
+	EnabledDomains        []string `mapstructure:"enabled_domains"`
+	DisabledDomains       []string `mapstructure:"disabled_domains"`
 	ProjectFocused        bool     `mapstructure:"project_focused"`
 	RequestTimeoutSeconds int      `mapstructure:"request_timeout_seconds"`
 }
@@ -70,6 +72,8 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	v.SetDefault("read_only", true)
 	v.SetDefault("enabled_tools", []string{})
 	v.SetDefault("disabled_tools", []string{})
+	v.SetDefault("enabled_domains", []string{})
+	v.SetDefault("disabled_domains", []string{})
 	v.SetDefault("project_focused", false)
 	v.SetDefault("request_timeout_seconds", 30)
 
@@ -97,6 +101,8 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	cfg.LogLevel = strings.ToLower(strings.TrimSpace(cfg.LogLevel))
 	cfg.EnabledTools = normalizeStringSlice(cfg.EnabledTools)
 	cfg.DisabledTools = normalizeStringSlice(cfg.DisabledTools)
+	cfg.EnabledDomains = normalizeStringSlice(cfg.EnabledDomains)
+	cfg.DisabledDomains = normalizeStringSlice(cfg.DisabledDomains)
 
 	if err := cfg.Validate(); err != nil {
 		return nil, err

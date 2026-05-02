@@ -69,12 +69,19 @@ func NewServer(configuration Configuration) (*Server, error) {
 
 func (s *Server) registerTools() error {
 	toolsetBuilder := &yunxiaoToolset.Toolset{ReadOnly: s.configuration.ReadOnly}
+
 	var yunxiaoTools []toolset.ServerTool
-	if s.configuration.ProjectFocused {
+	switch {
+	case len(s.configuration.EnabledDomains) > 0:
+		yunxiaoTools = filterToolsByDomains(toolsetBuilder.GetTools(s.client), s.configuration.EnabledDomains, nil)
+	case len(s.configuration.DisabledDomains) > 0:
+		yunxiaoTools = filterToolsByDomains(toolsetBuilder.GetTools(s.client), nil, s.configuration.DisabledDomains)
+	case s.configuration.ProjectFocused:
 		yunxiaoTools = toolsetBuilder.GetProjectFocusedTools(s.client)
-	} else {
+	default:
 		yunxiaoTools = toolsetBuilder.GetTools(s.client)
 	}
+
 	if err := validateToolFilters(yunxiaoTools, s.configuration.EnabledTools, s.configuration.DisabledTools); err != nil {
 		return err
 	}
@@ -86,11 +93,43 @@ func (s *Server) registerTools() error {
 		s.registerTool(tool)
 	}
 	if len(s.enabledTools) == 0 {
-		return fmt.Errorf("no MCP tools enabled; check enabled_tools and disabled_tools")
+		return fmt.Errorf("no MCP tools enabled; check enabled_tools, disabled_tools, enable_domains, disable_domains")
 	}
 
 	log.Info().Int("count", len(s.enabledTools)).Msg("registered MCP tools")
 	return nil
+}
+
+func filterToolsByDomains(tools []toolset.ServerTool, enabled, disabled []string) []toolset.ServerTool {
+	if len(enabled) > 0 {
+		allowed := make(map[string]struct{}, len(enabled))
+		for _, d := range enabled {
+			allowed[d] = struct{}{}
+		}
+		filtered := make([]toolset.ServerTool, 0, len(tools))
+		for _, tool := range tools {
+			if _, ok := allowed[tool.Domain]; ok {
+				filtered = append(filtered, tool)
+			}
+		}
+		return filtered
+	}
+
+	if len(disabled) > 0 {
+		blocked := make(map[string]struct{}, len(disabled))
+		for _, d := range disabled {
+			blocked[d] = struct{}{}
+		}
+		filtered := make([]toolset.ServerTool, 0, len(tools))
+		for _, tool := range tools {
+			if _, ok := blocked[tool.Domain]; !ok {
+				filtered = append(filtered, tool)
+			}
+		}
+		return filtered
+	}
+
+	return tools
 }
 
 func validateToolFilters(tools []toolset.ServerTool, enabledTools, disabledTools []string) error {

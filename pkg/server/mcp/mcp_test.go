@@ -194,3 +194,101 @@ func TestNewServerProjectFocusedModeAllowsExplicitEnable(t *testing.T) {
 		t.Fatalf("explicit enabled tools should override project-focused defaults, got %v", enabled)
 	}
 }
+
+func TestNewServerEnableDomainsWhitelist(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		EnabledDomains:        []string{"platform"},
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+	for _, name := range enabled {
+		if name == "search_projects" {
+			t.Fatalf("enable-domains whitelist should exclude projex, got %v", enabled)
+		}
+	}
+	if len(enabled) == 0 {
+		t.Fatal("enable-domains whitelist should include platform tools")
+	}
+}
+
+func TestNewServerDisableDomainsBlacklist(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		DisabledDomains:       []string{"codeup", "flow", "appstack", "lingma", "packages"},
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+	for _, name := range enabled {
+		if name == "list_repositories" || name == "list_pipelines" {
+			t.Fatalf("disable-domains blacklist should exclude codeup/flow, got %v", enabled)
+		}
+	}
+	// Should still include platform and projex
+	hasPlatform := false
+	hasProjex := false
+	for _, name := range enabled {
+		if name == "get_current_user" {
+			hasPlatform = true
+		}
+		if name == "get_project_overview" {
+			hasProjex = true
+		}
+	}
+	if !hasPlatform {
+		t.Fatalf("disable-domains should keep platform, got %v", enabled)
+	}
+	if !hasProjex {
+		t.Fatalf("disable-domains should keep projex, got %v", enabled)
+	}
+}
+
+func TestNewServerEnableDomainsOverridesProjectFocused(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		ProjectFocused:        true,
+		EnabledDomains:        []string{"platform", "projex", "codeup"},
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+
+	// Should include codeup because enabled_domains overrides project_focused
+	hasCodeup := false
+	for _, name := range enabled {
+		if name == "list_repositories" {
+			hasCodeup = true
+		}
+	}
+	if !hasCodeup {
+		t.Fatalf("enabled_domains should override project_focused, expected codeup tools, got %v", enabled)
+	}
+
+	// Should include superseded raw tools because enabled_domains does not hide them
+	hasGetProject := false
+	for _, name := range enabled {
+		if name == "get_project" {
+			hasGetProject = true
+		}
+	}
+	if !hasGetProject {
+		t.Fatalf("enabled_domains should include all projex tools including get_project, got %v", enabled)
+	}
+}
