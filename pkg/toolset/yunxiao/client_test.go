@@ -533,3 +533,38 @@ func TestClientRequestReturnsReadError(t *testing.T) {
 		t.Fatalf("error = %v", err)
 	}
 }
+
+type blockingTransport struct {
+	blockUntil context.Context
+}
+
+func (t *blockingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	select {
+	case <-t.blockUntil.Done():
+		return nil, t.blockUntil.Err()
+	case <-req.Context().Done():
+		return nil, req.Context().Err()
+	}
+}
+
+func TestClientRequestRespectsContextCancellation(t *testing.T) {
+	client, err := NewClient("https://example.com", "token", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	blockCtx, blockCancel := context.WithCancel(context.Background())
+	defer blockCancel()
+	client.httpClient = &http.Client{Transport: &blockingTransport{blockUntil: blockCtx}}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	_, err = client.Request(ctx, http.MethodGet, "/test", nil, nil)
+	if err == nil {
+		t.Fatal("Request() expected context cancellation error")
+	}
+	if !strings.Contains(err.Error(), "request failed") {
+		t.Fatalf("error = %v", err)
+	}
+}
