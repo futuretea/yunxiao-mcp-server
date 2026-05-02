@@ -112,3 +112,34 @@ func TestHandleGetCheckRunBuildsPath(t *testing.T) {
 		t.Fatalf("handleGetCheckRun() error = %v", err)
 	}
 }
+
+func TestCodeupCheckHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListCommitStatuses(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListCommitStatuses(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing sha error")
+	}
+	if _, err := handleListCommitStatuses(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "sha": "abc123"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListCheckRuns(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListCheckRuns(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "ref": "main"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetCheckRun(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetCheckRun(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing checkRunId error")
+	}
+	if _, err := handleGetCheckRun(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "checkRunId": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
