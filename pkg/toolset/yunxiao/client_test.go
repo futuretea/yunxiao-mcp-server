@@ -279,6 +279,18 @@ func TestClientResolveDefaultOrgIDWithZeroOrganizations(t *testing.T) {
 	}
 }
 
+func TestAPIErrorFormat(t *testing.T) {
+	errNoBody := &APIError{Method: "GET", URL: "/path", StatusCode: 404}
+	if got := errNoBody.Error(); got != "Yunxiao API error: GET /path returned status 404" {
+		t.Fatalf("Error() = %q", got)
+	}
+
+	errWithBody := &APIError{Method: "POST", URL: "/path", StatusCode: 500, Body: `{"error":"fail"}`}
+	if got := errWithBody.Error(); got != `Yunxiao API error: POST /path returned status 500: {"error":"fail"}` {
+		t.Fatalf("Error() = %q", got)
+	}
+}
+
 func TestEncodeRepositoryID(t *testing.T) {
 	tests := []struct {
 		name string

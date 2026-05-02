@@ -22,6 +22,28 @@ func newHandlerTestClient(t *testing.T, handler http.HandlerFunc) *Client {
 	return client
 }
 
+func TestBuildProjectConditions(t *testing.T) {
+	tests := []struct {
+		name   string
+		params map[string]any
+		want   string
+	}{
+		{"empty", map[string]any{}, ""},
+		{"name only", map[string]any{"name": "demo"}, `{"conditionGroups":[[{"className":"string","fieldIdentifier":"name","format":"input","operator":"CONTAINS","toValue":null,"value":["demo"]}]]}`},
+		{"status only", map[string]any{"status": "TODO,DOING"}, `{"conditionGroups":[[{"className":"status","fieldIdentifier":"status","format":"list","operator":"CONTAINS","toValue":null,"value":["TODO","DOING"]}]]}`},
+		{"creator only", map[string]any{"creator": "alice"}, `{"conditionGroups":[[{"className":"user","fieldIdentifier":"creator","format":"list","operator":"CONTAINS","toValue":null,"value":["alice"]}]]}`},
+		{"multiple", map[string]any{"name": "demo", "status": "TODO"}, `{"conditionGroups":[[{"className":"string","fieldIdentifier":"name","format":"input","operator":"CONTAINS","toValue":null,"value":["demo"]},{"className":"status","fieldIdentifier":"status","format":"list","operator":"CONTAINS","toValue":null,"value":["TODO"]}]]}`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := buildProjectConditions(tt.params)
+			if got != tt.want {
+				t.Fatalf("buildProjectConditions() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestHandleListRepositoriesBuildsPathAndQuery(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/oapi/v1/codeup/organizations/org-1/repositories" {
