@@ -115,12 +115,22 @@ func TestCodeUpMergeRequestHandlersRequireParams(t *testing.T) {
 	if err == nil {
 		t.Fatal("handleListMergeRequests() expected missing organizationId error")
 	}
+	if _, err := handleListMergeRequests(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 
+	_, err = handleGetMergeRequest(context.Background(), client, map[string]any{})
+	if err == nil {
+		t.Fatal("handleGetMergeRequest() expected missing organizationId error")
+	}
 	_, err = handleGetMergeRequest(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 		"repositoryId":   "repo-1",
 	})
 	if err == nil {
 		t.Fatal("handleGetMergeRequest() expected missing iid error")
+	}
+	if _, err := handleGetMergeRequest(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "iid": "1"}); err == nil {
+		t.Fatal("expected getClient error")
 	}
 }
