@@ -236,6 +236,16 @@ func (s *Server) IsHealthy() bool {
 // Close releases server resources.
 func (s *Server) Close() {}
 
+// NewTestServer creates a server with explicit fields for testing.
+func NewTestServer(client *yunxiaoToolset.Client, enabledTools []string) *Server {
+	return &Server{
+		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
+		client:        client,
+		server:        server.NewMCPServer(version.BinaryName, version.Version),
+		enabledTools:  enabledTools,
+	}
+}
+
 func withRequestAccessToken(ctx context.Context, r *http.Request) context.Context {
 	return yunxiaoToolset.WithAccessToken(ctx, requestAccessToken(r))
 }

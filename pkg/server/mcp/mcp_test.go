@@ -756,3 +756,17 @@ func TestCloseIsNoOp(t *testing.T) {
 	s := newTestServer(nil, nil)
 	s.Close() // should not panic
 }
+
+func TestNewTestServerCreatesUnhealthyServer(t *testing.T) {
+	s := NewTestServer(nil, nil)
+	if s.IsHealthy() {
+		t.Fatal("NewTestServer(nil, nil) should not be healthy")
+	}
+}
+
+func TestNewTestServerCreatesHealthyServer(t *testing.T) {
+	s := NewTestServer(&yunxiaoToolset.Client{}, []string{"tool-1"})
+	if !s.IsHealthy() {
+		t.Fatal("NewTestServer with client and tools should be healthy")
+	}
+}

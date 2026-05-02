@@ -67,6 +67,21 @@ func TestHealthEndpointDoesNotRequireStartupAccessToken(t *testing.T) {
 	}
 }
 
+func TestHealthEndpointReturnsUnhealthy(t *testing.T) {
+	handler := NewHandler(mcpserver.NewTestServer(nil, nil), &http.Server{}, "")
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, HealthEndpoint, nil)
+
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusServiceUnavailable)
+	}
+	if rec.Body.String() != "unhealthy" {
+		t.Fatalf("body = %q, want unhealthy", rec.Body.String())
+	}
+}
+
 func TestStreamableMCPEndpointIsMounted(t *testing.T) {
 	handler := NewHandler(newTestMCPServer(t, "token"), &http.Server{}, "")
 	rec := httptest.NewRecorder()
@@ -424,4 +439,48 @@ type hijackableRecorder struct {
 
 func (h *hijackableRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	return h.conn, h.buf, nil
+}
+
+func TestServeStartsAndShutsDown(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("listen: %v", err)
+	}
+	port := listener.Addr().(*net.TCPAddr).Port
+	listener.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+
+	err = Serve(ctx, newTestMCPServer(t, "token"), &config.StaticConfig{
+		Port:                  port,
+		LogLevel:              "info",
+		BaseURL:               config.DefaultBaseURL,
+		RequestTimeoutSeconds: 30,
+	})
+	if err != nil {
+		t.Fatalf("Serve() error = %v", err)
+	}
+}
+
+func TestServeReturnsListenError(t *testing.T) {
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		t.Fatalf("listen: %v", err)
+	}
+	defer listener.Close()
+	port := listener.Addr().(*net.TCPAddr).Port
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	err = Serve(ctx, newTestMCPServer(t, "token"), &config.StaticConfig{
+		Port:                  port,
+		LogLevel:              "info",
+		BaseURL:               config.DefaultBaseURL,
+		RequestTimeoutSeconds: 30,
+	})
+	if err == nil {
+		t.Fatal("Serve() expected error for occupied port")
+	}
 }
