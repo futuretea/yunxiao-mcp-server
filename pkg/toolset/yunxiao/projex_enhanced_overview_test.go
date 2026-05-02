@@ -172,3 +172,33 @@ func TestHandleGetProjectWorkitemContextRequiresCategory(t *testing.T) {
 		t.Fatal("handleGetProjectWorkitemContext() expected missing category error")
 	}
 }
+
+func TestHandleGetProjectWorkitemContextSkipsTypeDetailWithoutWorkItemTypeId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes":
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/members":
+			_, _ = w.Write([]byte(`[{"id":"user-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/labels":
+			_, _ = w.Write([]byte(`[{"id":"label-1"}]`))
+		default:
+			if strings.Contains(r.URL.Path, "/workitemTypes/") {
+				t.Fatalf("unexpected type detail request without workItemTypeId: %s", r.URL.Path)
+			}
+			t.Fatalf("unexpected path = %q", r.URL.Path)
+		}
+	})
+
+	result, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemContext() error = %v", err)
+	}
+	if strings.Contains(result, `"fields"`) || strings.Contains(result, `"workflow"`) {
+		t.Fatalf("result should not contain fields or workflow without workItemTypeId: %q", result)
+	}
+}
