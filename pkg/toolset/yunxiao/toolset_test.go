@@ -251,3 +251,96 @@ func expectedLingmaToolNames() []string {
 		"list_kb_members",
 	}
 }
+
+func TestGetMinimalToolsReturnsExactSet(t *testing.T) {
+	want := []string{
+		"get_current_user",
+		"get_current_organization_info",
+		"search_projects",
+		"get_project_overview",
+		"get_project_risk_dashboard",
+		"search_workitems",
+		"get_workitem",
+		"get_project_workitem_summary",
+		"get_project_workitem_detail",
+		"get_my_project_workitems",
+		"get_project_workitem_board",
+		"list_sprints",
+		"get_sprint_overview",
+		"list_project_members",
+	}
+
+	tools := (&Toolset{ReadOnly: true}).GetMinimalTools(nil)
+	if len(tools) != len(want) {
+		t.Fatalf("tool count = %d, want %d", len(tools), len(want))
+	}
+
+	names := make(map[string]bool, len(tools))
+	for _, tool := range tools {
+		names[tool.Tool.Name] = true
+		if tool.Domain != "platform" && tool.Domain != "projex" {
+			t.Fatalf("tool %q has unexpected domain %q", tool.Tool.Name, tool.Domain)
+		}
+	}
+	for _, w := range want {
+		if !names[w] {
+			t.Fatalf("expected minimal tool %q", w)
+		}
+	}
+}
+
+func TestGetProjectFocusedToolsIncludesPlatformAndProjex(t *testing.T) {
+	tools := (&Toolset{ReadOnly: true}).GetProjectFocusedTools(nil)
+
+	hasPlatform := false
+	hasProjex := false
+	for _, tool := range tools {
+		switch tool.Domain {
+		case "platform":
+			hasPlatform = true
+		case "projex":
+			hasProjex = true
+		default:
+			t.Fatalf("unexpected domain %q for tool %q", tool.Domain, tool.Tool.Name)
+		}
+	}
+	if !hasPlatform {
+		t.Fatal("project-focused tools should include platform tools")
+	}
+	if !hasProjex {
+		t.Fatal("project-focused tools should include projex tools")
+	}
+}
+
+func TestGetProjectFocusedToolsHidesSupersededTools(t *testing.T) {
+	tools := (&Toolset{ReadOnly: true}).GetProjectFocusedTools(nil)
+	for _, tool := range tools {
+		if tool.Tool.Name == "get_project" {
+			t.Fatal("project-focused tools should hide get_project")
+		}
+		if tool.Tool.Name == "get_sprint" {
+			t.Fatal("project-focused tools should hide get_sprint")
+		}
+		if tool.Tool.Name == "list_work_item_comments" {
+			t.Fatal("project-focused tools should hide list_work_item_comments")
+		}
+	}
+}
+
+func TestGetProjectFocusedToolsIncludesEnhancedAlternatives(t *testing.T) {
+	tools := (&Toolset{ReadOnly: true}).GetProjectFocusedTools(nil)
+
+	want := []string{"get_project_overview", "get_sprint_overview"}
+	for _, w := range want {
+		found := false
+		for _, tool := range tools {
+			if tool.Tool.Name == w {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("project-focused tools should include %q", w)
+		}
+	}
+}
