@@ -42,6 +42,21 @@ func TestHandleGetDepartmentUsageBuildsQueryWithMetadata(t *testing.T) {
 	}
 }
 
+func TestHandleGetDepartmentUsageRequiresDepartmentId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	_, err := handleGetDepartmentUsage(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"startTime":      "2026-04-01",
+		"endTime":        "2026-04-30",
+	})
+	if err == nil {
+		t.Fatal("handleGetDepartmentUsage() expected missing departmentId error")
+	}
+}
+
 func TestHandleListDeveloperMembersBuildsQueryWithMetadata(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
