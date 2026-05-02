@@ -137,6 +137,40 @@ func TestRequiredNumberPathStringRejectsEmptyAndMissing(t *testing.T) {
 	}
 }
 
+func TestPackagesHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListPackageRepositories(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListPackageRepositories(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListArtifacts(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListArtifacts(context.Background(), client, map[string]any{"organizationId": "org-1", "repoId": "repo-1"}); err == nil {
+		t.Fatal("expected missing repoType error")
+	}
+	if _, err := handleListArtifacts(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repoId": "repo-1", "repoType": "MAVEN"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetArtifact(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetArtifact(context.Background(), client, map[string]any{"organizationId": "org-1", "repoId": "repo-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetArtifact(context.Background(), client, map[string]any{"organizationId": "org-1", "repoId": "repo-1", "id": float64(1)}); err == nil {
+		t.Fatal("expected missing repoType error")
+	}
+	if _, err := handleGetArtifact(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repoId": "repo-1", "id": float64(1), "repoType": "MAVEN"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
 func TestRequiredOrganizationAndPackageRepoRequiresRepoId(t *testing.T) {
 	_, _, err := requiredOrganizationAndPackageRepo(map[string]any{"organizationId": "org-1"})
 	if err == nil {
