@@ -146,3 +146,136 @@ func TestHandleGetChangeRequestCommentBuildsPath(t *testing.T) {
 		t.Fatalf("handleGetChangeRequestComment() error = %v", err)
 	}
 }
+
+func TestCodeupHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListRepositories(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListRepositories(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetRepository(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetRepository(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListBranches(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListBranches(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetBranch(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetBranch(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing branchName error")
+	}
+	if _, err := handleGetBranch(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "branchName": "main"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListFiles(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListFiles(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetFileBlobs(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetFileBlobs(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing filePath error")
+	}
+	if _, err := handleGetFileBlobs(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "filePath": "main.go"}); err == nil {
+		t.Fatal("expected missing ref error")
+	}
+	if _, err := handleGetFileBlobs(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "filePath": "main.go", "ref": "main"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListCommits(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListCommits(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing refName error")
+	}
+	if _, err := handleListCommits(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "refName": "main"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetCommit(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetCommit(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing sha error")
+	}
+	if _, err := handleGetCommit(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "sha": "abc123"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleCompare(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleCompare(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1"}); err == nil {
+		t.Fatal("expected missing from error")
+	}
+	if _, err := handleCompare(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "from": "a"}); err == nil {
+		t.Fatal("expected missing to error")
+	}
+	if _, err := handleCompare(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "from": "a", "to": "b"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListChangeRequests(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListChangeRequests(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetChangeRequest(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetChangeRequest(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListChangeRequestPatchSets(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListChangeRequestPatchSets(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetChangeRequestTree(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetChangeRequestTree(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1"}); err == nil {
+		t.Fatal("expected missing fromPatchSetId error")
+	}
+	if _, err := handleGetChangeRequestTree(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1", "fromPatchSetId": "f1"}); err == nil {
+		t.Fatal("expected missing toPatchSetId error")
+	}
+	if _, err := handleGetChangeRequestTree(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1", "fromPatchSetId": "f1", "toPatchSetId": "t1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListChangeRequestComments(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListChangeRequestComments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetChangeRequestComment(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetChangeRequestComment(context.Background(), client, map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1"}); err == nil {
+		t.Fatal("expected missing commentBizId error")
+	}
+	if _, err := handleGetChangeRequestComment(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "repo-1", "localId": "1", "commentBizId": "c1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestChangeRequestPath(t *testing.T) {
+	if got := changeRequestPath("org-1", "group/repo", "12"); got != "/codeup/organizations/org-1/repositories/group%2Frepo/changeRequests/12" {
+		t.Fatalf("changeRequestPath() = %q", got)
+	}
+}
