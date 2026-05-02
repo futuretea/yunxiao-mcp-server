@@ -93,6 +93,7 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - `get_sprint_overview`
   - `get_my_project_workitems`
   - `get_project_workitem_board`
+  - `get_project_workitem_detail`
   - `get_project_risk_dashboard`
   - `get_project_member_task_status`
   - `list_project_members`

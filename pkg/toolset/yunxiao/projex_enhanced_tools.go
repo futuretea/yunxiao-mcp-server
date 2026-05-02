@@ -108,6 +108,22 @@ func projexEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetProjectWorkitemBoard,
 		},
+		{
+			Tool: mcp.NewTool("get_project_workitem_detail",
+				mcp.WithDescription("Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID.")),
+				mcp.WithBoolean("includeActivities", mcp.Description("Whether to include activity history. Defaults to true.")),
+				mcp.WithBoolean("includeRelations", mcp.Description("Whether to include relation records. Defaults to true.")),
+				mcp.WithString("relationTypes", mcp.Description("Comma-separated relation types for relation records. Defaults to ASSOCIATED,SUB.")),
+				mcp.WithBoolean("includeAttachments", mcp.Description("Whether to include attachments. Defaults to true.")),
+				mcp.WithBoolean("includeComments", mcp.Description("Whether to include comments. Defaults to true.")),
+				mcp.WithNumber("page", mcp.Description("Page number for comments. Defaults to 1.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size for comments. Defaults to 20.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetProjectWorkitemDetail,
+		},
 	}
 	tools = append(tools, projexInsightTools()...)
 	return tools

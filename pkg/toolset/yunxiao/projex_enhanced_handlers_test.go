@@ -585,3 +585,99 @@ func TestMergeConditions(t *testing.T) {
 		})
 	}
 }
+
+func TestHandleGetProjectWorkitemDetailBuildsCommonRequests(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		seen[r.URL.Path] = true
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+
+		switch r.URL.Path {
+		case "/oapi/v1/projex/organizations/org-1/workitems/wi-1":
+			_, _ = w.Write([]byte(`{"id":"wi-1"}`))
+		case "/oapi/v1/projex/organizations/org-1/workitems/wi-1/activities":
+			_, _ = w.Write([]byte(`[{"id":"act-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/workitems/wi-1/attachments":
+			_, _ = w.Write([]byte(`[{"id":"att-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/workitems/wi-1/comments":
+			if r.URL.Query().Get("page") != "1" || r.URL.Query().Get("perPage") != "20" {
+				t.Fatalf("query = %q", r.URL.RawQuery)
+			}
+			_, _ = w.Write([]byte(`[{"id":"cmt-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/workitems/wi-1/relationRecords":
+			rt := r.URL.Query().Get("relationType")
+			if rt != "ASSOCIATED" && rt != "SUB" {
+				t.Fatalf("relationType = %q", rt)
+			}
+			_, _ = w.Write([]byte(`[]`))
+		default:
+			t.Fatalf("unexpected path = %q", r.URL.Path)
+		}
+	})
+
+	result, err := handleGetProjectWorkitemDetail(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemDetail() error = %v", err)
+	}
+
+	if !seen["/oapi/v1/projex/organizations/org-1/workitems/wi-1"] {
+		t.Fatal("expected workitem request")
+	}
+	if !seen["/oapi/v1/projex/organizations/org-1/workitems/wi-1/activities"] {
+		t.Fatal("expected activities request")
+	}
+	if !seen["/oapi/v1/projex/organizations/org-1/workitems/wi-1/attachments"] {
+		t.Fatal("expected attachments request")
+	}
+	if !seen["/oapi/v1/projex/organizations/org-1/workitems/wi-1/comments"] {
+		t.Fatal("expected comments request")
+	}
+	if !strings.Contains(result, `"workitem"`) {
+		t.Fatalf("result missing workitem: %q", result)
+	}
+}
+
+func TestHandleGetProjectWorkitemDetailSkipsDisabledSections(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		seen[r.URL.Path] = true
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+			_, _ = w.Write([]byte(`{"id":"wi-1"}`))
+			return
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	_, err := handleGetProjectWorkitemDetail(context.Background(), client, map[string]any{
+		"organizationId":     "org-1",
+		"workitemId":         "wi-1",
+		"includeActivities":  false,
+		"includeRelations":   false,
+		"includeAttachments": false,
+		"includeComments":    false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemDetail() error = %v", err)
+	}
+
+	if len(seen) != 1 {
+		t.Fatalf("expected 1 request, got %d: %v", len(seen), seen)
+	}
+}
+
+func TestHandleGetProjectWorkitemDetailRequiresWorkitemId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without workitemId")
+	})
+
+	if _, err := handleGetProjectWorkitemDetail(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemDetail() expected missing workitemId error")
+	}
+}

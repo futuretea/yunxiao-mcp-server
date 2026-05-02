@@ -122,6 +122,18 @@ Simple filters (`status`, `assignedTo`, `sprint`, etc.) are translated into Yunx
 
 **Output**: `columns` object where each key is a status name and the value is a list of work items in that status.
 
+### get_project_workitem_detail
+
+**When to use**: You want a complete view of a single work item — its basic info plus activities, attachments, comments, and relation records.
+
+**Parameters**:
+- `organizationId`, `workitemId`: required
+- `includeActivities`, `includeRelations`, `includeAttachments`, `includeComments`: toggle sections, default true
+- `relationTypes`: comma-separated relation types for relation records, defaults to `ASSOCIATED,SUB`
+- `page`, `perPage`: control comments pagination
+
+**Note**: Relation records require one API call per relation type. Use `relationTypes` to control the number of requests.
+
 ### get_project_risk_dashboard
 
 **When to use**: You need to identify at-risk work items — overdue, high-priority, or stale.

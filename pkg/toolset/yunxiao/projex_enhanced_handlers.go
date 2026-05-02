@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -270,4 +271,99 @@ func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[s
 	}
 
 	return marshalPretty(board)
+}
+
+func handleGetProjectWorkitemDetail(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, err := requiredString(params, "organizationId")
+	if err != nil {
+		return "", err
+	}
+	workitemID, err := requiredString(params, "workitemId")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	workitemPath := projexWorkitemPath(organizationID, workitemID)
+	workitem, err := getProjectOverviewSection(ctx, c, "workitem", workitemPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	detail := map[string]any{
+		"workitem": workitem,
+		"filters":  workitemDetailFilters(params),
+	}
+
+	for _, section := range workitemDetailSections(workitemPath, params) {
+		if err := addWorkitemDetailSection(ctx, c, detail, params, section); err != nil {
+			return "", err
+		}
+	}
+
+	return marshalPretty(detail)
+}
+
+type workitemDetailSection struct {
+	flag  string
+	name  string
+	path  string
+	query url.Values
+}
+
+func workitemDetailSections(workitemPath string, params map[string]any) []workitemDetailSection {
+	sections := []workitemDetailSection{
+		{flag: "includeActivities", name: "activities", path: workitemPath + "/activities"},
+		{flag: "includeAttachments", name: "attachments", path: workitemPath + "/attachments"},
+	}
+
+	if optionalBoolDefault(params, "includeComments", true) {
+		query := url.Values{}
+		query.Set("page", strconv.Itoa(optionalIntDefault(params, "page", 1)))
+		query.Set("perPage", strconv.Itoa(optionalIntDefault(params, "perPage", 20)))
+		sections = append(sections, workitemDetailSection{flag: "includeComments", name: "comments", path: workitemPath + "/comments", query: query})
+	}
+
+	if optionalBoolDefault(params, "includeRelations", true) {
+		relationTypes := splitCSV(optionalStringDefault(params, "relationTypes", "ASSOCIATED,SUB"))
+		for _, rt := range relationTypes {
+			query := url.Values{}
+			query.Set("relationType", rt)
+			sections = append(sections, workitemDetailSection{
+				flag:  "includeRelations",
+				name:  "relations_" + strings.ToLower(rt),
+				path:  workitemPath + "/relationRecords",
+				query: query,
+			})
+		}
+	}
+
+	return sections
+}
+
+func addWorkitemDetailSection(ctx context.Context, c *Client, detail map[string]any, params map[string]any, section workitemDetailSection) error {
+	if !optionalBoolDefault(params, section.flag, true) {
+		return nil
+	}
+	payload, err := getProjectOverviewSection(ctx, c, section.name, section.path, section.query)
+	if err != nil {
+		return err
+	}
+	detail[section.name] = payload
+	return nil
+}
+
+func workitemDetailFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeActivities":  optionalBoolDefault(params, "includeActivities", true),
+		"includeRelations":   optionalBoolDefault(params, "includeRelations", true),
+		"relationTypes":      optionalStringDefault(params, "relationTypes", "ASSOCIATED,SUB"),
+		"includeAttachments": optionalBoolDefault(params, "includeAttachments", true),
+		"includeComments":    optionalBoolDefault(params, "includeComments", true),
+		"page":               optionalIntDefault(params, "page", 1),
+		"perPage":            optionalIntDefault(params, "perPage", 20),
+	}
 }
