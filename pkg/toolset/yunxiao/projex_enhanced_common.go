@@ -210,53 +210,6 @@ func groupWorkitemsByStatus(data []any) (map[string]any, map[string]int) {
 	return columns, counts
 }
 
-func marshalPretty(value any) (string, error) {
-	formatted, err := json.MarshalIndent(value, "", "  ")
-	if err != nil {
-		return "", err
-	}
-	return string(formatted), nil
-}
-
-func optionalIntDefault(params map[string]any, key string, defaultValue int) int {
-	switch value := params[key].(type) {
-	case float64:
-		return int(value)
-	case int:
-		return value
-	case int64:
-		return int(value)
-	case string:
-		if parsed, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
-			return parsed
-		}
-	}
-	return defaultValue
-}
-
-func responsePayload(resp *Response) any {
-	var data any
-	if err := json.Unmarshal(resp.Body, &data); err != nil {
-		data = string(resp.Body)
-	}
-
-	if resp.Pagination == nil && resp.NextToken == "" && resp.RequestID == "" {
-		return data
-	}
-
-	payload := map[string]any{"data": data}
-	if resp.Pagination != nil {
-		payload["pagination"] = resp.Pagination
-	}
-	if resp.NextToken != "" {
-		payload["nextToken"] = resp.NextToken
-	}
-	if resp.RequestID != "" {
-		payload["requestId"] = resp.RequestID
-	}
-	return payload
-}
-
 type projectOverviewSection struct {
 	flag  string
 	name  string

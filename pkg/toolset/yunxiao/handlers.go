@@ -199,6 +199,37 @@ func marshalConditions(filterConditions []map[string]any) string {
 	return string(data)
 }
 
+func marshalPretty(value any) (string, error) {
+	formatted, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(formatted), nil
+}
+
+func responsePayload(resp *Response) any {
+	var data any
+	if err := json.Unmarshal(resp.Body, &data); err != nil {
+		data = string(resp.Body)
+	}
+
+	if resp.Pagination == nil && resp.NextToken == "" && resp.RequestID == "" {
+		return data
+	}
+
+	payload := map[string]any{"data": data}
+	if resp.Pagination != nil {
+		payload["pagination"] = resp.Pagination
+	}
+	if resp.NextToken != "" {
+		payload["nextToken"] = resp.NextToken
+	}
+	if resp.RequestID != "" {
+		payload["requestId"] = resp.RequestID
+	}
+	return payload
+}
+
 func splitCSV(value string) []string {
 	parts := strings.Split(value, ",")
 	values := make([]string, 0, len(parts))
@@ -233,6 +264,22 @@ func optionalStringDefault(params map[string]any, key, defaultValue string) stri
 func optionalBoolDefault(params map[string]any, key string, defaultValue bool) bool {
 	if value, ok := params[key].(bool); ok {
 		return value
+	}
+	return defaultValue
+}
+
+func optionalIntDefault(params map[string]any, key string, defaultValue int) int {
+	switch value := params[key].(type) {
+	case float64:
+		return int(value)
+	case int:
+		return value
+	case int64:
+		return int(value)
+	case string:
+		if parsed, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
+			return parsed
+		}
 	}
 	return defaultValue
 }
