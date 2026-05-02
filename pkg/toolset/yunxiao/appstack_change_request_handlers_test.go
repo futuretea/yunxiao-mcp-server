@@ -107,6 +107,20 @@ func TestHandleListAppStackChangeRequestExecutionsRequiresReleaseWorkflowSn(t *t
 	}
 }
 
+func TestHandleListAppStackChangeRequestExecutionsRequiresReleaseStageSn(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListAppStackChangeRequestExecutions(context.Background(), client, map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"sn":                "cr-1",
+		"releaseWorkflowSn": "rw-1",
+	}); err == nil {
+		t.Fatal("expected missing releaseStageSn error")
+	}
+}
+
 func TestHandleListAppStackChangeRequestWorkItemsRequiresSn(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("unexpected request")

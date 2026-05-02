@@ -329,3 +329,50 @@ func TestHandleGetProjectWorkitemContextReturnsTypeDetailError(t *testing.T) {
 		t.Fatal("handleGetProjectWorkitemContext() expected type detail error")
 	}
 }
+
+func TestHandleGetProjectWorkitemContextReturnsLabelsError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes":
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/members":
+			_, _ = w.Write([]byte(`[]`))
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
+
+	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemContext() expected labels error")
+	}
+}
+
+func TestHandleGetProjectWorkitemContextReturnsWorkflowError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.EscapedPath() {
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes":
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/members":
+			_, _ = w.Write([]byte(`[]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/labels":
+			_, _ = w.Write([]byte(`[]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes/type%2F1/fields":
+			_, _ = w.Write([]byte(`[]`))
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
+
+	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+		"workItemTypeId": "type/1",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemContext() expected workflow error")
+	}
+}

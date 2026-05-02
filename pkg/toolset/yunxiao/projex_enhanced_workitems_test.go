@@ -172,6 +172,21 @@ func TestHandleGetMyProjectWorkitemsRejectsMissingUserId(t *testing.T) {
 	}
 }
 
+func TestHandleGetMyProjectWorkitemsRejectsEmptyCategories(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without categories")
+	})
+
+	if _, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"userId":         "user-1",
+		"categories":     ", ,",
+	}); err == nil {
+		t.Fatal("handleGetMyProjectWorkitems() expected missing categories error")
+	}
+}
+
 func TestHandleGetProjectWorkitemBoardGroupsByStatus(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -249,6 +264,20 @@ func TestHandleGetProjectWorkitemBoardWithSprintFilter(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("handleGetProjectWorkitemBoard() error = %v", err)
+	}
+}
+
+func TestHandleGetProjectWorkitemBoardReturnsExtractError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`"not-an-array"`))
+	})
+
+	if _, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemBoard() expected extract error")
 	}
 }
 

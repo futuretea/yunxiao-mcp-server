@@ -142,6 +142,24 @@ func TestHandleGetProjectMemberTaskStatusLoadsProjectMembers(t *testing.T) {
 	}
 }
 
+func TestHandleGetProjectMemberTaskStatusRejectsEmptyUserIdsFromMembers(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, _ = w.Write([]byte(`[{"name":"no-id"}]`))
+			return
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("handleGetProjectMemberTaskStatus() expected empty assigneeIds error")
+	}
+}
+
 func TestHandleGetProjectRiskDashboardRejectsEmptyCategories(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("handler should not issue request without categories")
@@ -156,13 +174,13 @@ func TestHandleGetProjectRiskDashboardRejectsEmptyCategories(t *testing.T) {
 	}
 }
 
-func TestHandleGetProjectMemberTaskStatusRejectsEmptyAssignees(t *testing.T) {
+func TestHandleGetProjectMemberTaskStatusReturnsMembersError(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			_, _ = w.Write([]byte(`[]`))
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		t.Fatal("handler should not issue search when no assignees")
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
@@ -170,7 +188,50 @@ func TestHandleGetProjectMemberTaskStatusRejectsEmptyAssignees(t *testing.T) {
 		"projectId":      "project-1",
 		"categories":     "Task",
 	}); err == nil {
-		t.Fatal("handleGetProjectMemberTaskStatus() expected empty assignees error")
+		t.Fatal("handleGetProjectMemberTaskStatus() expected members error")
+	}
+}
+
+func TestHandleGetProjectMemberTaskStatusReturnsOverdueSearchError(t *testing.T) {
+	requestCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		if requestCount == 1 {
+			_, _ = w.Write([]byte(`[{"id":"wi-1"}]`))
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"assigneeIds":    "user-1",
+		"categories":     "Task",
+		"overdueBefore":  "2026-05-01",
+	}); err == nil {
+		t.Fatal("handleGetProjectMemberTaskStatus() expected overdue search error")
+	}
+}
+
+func TestHandleGetProjectRiskDashboardReturnsOverdueSearchError(t *testing.T) {
+	requestCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		if requestCount == 2 {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	if _, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Risk",
+		"overdueBefore":  "2026-05-01",
+	}); err == nil {
+		t.Fatal("handleGetProjectRiskDashboard() expected overdue search error")
 	}
 }
 

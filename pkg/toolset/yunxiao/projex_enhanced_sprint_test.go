@@ -90,6 +90,25 @@ func TestHandleGetSprintOverviewRejectsEmptyCategories(t *testing.T) {
 	}
 }
 
+func TestHandleGetSprintOverviewReturnsSearchError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, _ = w.Write([]byte(`{"id":"sp-1"}`))
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	if _, err := handleGetSprintOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"sprintId":       "sp-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("handleGetSprintOverview() expected search error")
+	}
+}
+
 func TestHandleGetSprintOverviewWithAssigneeAndSubject(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {

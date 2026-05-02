@@ -1,6 +1,7 @@
 package yunxiao
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -23,6 +24,13 @@ func TestBuildProjectConditions(t *testing.T) {
 				t.Fatalf("buildProjectConditions() = %q, want %q", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestBuildWorkitemConditionsIncludesSubjectDescription(t *testing.T) {
+	got := buildWorkitemConditions(map[string]any{"subjectDescription": "login"})
+	if !strings.Contains(got, `"fieldIdentifier":"subject-description"`) || !strings.Contains(got, `"value":["login"]`) {
+		t.Fatalf("buildWorkitemConditions() = %q", got)
 	}
 }
 
