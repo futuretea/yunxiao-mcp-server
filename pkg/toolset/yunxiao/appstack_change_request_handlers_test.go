@@ -125,3 +125,28 @@ func TestRequiredAppStackChangeRequestRequiresSn(t *testing.T) {
 		t.Fatal("expected missing sn error")
 	}
 }
+
+func TestAppstackChangeRequestHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetAppStackChangeRequestAuditItems(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetAppStackChangeRequestAuditItems(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "sn": "cr-1", "refType": "CR"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAppStackChangeRequestExecutions(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleListAppStackChangeRequestExecutions(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "sn": "cr-1", "releaseWorkflowSn": "rw-1", "releaseStageSn": "rs-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAppStackChangeRequestWorkItems(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleListAppStackChangeRequestWorkItems(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "sn": "cr-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
