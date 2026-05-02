@@ -209,3 +209,24 @@ func TestRequiredOrganizationProjectAndWorkItemTypeRequiresWorkItemTypeId(t *tes
 		t.Fatal("expected missing workItemTypeId error")
 	}
 }
+
+func TestProjexWorkitemTypeHandlersRequireParams(t *testing.T) {
+	if _, err := handleListAllWorkItemTypes(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListWorkItemTypes(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "category": "Task"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetWorkItemType(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "type-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListWorkItemRelationWorkItemTypes(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workItemTypeId": "type-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetWorkItemTypeFieldConfig(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "workItemTypeId": "type-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetWorkItemWorkflow(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "workItemTypeId": "type-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
