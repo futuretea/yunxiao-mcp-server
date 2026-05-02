@@ -17,6 +17,7 @@ test:
 lint:
 	go vet ./...
 	test -z "$$(gofmt -l cmd internal pkg)"
+	@which gocyclo >/dev/null 2>&1 && gocyclo -over 15 $$(find cmd internal pkg -name '*.go' -not -name '*_test.go') || echo "gocyclo not installed, skipping complexity check"
 
 format:
 	gofmt -w $$(find . -path './third-party-projects' -prune -o -name '*.go' -print)
