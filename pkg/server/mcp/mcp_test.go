@@ -292,3 +292,86 @@ func TestNewServerEnableDomainsOverridesProjectFocused(t *testing.T) {
 		t.Fatalf("enabled_domains should include all projex tools including get_project, got %v", enabled)
 	}
 }
+
+func TestNewServerMinimalMode(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		MinimalMode:           true,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+
+	// Should include core platform tools
+	hasCurrentUser := false
+	for _, name := range enabled {
+		if name == "get_current_user" {
+			hasCurrentUser = true
+			break
+		}
+	}
+	if !hasCurrentUser {
+		t.Fatalf("minimal mode should include get_current_user, got %v", enabled)
+	}
+
+	// Should include core projex tools
+	hasProjectOverview := false
+	for _, name := range enabled {
+		if name == "get_project_overview" {
+			hasProjectOverview = true
+			break
+		}
+	}
+	if !hasProjectOverview {
+		t.Fatalf("minimal mode should include get_project_overview, got %v", enabled)
+	}
+
+	// Should NOT include non-core tools like codeup
+	for _, name := range enabled {
+		if name == "list_repositories" {
+			t.Fatalf("minimal mode should not include codeup tools, got %v", enabled)
+		}
+	}
+
+	// Should NOT include platform admin tools
+	for _, name := range enabled {
+		if name == "list_organization_departments" {
+			t.Fatalf("minimal mode should not include platform admin tools, got %v", enabled)
+		}
+	}
+
+	// Should NOT include projex metadata tools
+	for _, name := range enabled {
+		if name == "get_work_item_type" {
+			t.Fatalf("minimal mode should not include metadata tools, got %v", enabled)
+		}
+	}
+}
+
+func TestNewServerMinimalModeOverridesProjectFocused(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		MinimalMode:           true,
+		ProjectFocused:        true,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+
+	// Minimal should take priority over project-focused
+	for _, name := range enabled {
+		if name == "list_organization_departments" {
+			t.Fatalf("minimal mode should override project_focused, got %v", enabled)
+		}
+	}
+}

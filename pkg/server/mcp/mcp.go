@@ -72,6 +72,8 @@ func (s *Server) registerTools() error {
 
 	var yunxiaoTools []toolset.ServerTool
 	switch {
+	case s.configuration.MinimalMode:
+		yunxiaoTools = toolsetBuilder.GetMinimalTools(s.client)
 	case len(s.configuration.EnabledDomains) > 0:
 		yunxiaoTools = filterToolsByDomains(toolsetBuilder.GetTools(s.client), s.configuration.EnabledDomains, nil)
 	case len(s.configuration.DisabledDomains) > 0:

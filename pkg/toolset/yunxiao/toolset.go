@@ -2,6 +2,33 @@ package yunxiao
 
 import "github.com/futuretea/yunxiao-mcp-server/pkg/toolset"
 
+// minimalToolNames are the core query tools kept in --minimal mode.
+var minimalToolNames = map[string]struct{}{
+	// Platform
+	"get_current_user":              {},
+	"get_current_organization_info": {},
+
+	// Projex — Project overview
+	"search_projects":        {},
+	"get_project_overview":   {},
+	"get_project_risk_dashboard": {},
+
+	// Projex — Workitem queries
+	"search_workitems":             {},
+	"get_workitem":                 {},
+	"get_project_workitem_summary": {},
+	"get_project_workitem_detail":  {},
+	"get_my_project_workitems":     {},
+	"get_project_workitem_board":   {},
+
+	// Projex — Sprint
+	"list_sprints":      {},
+	"get_sprint_overview": {},
+
+	// Projex — Members
+	"list_project_members": {},
+}
+
 // projectFocusedDomains are the tool domains enabled in project-focused mode.
 var projectFocusedDomains = map[string]struct{}{
 	"platform": {},
@@ -38,6 +65,18 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 	tools = append(tools, withDomain(appstackTools(), "appstack")...)
 	tools = append(tools, withDomain(lingmaTools(), "lingma")...)
 	return tools
+}
+
+// GetMinimalTools returns only the most essential query tools.
+func (t *Toolset) GetMinimalTools(client any) []toolset.ServerTool {
+	all := t.GetTools(client)
+	filtered := make([]toolset.ServerTool, 0, len(minimalToolNames))
+	for _, tool := range all {
+		if _, ok := minimalToolNames[tool.Tool.Name]; ok {
+			filtered = append(filtered, tool)
+		}
+	}
+	return filtered
 }
 
 // GetProjectFocusedTools returns only platform + projex tools, hiding

@@ -27,6 +27,7 @@ type StaticConfig struct {
 	EnabledDomains        []string `mapstructure:"enabled_domains"`
 	DisabledDomains       []string `mapstructure:"disabled_domains"`
 	ProjectFocused        bool     `mapstructure:"project_focused"`
+	MinimalMode           bool     `mapstructure:"minimal"`
 	RequestTimeoutSeconds int      `mapstructure:"request_timeout_seconds"`
 }
 
@@ -75,6 +76,7 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	v.SetDefault("enabled_domains", []string{})
 	v.SetDefault("disabled_domains", []string{})
 	v.SetDefault("project_focused", false)
+	v.SetDefault("minimal", false)
 	v.SetDefault("request_timeout_seconds", 30)
 
 	if configPath != "" {
