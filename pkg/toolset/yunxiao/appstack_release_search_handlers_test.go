@@ -54,4 +54,7 @@ func TestHandleSearchReleasesRequiresOrganizationID(t *testing.T) {
 	if _, err := handleSearchReleases(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("handleSearchReleases() expected missing organizationId error")
 	}
+	if _, err := handleSearchReleases(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 }
