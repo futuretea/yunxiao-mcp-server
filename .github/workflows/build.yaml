@@ -34,6 +34,9 @@ jobs:
       - name: Run CI checks
         run: make ci
 
+      - name: Check coverage threshold
+        run: make coverage-check
+
   docker:
     name: Docker Build
     runs-on: ubuntu-latest
