@@ -306,6 +306,97 @@ func TestHandleOrganizationRoleToolsBuildPaths(t *testing.T) {
 	}
 }
 
+func TestPlatformHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetCurrentUser(context.Background(), "invalid-client", nil); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetCurrentOrganizationInfo(context.Background(), "invalid-client", nil); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListOrganizations(context.Background(), "invalid-client", nil); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetUserOrganizations(context.Background(), "invalid-client", nil); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetOrganization(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleGetOrganization(context.Background(), "invalid-client", map[string]any{"id": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListOrganizationDepartments(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListOrganizationDepartments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetOrganizationDepartmentInfo(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetOrganizationDepartmentAncestors(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListOrganizationMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListOrganizationMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetOrganizationMemberInfo(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetOrganizationMemberInfo(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id and memberId error")
+	}
+	if _, err := handleGetOrganizationMemberInfo(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "memberId": "m-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetOrganizationMemberInfoByUserID(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetOrganizationMemberInfoByUserID(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing userId error")
+	}
+	if _, err := handleGetOrganizationMemberInfoByUserID(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "userId": "u-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleSearchOrganizationMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleSearchOrganizationMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListOrganizationRoles(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListOrganizationRoles(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetOrganizationRole(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetOrganizationRole(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id and roleId error")
+	}
+	if _, err := handleGetOrganizationRole(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "roleId": "r-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListUsers(context.Background(), "invalid-client", nil); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestOrganizationPath(t *testing.T) {
+	if got := organizationPath("org-1"); got != "/platform/organizations/org-1" {
+		t.Fatalf("organizationPath() = %q", got)
+	}
+}
+
 func TestHandleListUsersBuildsQuery(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
