@@ -10,7 +10,7 @@ import (
 )
 
 func handleGetProjectOverview(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -41,7 +41,7 @@ func handleGetProjectOverview(ctx context.Context, client any, params map[string
 }
 
 func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -66,7 +66,7 @@ func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map
 }
 
 func handleGetProjectWorkitemContext(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -140,7 +140,7 @@ func addProjectWorkitemTypeContext(ctx context.Context, c *Client, payload map[s
 }
 
 func handleGetMyProjectWorkitems(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -180,7 +180,7 @@ func handleGetMyProjectWorkitems(ctx context.Context, client any, params map[str
 }
 
 func handleGetSprintOverview(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -216,7 +216,7 @@ func handleGetSprintOverview(ctx context.Context, client any, params map[string]
 }
 
 func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}

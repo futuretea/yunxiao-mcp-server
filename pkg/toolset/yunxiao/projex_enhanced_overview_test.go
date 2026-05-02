@@ -46,7 +46,7 @@ func TestHandleGetProjectOverviewBuildsCommonRequests(t *testing.T) {
 
 	result, err := handleGetProjectOverview(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"page":           float64(2),
 		"perPage":        float64(3),
 	})
@@ -80,7 +80,7 @@ func TestHandleGetProjectOverviewHonorsIncludeFlags(t *testing.T) {
 
 	result, err := handleGetProjectOverview(context.Background(), client, map[string]any{
 		"organizationId":    "org-1",
-		"id":                "project-1",
+		"projectId":         "project-1",
 		"includeMembers":    false,
 		"includeSprints":    false,
 		"includeMilestones": false,
@@ -135,7 +135,7 @@ func TestHandleGetProjectWorkitemContextBuildsMetadataRequests(t *testing.T) {
 
 	result, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"category":       "Task",
 		"workItemTypeId": "type/1",
 		"page":           float64(2),
@@ -167,7 +167,7 @@ func TestHandleGetProjectWorkitemContextRequiresCategory(t *testing.T) {
 
 	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 	}); err == nil {
 		t.Fatal("handleGetProjectWorkitemContext() expected missing category error")
 	}

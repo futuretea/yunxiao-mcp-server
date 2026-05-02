@@ -41,7 +41,7 @@ func TestHandleGetProjectWorkitemSummarySearchesCategories(t *testing.T) {
 
 	result, err := handleGetProjectWorkitemSummary(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"categories":     "Task,Bug",
 		"status":         "open,doing",
 		"assignedTo":     "user-1",
@@ -65,7 +65,7 @@ func TestHandleGetProjectWorkitemSummaryRejectsEmptyCategories(t *testing.T) {
 
 	if _, err := handleGetProjectWorkitemSummary(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"categories":     ", ,",
 	}); err == nil {
 		t.Fatal("handleGetProjectWorkitemSummary() expected missing categories error")
@@ -97,7 +97,7 @@ func TestHandleGetMyProjectWorkitemsBuildsAssignedSearch(t *testing.T) {
 
 	result, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"userId":         "user-1",
 		"relation":       "assigned",
 		"categories":     "Task,Bug",
@@ -131,7 +131,7 @@ func TestHandleGetMyProjectWorkitemsBuildsCreatedSearch(t *testing.T) {
 
 	_, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"userId":         "user-1",
 		"relation":       "created",
 		"categories":     "Task",
@@ -151,7 +151,7 @@ func TestHandleGetMyProjectWorkitemsRejectsInvalidRelation(t *testing.T) {
 
 	if _, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"userId":         "user-1",
 		"relation":       "invalid",
 	}); err == nil {
@@ -166,7 +166,7 @@ func TestHandleGetMyProjectWorkitemsRejectsMissingUserId(t *testing.T) {
 
 	if _, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 	}); err == nil {
 		t.Fatal("handleGetMyProjectWorkitems() expected missing userId error")
 	}
@@ -197,7 +197,7 @@ func TestHandleGetProjectWorkitemBoardGroupsByStatus(t *testing.T) {
 
 	result, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"category":       "Task",
 		"sampleLimit":    float64(5),
 	})
@@ -222,7 +222,7 @@ func TestHandleGetProjectWorkitemBoardRequiresCategory(t *testing.T) {
 
 	if _, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 	}); err == nil {
 		t.Fatal("handleGetProjectWorkitemBoard() expected missing category error")
 	}
@@ -243,7 +243,7 @@ func TestHandleGetProjectWorkitemBoardWithSprintFilter(t *testing.T) {
 
 	_, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"category":       "Bug",
 		"sprint":         "sp-1",
 	})
@@ -270,7 +270,7 @@ func TestHandleGetProjectWorkitemBoardWithAssigneeAndSubject(t *testing.T) {
 
 	_, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"category":       "Task",
 		"assignedTo":     "user-1",
 		"subject":        "login",

@@ -11,7 +11,7 @@ import (
 )
 
 func handleGetProjectRiskDashboard(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -42,7 +42,7 @@ func handleGetProjectRiskDashboard(ctx context.Context, client any, params map[s
 }
 
 func handleGetProjectMemberTaskStatus(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndID(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}

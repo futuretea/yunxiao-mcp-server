@@ -44,7 +44,7 @@ func TestHandleGetSprintOverviewBuildsSprintAndSearchRequests(t *testing.T) {
 
 	result, err := handleGetSprintOverview(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"sprintId":       "sp-1",
 		"categories":     "Task,Bug",
 		"sampleLimit":    float64(3),
@@ -69,7 +69,7 @@ func TestHandleGetSprintOverviewRejectsMissingSprintId(t *testing.T) {
 
 	if _, err := handleGetSprintOverview(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 	}); err == nil {
 		t.Fatal("handleGetSprintOverview() expected missing sprintId error")
 	}
@@ -82,7 +82,7 @@ func TestHandleGetSprintOverviewRejectsEmptyCategories(t *testing.T) {
 
 	if _, err := handleGetSprintOverview(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"sprintId":       "sp-1",
 		"categories":     ", ,",
 	}); err == nil {
@@ -115,7 +115,7 @@ func TestHandleGetSprintOverviewWithAssigneeAndSubject(t *testing.T) {
 
 	_, err := handleGetSprintOverview(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"sprintId":       "sp-1",
 		"categories":     "Task",
 		"assignedTo":     "user-1",

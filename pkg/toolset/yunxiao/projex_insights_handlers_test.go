@@ -40,7 +40,7 @@ func TestHandleGetProjectRiskDashboardBuildsRiskQueries(t *testing.T) {
 
 	result, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"categories":     "Risk,Bug",
 		"status":         "open,doing",
 		"overdueBefore":  "2026-05-01",
@@ -87,7 +87,7 @@ func TestHandleGetProjectMemberTaskStatusUsesProvidedAssigneesAndGroups(t *testi
 
 	result, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"assigneeIds":    "user-1,user-2",
 		"categories":     "Task",
 		"overdueBefore":  "2026-05-01",
@@ -127,7 +127,7 @@ func TestHandleGetProjectMemberTaskStatusLoadsProjectMembers(t *testing.T) {
 
 	result, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"memberLimit":    float64(1),
 		"sampleLimit":    float64(0),
 	})
@@ -149,7 +149,7 @@ func TestHandleGetProjectRiskDashboardRejectsEmptyCategories(t *testing.T) {
 
 	if _, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"categories":     ", ,",
 	}); err == nil {
 		t.Fatal("handleGetProjectRiskDashboard() expected missing categories error")
@@ -167,7 +167,7 @@ func TestHandleGetProjectMemberTaskStatusRejectsEmptyAssignees(t *testing.T) {
 
 	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"categories":     "Task",
 	}); err == nil {
 		t.Fatal("handleGetProjectMemberTaskStatus() expected empty assignees error")
@@ -181,7 +181,7 @@ func TestHandleGetProjectMemberTaskStatusRejectsInvalidStatusGroups(t *testing.T
 
 	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"assigneeIds":    "user-1",
 		"statusGroups":   "not-json",
 	}); err == nil {
@@ -212,7 +212,7 @@ func TestHandleGetProjectRiskDashboardWithHighPriorityAndStale(t *testing.T) {
 
 	_, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"categories":     "Task",
 		"highPriority":   "p0",
 		"staleBefore":    "2024-01-01",
