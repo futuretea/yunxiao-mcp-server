@@ -258,6 +258,47 @@ func TestProjectMembersFromResponse(t *testing.T) {
 	}
 }
 
+func TestSearchProjectWorkitemsReturnsError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	c, _ := getClient(client)
+	if _, err := searchProjectWorkitems(context.Background(), c, "org-1", "project-1", "Task", map[string]any{}); err == nil {
+		t.Fatal("expected search error")
+	}
+}
+
+func TestProjectTaskStatusMembersReturnsError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	c, _ := getClient(client)
+	if _, _, err := projectTaskStatusMembers(context.Background(), c, "org-1", "project-1", map[string]any{}); err == nil {
+		t.Fatal("expected members fetch error")
+	}
+}
+
+func TestProjectMembersFromResponseNegativeLimitIncludesAll(t *testing.T) {
+	resp := &Response{Body: []byte(`[{"userId":"u-1"},{"userId":"u-2"}]`)}
+	_, ids, err := projectMembersFromResponse(resp, -1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(ids) != 2 {
+		t.Fatalf("ids = %v, want 2", ids)
+	}
+}
+
+func TestParseStatusGroupsTrimsEmptyEntries(t *testing.T) {
+	got, err := parseStatusGroups(map[string]any{"statusGroups": `{"todo":"todo-id","":"","  ":"  "}`})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(got) != 1 || got["todo"] != "todo-id" {
+		t.Fatalf("unexpected groups: %v", got)
+	}
+}
+
 func TestHandleGetProjectRiskDashboardWithHighPriorityAndStale(t *testing.T) {
 	seen := map[string]bool{}
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
