@@ -132,3 +132,80 @@ func TestHandleGetWorkItemWorkflowBuildsPath(t *testing.T) {
 		t.Fatalf("handleGetWorkItemWorkflow() error = %v", err)
 	}
 }
+
+func TestHandleListAllWorkItemTypesRequiresOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListAllWorkItemTypes(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
+func TestHandleListWorkItemTypesRequiresCategory(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListWorkItemTypes(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+	}); err == nil {
+		t.Fatal("expected missing category error")
+	}
+}
+
+func TestHandleGetWorkItemTypeRequiresID(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetWorkItemType(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+}
+
+func TestHandleListWorkItemRelationWorkItemTypesRequiresWorkItemTypeId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListWorkItemRelationWorkItemTypes(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing workItemTypeId error")
+	}
+}
+
+func TestHandleGetWorkItemTypeFieldConfigRequiresWorkItemTypeId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetWorkItemTypeFieldConfig(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+	}); err == nil {
+		t.Fatal("expected missing workItemTypeId error")
+	}
+}
+
+func TestHandleGetWorkItemWorkflowRequiresWorkItemTypeId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetWorkItemWorkflow(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+	}); err == nil {
+		t.Fatal("expected missing workItemTypeId error")
+	}
+}
+
+func TestRequiredOrganizationAndProjectRequiresProjectId(t *testing.T) {
+	_, _, err := requiredOrganizationAndProject(map[string]any{"organizationId": "org-1"})
+	if err == nil {
+		t.Fatal("expected missing projectId error")
+	}
+}
+
+func TestRequiredOrganizationProjectAndWorkItemTypeRequiresWorkItemTypeId(t *testing.T) {
+	_, _, _, err := requiredOrganizationProjectAndWorkItemType(map[string]any{"organizationId": "org-1", "projectId": "project-1"})
+	if err == nil {
+		t.Fatal("expected missing workItemTypeId error")
+	}
+}
