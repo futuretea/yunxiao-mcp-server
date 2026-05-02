@@ -9,3 +9,4 @@ coverage.out
 config.yaml
 config.local.yaml
 .env
+docs/baseline/
