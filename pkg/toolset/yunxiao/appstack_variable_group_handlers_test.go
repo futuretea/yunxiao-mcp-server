@@ -89,6 +89,18 @@ func TestAppstackVariableGroupHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetAppVariableGroupsRevision(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleGetEnvVariableGroups(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "dev"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetVariableGroup(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "variableGroupName": "vg-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetAppVariableGroups(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetAppVariableGroupsRevision(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 }
 
 func TestRequiredAppVariableGroupRequiresVariableGroupName(t *testing.T) {
