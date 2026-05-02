@@ -666,6 +666,32 @@ func TestServeSSEReturnsWorkingSSEServer(t *testing.T) {
 	}
 }
 
+func TestServeSSEUsesBaseURL(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		AccessToken:           "token",
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	sseServer := s.ServeSSE("http://localhost:8080", &http.Server{})
+	if sseServer == nil {
+		t.Fatal("ServeSSE() returned nil")
+	}
+
+	ep, err := sseServer.CompleteSseEndpoint()
+	if err != nil {
+		t.Fatalf("CompleteSseEndpoint() error = %v", err)
+	}
+	if ep != "http://localhost:8080/sse" {
+		t.Fatalf("SSE endpoint = %q, want http://localhost:8080/sse", ep)
+	}
+}
+
 func TestServeStreamableHTTPReturnsWorkingHandler(t *testing.T) {
 	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
 		BaseURL:               config.DefaultBaseURL,
