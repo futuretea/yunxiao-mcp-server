@@ -110,14 +110,14 @@ func handleSearchWorkitems(ctx context.Context, client any, params map[string]an
 	if err != nil {
 		return "", err
 	}
-	spaceID, err := requiredString(params, "spaceId")
+	projectID, err := requiredString(params, "projectId")
 	if err != nil {
 		return "", err
 	}
 
 	body := map[string]any{
 		"category": category,
-		"spaceId":  spaceID,
+		"spaceId":  projectID,
 	}
 	setOptionalStringBody(body, params, "conditions")
 	setOptionalStringBody(body, params, "orderBy")

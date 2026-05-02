@@ -87,7 +87,7 @@ func projexWorkitemTools() []toolset.ServerTool {
 				mcp.WithDescription("Search work items in one Projex project space."),
 				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
 				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Req, Task, Bug, or Risk.")),
-				mcp.WithString("spaceId", mcp.Required(), mcp.Description("Project ID. This API searches one project at a time.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID. This API searches one project at a time.")),
 				mcp.WithString("subject", mcp.Description("Subject contains filter.")),
 				mcp.WithString("status", mcp.Description("Comma-separated status IDs.")),
 				mcp.WithString("assignedTo", mcp.Description("Comma-separated assignee user IDs.")),

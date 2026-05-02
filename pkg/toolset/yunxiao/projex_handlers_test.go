@@ -170,7 +170,7 @@ func TestHandleSearchWorkitemsBuildsBody(t *testing.T) {
 	if _, err := handleSearchWorkitems(context.Background(), client, map[string]any{
 		"organizationId":   "org-1",
 		"category":         "Task",
-		"spaceId":          "project-1",
+		"projectId":        "project-1",
 		"subject":          "demo",
 		"assignedTo":       "user-1,user-2",
 		"tag":              "tag-1,tag-2",
@@ -258,6 +258,6 @@ func TestSearchWorkitemsRequiresCategoryAndSpace(t *testing.T) {
 		"organizationId": "org-1",
 		"category":       "Task",
 	}); err == nil {
-		t.Fatal("handleSearchWorkitems() expected missing spaceId error")
+		t.Fatal("handleSearchWorkitems() expected missing projectId error")
 	}
 }
