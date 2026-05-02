@@ -132,3 +132,40 @@ func TestRequiredOrganizationAndPoolRequiresPoolName(t *testing.T) {
 		t.Fatal("expected missing poolName error")
 	}
 }
+
+func TestAppstackDeploymentResourceHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetMachineDeployLog(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetMachineDeployLog(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing tunnelId error")
+	}
+	if _, err := handleGetMachineDeployLog(context.Background(), client, map[string]any{"organizationId": "org-1", "tunnelId": "1"}); err == nil {
+		t.Fatal("expected missing machineSn error")
+	}
+	if _, err := handleGetMachineDeployLog(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "tunnelId": "1", "machineSn": "m-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetDeployGroup(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetDeployGroup(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "poolName": "pool-1", "deployGroupName": "dg-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListResourceInstances(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListResourceInstances(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "poolName": "pool-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetResourceInstance(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetResourceInstance(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "poolName": "pool-1", "instanceName": "i-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
