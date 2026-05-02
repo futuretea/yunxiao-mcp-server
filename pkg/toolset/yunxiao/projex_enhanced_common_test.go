@@ -19,6 +19,8 @@ func TestMergeConditions(t *testing.T) {
 		{"existing object extra array", `{"conditionGroups":[[{"field":"a"}]]}`, `[{"field":"b"}]`, `{"conditionGroups":[[{"field":"a"}]]}`},
 		{"existing array extra object", `[{"field":"a"}]`, `{"conditionGroups":[[{"field":"b"}]]}`, `[{"field":"a"}]`},
 		{"existing invalid json", `not-json`, `[{"field":"b"}]`, `not-json`},
+		{"empty existing groups extra groups", `{"conditionGroups":[]}`, `{"conditionGroups":[[{"field":"b"}]]}`, `{"conditionGroups":[[{"field":"b"}]]}`},
+		{"both empty groups", `{"conditionGroups":[]}`, `{"conditionGroups":[]}`, `{"conditionGroups":[]}`},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
