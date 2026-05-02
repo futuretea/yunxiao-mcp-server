@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -362,4 +363,46 @@ func TestLoggingResponseWriterIsIdempotent(t *testing.T) {
 	if rec.Code != http.StatusCreated {
 		t.Fatalf("recorder code = %d, want %d", rec.Code, http.StatusCreated)
 	}
+}
+
+func TestLoggingResponseWriterFlush(t *testing.T) {
+	rec := httptest.NewRecorder()
+	lrw := &loggingResponseWriter{ResponseWriter: rec, statusCode: http.StatusOK}
+
+	// Should not panic; ResponseRecorder implements Flusher
+	lrw.Flush()
+}
+
+func TestLoggingResponseWriterHijack(t *testing.T) {
+	rec := httptest.NewRecorder()
+	lrw := &loggingResponseWriter{ResponseWriter: rec, statusCode: http.StatusOK}
+
+	// ResponseRecorder does not implement Hijacker
+	_, _, err := lrw.Hijack()
+	if err != http.ErrNotSupported {
+		t.Fatalf("Hijack() error = %v, want ErrNotSupported", err)
+	}
+
+	hijackRec := &hijackableRecorder{ResponseRecorder: rec}
+	lrw2 := &loggingResponseWriter{ResponseWriter: hijackRec, statusCode: http.StatusOK}
+	conn, buf, err := lrw2.Hijack()
+	if err != nil {
+		t.Fatalf("Hijack() error = %v", err)
+	}
+	if conn != hijackRec.conn {
+		t.Fatal("Hijack() returned wrong conn")
+	}
+	if buf != hijackRec.buf {
+		t.Fatal("Hijack() returned wrong bufio")
+	}
+}
+
+type hijackableRecorder struct {
+	*httptest.ResponseRecorder
+	conn net.Conn
+	buf  *bufio.ReadWriter
+}
+
+func (h *hijackableRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	return h.conn, h.buf, nil
 }
