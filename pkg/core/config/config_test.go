@@ -216,3 +216,23 @@ func TestLoadConfigNormalizesToolFilters(t *testing.T) {
 		t.Fatalf("EnabledTools = %#v", cfg.EnabledTools)
 	}
 }
+
+func TestLoadConfigUsesNewViperWhenNil(t *testing.T) {
+	cfg, err := LoadConfig("", nil)
+	if err != nil {
+		t.Fatalf("LoadConfig() error = %v", err)
+	}
+	if cfg.BaseURL != DefaultBaseURL {
+		t.Fatalf("BaseURL = %q, want %q", cfg.BaseURL, DefaultBaseURL)
+	}
+	if cfg.LogLevel != "info" {
+		t.Fatalf("LogLevel = %q, want info", cfg.LogLevel)
+	}
+}
+
+func TestLoadConfigReturnsErrorForMissingConfigFile(t *testing.T) {
+	_, err := LoadConfig(filepath.Join(t.TempDir(), "nonexistent.yaml"), viper.New())
+	if err == nil {
+		t.Fatal("LoadConfig() expected error for missing config file")
+	}
+}
