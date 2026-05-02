@@ -101,3 +101,45 @@ func TestHandleGetArtifactBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleGetArtifact() error = %v", err)
 	}
 }
+
+func TestRequiredNumberPathStringAcceptsTypes(t *testing.T) {
+	tests := []struct {
+		name string
+		val  any
+		want string
+	}{
+		{"float64", float64(123), "123"},
+		{"int", int(456), "456"},
+		{"int64", int64(789), "789"},
+		{"string", "abc", "abc"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := requiredNumberPathString(map[string]any{"k": tt.val}, "k")
+			if err != nil {
+				t.Fatalf("requiredNumberPathString() error = %v", err)
+			}
+			if got != tt.want {
+				t.Fatalf("requiredNumberPathString() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRequiredNumberPathStringRejectsEmptyAndMissing(t *testing.T) {
+	_, err := requiredNumberPathString(map[string]any{"k": ""}, "k")
+	if err == nil {
+		t.Fatal("expected error for empty string")
+	}
+	_, err = requiredNumberPathString(map[string]any{}, "k")
+	if err == nil {
+		t.Fatal("expected error for missing key")
+	}
+}
+
+func TestRequiredOrganizationAndPackageRepoRequiresRepoId(t *testing.T) {
+	_, _, err := requiredOrganizationAndPackageRepo(map[string]any{"organizationId": "org-1"})
+	if err == nil {
+		t.Fatal("expected missing repoId error")
+	}
+}
