@@ -252,6 +252,16 @@ func expectedLingmaToolNames() []string {
 	}
 }
 
+func TestToolsetGetNameAndDescription(t *testing.T) {
+	ts := &Toolset{ReadOnly: true}
+	if got := ts.GetName(); got != "yunxiao" {
+		t.Fatalf("GetName() = %q, want yunxiao", got)
+	}
+	if got := ts.GetDescription(); got != "Yunxiao organization and DevOps OpenAPI tools" {
+		t.Fatalf("GetDescription() = %q", got)
+	}
+}
+
 func TestGetMinimalToolsReturnsExactSet(t *testing.T) {
 	want := []string{
 		"get_current_user",
