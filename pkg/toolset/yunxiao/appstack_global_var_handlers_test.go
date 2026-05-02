@@ -76,3 +76,31 @@ func TestHandleListGlobalVarsUsesDefaultPagination(t *testing.T) {
 		t.Fatalf("handleListGlobalVars() error = %v", err)
 	}
 }
+
+func TestAppstackGlobalVarHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetGlobalVar(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetGlobalVar(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing name error")
+	}
+	if _, err := handleGetGlobalVar(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "name": "g-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListGlobalVars(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListGlobalVars(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestAppstackGlobalVarPath(t *testing.T) {
+	if got := appstackGlobalVarPath("org-1", "group/1"); got != "/appstack/organizations/org-1/globalVars/group%2F1" {
+		t.Fatalf("appstackGlobalVarPath() = %q", got)
+	}
+}
