@@ -141,3 +141,50 @@ func TestHandleGetProjectMemberTaskStatusLoadsProjectMembers(t *testing.T) {
 		t.Fatalf("result = %q", result)
 	}
 }
+
+func TestHandleGetProjectRiskDashboardRejectsEmptyCategories(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without categories")
+	})
+
+	if _, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"categories":     ", ,",
+	}); err == nil {
+		t.Fatal("handleGetProjectRiskDashboard() expected missing categories error")
+	}
+}
+
+func TestHandleGetProjectMemberTaskStatusRejectsEmptyAssignees(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, _ = w.Write([]byte(`[]`))
+			return
+		}
+		t.Fatal("handler should not issue search when no assignees")
+	})
+
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("handleGetProjectMemberTaskStatus() expected empty assignees error")
+	}
+}
+
+func TestHandleGetProjectMemberTaskStatusRejectsInvalidStatusGroups(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`[{"userId":"user-1"}]`))
+	})
+
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"assigneeIds":    "user-1",
+		"statusGroups":   "not-json",
+	}); err == nil {
+		t.Fatal("handleGetProjectMemberTaskStatus() expected invalid statusGroups error")
+	}
+}
