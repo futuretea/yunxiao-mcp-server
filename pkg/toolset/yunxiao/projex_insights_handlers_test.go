@@ -189,6 +189,75 @@ func TestHandleGetProjectMemberTaskStatusRejectsInvalidStatusGroups(t *testing.T
 	}
 }
 
+func TestProjexInsightsHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProjectRiskDashboard(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "p-1", "assigneeIds": "u-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestParseStatusGroups(t *testing.T) {
+	if got, err := parseStatusGroups(map[string]any{}); err != nil || got != nil {
+		t.Fatalf("parseStatusGroups(empty) = %v, %v", got, err)
+	}
+	if _, err := parseStatusGroups(map[string]any{"statusGroups": "not-json"}); err == nil {
+		t.Fatal("expected invalid statusGroups error")
+	}
+	got, err := parseStatusGroups(map[string]any{"statusGroups": `{"todo":"todo-id","doing":"doing-id"}`})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got["todo"] != "todo-id" || got["doing"] != "doing-id" {
+		t.Fatalf("unexpected groups: %v", got)
+	}
+}
+
+func TestCopyParams(t *testing.T) {
+	original := map[string]any{"a": 1, "b": "two"}
+	copied := copyParams(original)
+	copied["a"] = 999
+	if original["a"] != 1 {
+		t.Fatal("copyParams did not create independent copy")
+	}
+}
+
+func TestTodayDate(t *testing.T) {
+	if todayDate() == "" {
+		t.Fatal("todayDate() returned empty")
+	}
+}
+
+func TestProjectMembersFromResponse(t *testing.T) {
+	resp := &Response{Body: []byte(`[{"userId":" u-1 ","name":"Alice"},{"userId":"","name":"Bob"},{"userId":"u-2","name":"Charlie"}]`)}
+	members, ids, err := projectMembersFromResponse(resp, 2)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(ids) != 2 || ids[0] != "u-1" || ids[1] != "u-2" {
+		t.Fatalf("ids = %v", ids)
+	}
+	if members["u-1"] == nil || members["u-2"] == nil {
+		t.Fatal("missing members")
+	}
+
+	_, _, err = projectMembersFromResponse(&Response{Body: []byte(`{invalid`)}, 10)
+	if err == nil {
+		t.Fatal("expected decode error")
+	}
+}
+
 func TestHandleGetProjectRiskDashboardWithHighPriorityAndStale(t *testing.T) {
 	seen := map[string]bool{}
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
