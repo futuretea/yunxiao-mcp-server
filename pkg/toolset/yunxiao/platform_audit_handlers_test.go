@@ -55,4 +55,10 @@ func TestHandleListAuditLogsRequiresActionTimeStart(t *testing.T) {
 	if err == nil {
 		t.Fatal("handleListAuditLogs() expected missing actionTimeStart error")
 	}
+	if _, err := handleListAuditLogs(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAuditLogs(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "actionTimeStart": "2026-05-01T00:00:00Z"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 }
