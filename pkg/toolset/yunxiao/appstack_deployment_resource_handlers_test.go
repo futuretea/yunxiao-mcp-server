@@ -98,3 +98,37 @@ func TestHandleGetResourceInstanceBuildsPath(t *testing.T) {
 		t.Fatalf("handleGetResourceInstance() error = %v", err)
 	}
 }
+
+func TestHandleListResourceInstancesRequiresPoolName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleListResourceInstances(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing poolName error")
+	}
+}
+
+func TestHandleGetDeployGroupRequiresDeployGroupName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetDeployGroup(context.Background(), client, map[string]any{"organizationId": "org-1", "poolName": "pool-1"}); err == nil {
+		t.Fatal("expected missing deployGroupName error")
+	}
+}
+
+func TestHandleGetResourceInstanceRequiresInstanceName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetResourceInstance(context.Background(), client, map[string]any{"organizationId": "org-1", "poolName": "pool-1"}); err == nil {
+		t.Fatal("expected missing instanceName error")
+	}
+}
+
+func TestRequiredOrganizationAndPoolRequiresPoolName(t *testing.T) {
+	_, _, err := requiredOrganizationAndPool(map[string]any{"organizationId": "org-1"})
+	if err == nil {
+		t.Fatal("expected missing poolName error")
+	}
+}
