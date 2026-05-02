@@ -493,6 +493,9 @@ func TestHandleGetProjectWorkitemBoardGroupsByStatus(t *testing.T) {
 	if !strings.Contains(result, `"total"`) {
 		t.Fatalf("result missing total: %q", result)
 	}
+	if !strings.Contains(result, `"columnCounts"`) {
+		t.Fatalf("result missing columnCounts: %q", result)
+	}
 }
 
 func TestHandleGetProjectWorkitemBoardRequiresCategory(t *testing.T) {

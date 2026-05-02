@@ -258,6 +258,7 @@ func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[s
 	}
 	board["total"] = total
 
+	columnCounts := map[string]int{}
 	columns := board["columns"].(map[string]any)
 	for _, item := range data {
 		statusName := extractStatusName(item)
@@ -268,7 +269,9 @@ func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[s
 			columns[statusName] = []any{}
 		}
 		columns[statusName] = append(columns[statusName].([]any), item)
+		columnCounts[statusName]++
 	}
+	board["columnCounts"] = columnCounts
 
 	return marshalPretty(board)
 }
