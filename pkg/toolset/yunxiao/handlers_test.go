@@ -212,6 +212,45 @@ func TestHandleGetCommitBuildsPath(t *testing.T) {
 	}
 }
 
+func TestMarshalPrettyReturnsErrorForInvalidValue(t *testing.T) {
+	_, err := marshalPretty(make(chan int))
+	if err == nil {
+		t.Fatal("marshalPretty() expected error for invalid value")
+	}
+}
+
+func TestResponsePayloadReturnsDataOnlyForSimpleResponse(t *testing.T) {
+	resp := &Response{Body: []byte(`{"id":1}`)}
+	got := responsePayload(resp)
+	if got == nil {
+		t.Fatal("responsePayload() = nil")
+	}
+}
+
+func TestResponsePayloadWrapsPagination(t *testing.T) {
+	resp := &Response{Body: []byte(`[]`), Pagination: &Pagination{Page: 2, TotalPages: 3}, NextToken: "next-1", RequestID: "req-1"}
+	got := responsePayload(resp)
+	payload, ok := got.(map[string]any)
+	if !ok {
+		t.Fatalf("responsePayload() = %T", got)
+	}
+	if payload["data"] == nil || payload["pagination"] == nil || payload["nextToken"] != "next-1" || payload["requestId"] != "req-1" {
+		t.Fatalf("payload = %v", payload)
+	}
+}
+
+func TestResponsePayloadWrapsStringForInvalidJSON(t *testing.T) {
+	resp := &Response{Body: []byte(`{invalid`), NextToken: "tok-1"}
+	got := responsePayload(resp)
+	payload, ok := got.(map[string]any)
+	if !ok {
+		t.Fatalf("responsePayload() = %T", got)
+	}
+	if payload["data"] != "{invalid" || payload["nextToken"] != "tok-1" {
+		t.Fatalf("payload = %v", payload)
+	}
+}
+
 func TestHandleCompareBuildsPathAndQuery(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.RequestURI, "/repositories/group%2Frepo/compares") {
