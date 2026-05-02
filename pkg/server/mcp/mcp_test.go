@@ -9,6 +9,7 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
+	"github.com/futuretea/yunxiao-mcp-server/pkg/toolset"
 	yunxiaoToolset "github.com/futuretea/yunxiao-mcp-server/pkg/toolset/yunxiao"
 )
 
@@ -430,5 +431,21 @@ func TestNewTextResultReturnsError(t *testing.T) {
 	}
 	if text.Text != "something went wrong" {
 		t.Fatalf("text = %q, want error message", text.Text)
+	}
+}
+
+func TestRequestAccessTokenHandlesNilRequest(t *testing.T) {
+	if got := requestAccessToken(nil); got != "" {
+		t.Fatalf("requestAccessToken(nil) = %q, want empty", got)
+	}
+}
+
+func TestValidateToolFiltersDetectsDuplicate(t *testing.T) {
+	tools := []toolset.ServerTool{
+		{Tool: mcp.NewTool("dup_tool")},
+		{Tool: mcp.NewTool("dup_tool")},
+	}
+	if err := validateToolFilters(tools, nil, nil); err == nil {
+		t.Fatal("validateToolFilters expected duplicate error")
 	}
 }
