@@ -457,6 +457,22 @@ func TestHandleGetProjectWorkitemDetailAPIErrors(t *testing.T) {
 	}
 }
 
+func TestHandleGetProjectWorkitemDetailReturnsSectionError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+			_, _ = w.Write([]byte(`{"id":"wi-1"}`))
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetProjectWorkitemDetail(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	}); err == nil {
+		t.Fatal("expected section error")
+	}
+}
+
 func TestHandleGetProjectWorkitemSummaryAPIErrors(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)

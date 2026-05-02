@@ -367,3 +367,80 @@ func TestHandleGetProjectMemberTaskStatusReturnsSearchError(t *testing.T) {
 		t.Fatal("expected search error")
 	}
 }
+
+func TestHandleGetProjectRiskDashboardReturnsFocusSearchError(t *testing.T) {
+	requests := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if strings.Contains(conditions, `"fieldIdentifier":"priority"`) {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[]`))
+	})
+	if _, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+		"highPriority":   "p0",
+	}); err == nil {
+		t.Fatal("expected highPriority search error")
+	}
+}
+
+func TestHandleGetProjectRiskDashboardReturnsStaleSearchError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if strings.Contains(conditions, `"fieldIdentifier":"updateStatusAt"`) {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[]`))
+	})
+	if _, err := handleGetProjectRiskDashboard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+		"staleBefore":    "2024-01-01",
+	}); err == nil {
+		t.Fatal("expected stale search error")
+	}
+}
+
+func TestHandleGetProjectMemberTaskStatusReturnsStatusGroupError(t *testing.T) {
+	requests := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if strings.Contains(conditions, `"fieldIdentifier":"status"`) {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("x-total", "1")
+		_, _ = w.Write([]byte(`[]`))
+	})
+	if _, err := handleGetProjectMemberTaskStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"assigneeIds":    "user-1",
+		"categories":     "Task",
+		"statusGroups":   `{"todo":"todo-id"}`,
+	}); err == nil {
+		t.Fatal("expected statusGroup search error")
+	}
+}

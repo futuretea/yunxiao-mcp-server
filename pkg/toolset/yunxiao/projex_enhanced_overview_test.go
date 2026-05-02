@@ -202,3 +202,130 @@ func TestHandleGetProjectWorkitemContextSkipsTypeDetailWithoutWorkItemTypeId(t *
 		t.Fatalf("result should not contain fields or workflow without workItemTypeId: %q", result)
 	}
 }
+
+func TestHandleGetProjectWorkitemContextHonorsIncludeFlags(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		seen[r.URL.Path] = true
+		switch r.URL.Path {
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes":
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+		default:
+			_, _ = w.Write([]byte(`[]`))
+		}
+	})
+
+	result, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+		"includeMembers": false,
+		"includeLabels":  false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemContext() error = %v", err)
+	}
+	if seen["/oapi/v1/projex/organizations/org-1/projects/project-1/members"] {
+		t.Fatal("members request should be skipped")
+	}
+	if seen["/oapi/v1/projex/organizations/org-1/projects/project-1/labels"] {
+		t.Fatal("labels request should be skipped")
+	}
+	if !strings.Contains(result, `"workItemTypes"`) {
+		t.Fatalf("result missing workItemTypes: %q", result)
+	}
+}
+
+func TestHandleGetProjectWorkitemContextSkipsTypeDetailFields(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		seen[r.URL.EscapedPath()] = true
+		switch r.URL.EscapedPath() {
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes":
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes/type%2F1/fields":
+			t.Fatal("fields request should be skipped")
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes/type%2F1/workflows":
+			t.Fatal("workflow request should be skipped")
+		default:
+			_, _ = w.Write([]byte(`[]`))
+		}
+	})
+
+	result, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId":  "org-1",
+		"projectId":       "project-1",
+		"category":        "Task",
+		"workItemTypeId":  "type/1",
+		"includeFields":   false,
+		"includeWorkflow": false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemContext() error = %v", err)
+	}
+	if strings.Contains(result, `"fields"`) {
+		t.Fatalf("result should not contain fields: %q", result)
+	}
+	if strings.Contains(result, `"workflow"`) {
+		t.Fatalf("result should not contain workflow: %q", result)
+	}
+}
+
+func TestHandleGetProjectOverviewReturnsSectionError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/projects/project-1" {
+			_, _ = w.Write([]byte(`{"id":"project-1"}`))
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	if _, err := handleGetProjectOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+	}); err == nil {
+		t.Fatal("handleGetProjectOverview() expected section error")
+	}
+}
+
+func TestHandleGetProjectWorkitemContextReturnsBaseSectionError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes" {
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemContext() expected base section error")
+	}
+}
+
+func TestHandleGetProjectWorkitemContextReturnsTypeDetailError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.EscapedPath() {
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/workitemTypes":
+			_, _ = w.Write([]byte(`[{"id":"type-1"}]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/members":
+			_, _ = w.Write([]byte(`[]`))
+		case "/oapi/v1/projex/organizations/org-1/projects/project-1/labels":
+			_, _ = w.Write([]byte(`[]`))
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
+
+	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+		"workItemTypeId": "type/1",
+	}); err == nil {
+		t.Fatal("handleGetProjectWorkitemContext() expected type detail error")
+	}
+}

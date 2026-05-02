@@ -154,6 +154,19 @@ func TestHandleListWorkItemTypesRequiresCategory(t *testing.T) {
 	}
 }
 
+func TestHandleListWorkItemTypesReturnsAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleListWorkItemTypes(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+	}); err == nil {
+		t.Fatal("expected API error")
+	}
+}
+
 func TestHandleGetWorkItemTypeRequiresID(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("unexpected request")
@@ -203,10 +216,24 @@ func TestRequiredOrganizationAndProjectRequiresProjectId(t *testing.T) {
 	}
 }
 
+func TestRequiredOrganizationAndProjectRequiresOrganizationId(t *testing.T) {
+	_, _, err := requiredOrganizationAndProject(map[string]any{})
+	if err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+}
+
 func TestRequiredOrganizationProjectAndWorkItemTypeRequiresWorkItemTypeId(t *testing.T) {
 	_, _, _, err := requiredOrganizationProjectAndWorkItemType(map[string]any{"organizationId": "org-1", "projectId": "project-1"})
 	if err == nil {
 		t.Fatal("expected missing workItemTypeId error")
+	}
+}
+
+func TestRequiredOrganizationProjectAndWorkItemTypeRequiresOrganizationId(t *testing.T) {
+	_, _, _, err := requiredOrganizationProjectAndWorkItemType(map[string]any{})
+	if err == nil {
+		t.Fatal("expected missing organizationId error")
 	}
 }
 
