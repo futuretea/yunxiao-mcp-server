@@ -5,6 +5,7 @@ third-party-projects/
 bin/
 dist/
 coverage.out
+coverage.html
 *.test
 config.yaml
 config.local.yaml
