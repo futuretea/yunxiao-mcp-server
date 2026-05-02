@@ -291,6 +291,16 @@ func TestAPIErrorFormat(t *testing.T) {
 	}
 }
 
+func TestAccessTokenFromContext(t *testing.T) {
+	if got := AccessTokenFromContext(nil); got != "" {
+		t.Fatalf("AccessTokenFromContext(nil) = %q, want empty", got)
+	}
+	ctx := WithAccessToken(context.Background(), "scoped-token")
+	if got := AccessTokenFromContext(ctx); got != "scoped-token" {
+		t.Fatalf("AccessTokenFromContext(ctx) = %q, want scoped-token", got)
+	}
+}
+
 func TestEncodeRepositoryID(t *testing.T) {
 	tests := []struct {
 		name string
