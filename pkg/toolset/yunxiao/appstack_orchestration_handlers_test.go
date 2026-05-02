@@ -69,3 +69,56 @@ func TestHandleGetAppOrchestrationBuildsPathAndQuery(t *testing.T) {
 		t.Fatalf("handleGetAppOrchestration() error = %v", err)
 	}
 }
+
+func TestAppstackOrchestrationHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetLatestOrchestration(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetLatestOrchestration(context.Background(), client, map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected missing envName error")
+	}
+	if _, err := handleGetLatestOrchestration(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "envName": "dev-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAppOrchestration(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAppOrchestration(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetAppOrchestration(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetAppOrchestration(context.Background(), client, map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected missing sn error")
+	}
+	if _, err := handleGetAppOrchestration(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "sn": "orch-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestRequiredAppOrchestrationAndPath(t *testing.T) {
+	if _, _, _, err := requiredAppOrchestration(map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, _, _, err := requiredAppOrchestration(map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing appName error")
+	}
+	if _, _, _, err := requiredAppOrchestration(map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected missing sn error")
+	}
+	org, app, sn, err := requiredAppOrchestration(map[string]any{"organizationId": "org-1", "appName": "app-1", "sn": "orch/1"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if org != "org-1" || app != "app-1" || sn != "orch/1" {
+		t.Fatalf("unexpected values: %q %q %q", org, app, sn)
+	}
+	if got := appstackOrchestrationPath("org-1", "app/1", "orch/1"); got != "/appstack/organizations/org-1/apps/app%2F1/orchestrations/orch%2F1" {
+		t.Fatalf("appstackOrchestrationPath() = %q", got)
+	}
+}
