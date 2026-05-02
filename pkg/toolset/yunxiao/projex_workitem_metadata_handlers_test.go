@@ -161,3 +161,18 @@ func TestRequiredOrganizationWorkitemAndFileRequiresFileId(t *testing.T) {
 		t.Fatal("expected missing id error")
 	}
 }
+
+func TestProjexWorkitemMetadataHandlersRequireParams(t *testing.T) {
+	if _, err := handleListWorkitemAttachments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetWorkitemFile(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1", "id": "file-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListWorkitemRelationRecords(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1", "relationType": "ASSOCIATED"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListLabels(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "project-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
