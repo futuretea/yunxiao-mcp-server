@@ -375,3 +375,151 @@ func TestHandleGetProjectWorkitemDetailRequiresWorkitemId(t *testing.T) {
 		t.Fatal("handleGetProjectWorkitemDetail() expected missing workitemId error")
 	}
 }
+
+func TestProjexEnhancedHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetProjectOverview(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProjectOverview(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetProjectWorkitemSummary(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProjectWorkitemSummary(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProjectWorkitemContext(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "category": "Task"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetMyProjectWorkitems(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "userId": "user-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetSprintOverview(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetSprintOverview(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "sprintId": "sp-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProjectWorkitemBoard(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "category": "Task"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetProjectWorkitemDetail(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetProjectWorkitemDetail(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestHandleGetProjectOverviewAPIErrors(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/projects/project-1" {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+	if _, err := handleGetProjectOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+	}); err == nil {
+		t.Fatal("expected project fetch error")
+	}
+}
+
+func TestHandleGetProjectWorkitemDetailAPIErrors(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+	if _, err := handleGetProjectWorkitemDetail(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	}); err == nil {
+		t.Fatal("expected workitem fetch error")
+	}
+}
+
+func TestHandleGetProjectWorkitemSummaryAPIErrors(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetProjectWorkitemSummary(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("expected search error")
+	}
+}
+
+func TestHandleGetProjectWorkitemContextAPIErrors(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetProjectWorkitemContext(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+	}); err == nil {
+		t.Fatal("expected context fetch error")
+	}
+}
+
+func TestHandleGetMyProjectWorkitemsAPIErrors(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetMyProjectWorkitems(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"userId":         "user-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("expected search error")
+	}
+}
+
+func TestHandleGetSprintOverviewAPIErrors(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetSprintOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"sprintId":       "sp-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("expected sprint fetch error")
+	}
+}
+
+func TestHandleGetProjectWorkitemBoardAPIErrors(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"category":       "Task",
+	}); err == nil {
+		t.Fatal("expected search error")
+	}
+}
