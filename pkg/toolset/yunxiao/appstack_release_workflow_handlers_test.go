@@ -196,3 +196,48 @@ func TestHandleGetAppReleaseStagePipelineJobLogBuildsPathAndQuery(t *testing.T) 
 		t.Fatalf("handleGetAppReleaseStagePipelineJobLog() error = %v", err)
 	}
 }
+
+func TestHandleGetAppReleaseStagePipelineJobLogRequiresJobId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected request")
+	})
+	if _, err := handleGetAppReleaseStagePipelineJobLog(context.Background(), client, map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "rw-1",
+		"releaseStageSn":    "rs-1",
+		"executionNumber":   "1",
+	}); err == nil {
+		t.Fatal("expected missing jobId error")
+	}
+}
+
+func TestRequiredAppReleaseWorkflowRequiresReleaseWorkflowSn(t *testing.T) {
+	_, _, _, err := requiredAppReleaseWorkflow(map[string]any{"organizationId": "org-1", "appName": "app-1"})
+	if err == nil {
+		t.Fatal("expected missing releaseWorkflowSn error")
+	}
+}
+
+func TestRequiredAppReleaseStageRequiresReleaseStageSn(t *testing.T) {
+	_, _, _, _, err := requiredAppReleaseStage(map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "rw-1",
+	})
+	if err == nil {
+		t.Fatal("expected missing releaseStageSn error")
+	}
+}
+
+func TestRequiredAppReleaseStageExecutionRequiresExecutionNumber(t *testing.T) {
+	_, _, _, _, _, err := requiredAppReleaseStageExecution(map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "rw-1",
+		"releaseStageSn":    "rs-1",
+	})
+	if err == nil {
+		t.Fatal("expected missing executionNumber error")
+	}
+}
