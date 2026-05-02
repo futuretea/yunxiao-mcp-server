@@ -212,6 +212,61 @@ func TestHandleGetAppReleaseStagePipelineJobLogRequiresJobId(t *testing.T) {
 	}
 }
 
+func TestAppstackReleaseWorkflowHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListAppReleaseWorkflows(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAppReleaseWorkflows(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAppReleaseWorkflowBriefs(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAppReleaseWorkflowBriefs(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetAppReleaseWorkflowStage(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetAppReleaseWorkflowStage(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "rw-1", "releaseStageSn": "rs-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAppReleaseStageBriefs(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAppReleaseStageBriefs(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "rw-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAppReleaseStageRuns(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAppReleaseStageRuns(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "rw-1", "releaseStageSn": "rs-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListAppReleaseStageExecMetadata(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListAppReleaseStageExecMetadata(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "rw-1", "releaseStageSn": "rs-1", "executionNumber": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetAppReleaseStagePipelineRun(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetAppReleaseStagePipelineRun(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "rw-1", "releaseStageSn": "rs-1", "executionNumber": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetAppReleaseStagePipelineJobLog(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetAppReleaseStagePipelineJobLog(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "rw-1", "releaseStageSn": "rs-1", "executionNumber": "1", "jobId": "job-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
 func TestRequiredAppReleaseWorkflowRequiresReleaseWorkflowSn(t *testing.T) {
 	_, _, _, err := requiredAppReleaseWorkflow(map[string]any{"organizationId": "org-1", "appName": "app-1"})
 	if err == nil {
