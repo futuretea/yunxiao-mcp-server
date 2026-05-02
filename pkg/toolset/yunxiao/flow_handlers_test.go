@@ -135,6 +135,73 @@ func TestFlowHandlersRequirePipelineParams(t *testing.T) {
 	}
 }
 
+func TestFlowHandlersRequireParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleListPipelines(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListPipelines(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetPipeline(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListPipelineRuns(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListPipelineRuns(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetPipelineRun(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetPipelineRun(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "pipelineRunId": "r-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetLatestPipelineRun(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetLatestPipelineRun(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListPipelineJobsByCategory(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListPipelineJobsByCategory(context.Background(), client, map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected missing category error")
+	}
+	if _, err := handleListPipelineJobsByCategory(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "category": "DEPLOY"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListPipelineJobHistorys(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListPipelineJobHistorys(context.Background(), client, map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected missing category error")
+	}
+	if _, err := handleListPipelineJobHistorys(context.Background(), client, map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "category": "DEPLOY"}); err == nil {
+		t.Fatal("expected missing identifier error")
+	}
+	if _, err := handleListPipelineJobHistorys(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "category": "DEPLOY", "identifier": "job-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetPipelineJobRunLog(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetPipelineJobRunLog(context.Background(), client, map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected missing pipelineRunId error")
+	}
+	if _, err := handleGetPipelineJobRunLog(context.Background(), client, map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "pipelineRunId": "r-1"}); err == nil {
+		t.Fatal("expected missing jobId error")
+	}
+	if _, err := handleGetPipelineJobRunLog(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "pipelineRunId": "r-1", "jobId": "j-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
 func TestHandleListPipelineJobsByCategoryBuildsPath(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
