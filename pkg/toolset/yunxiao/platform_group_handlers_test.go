@@ -88,10 +88,31 @@ func TestPlatformGroupHandlersRequireParams(t *testing.T) {
 		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
 	})
 
+	if _, err := handleListOrganizationGroups(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListOrganizationGroups(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetOrganizationGroup(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
 	_, err := handleGetOrganizationGroup(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 	})
 	if err == nil {
 		t.Fatal("handleGetOrganizationGroup() expected missing id error")
+	}
+	if _, err := handleGetOrganizationGroup(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "g-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleListOrganizationGroupMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListOrganizationGroupMembers(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing id error")
+	}
+	if _, err := handleListOrganizationGroupMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "g-1"}); err == nil {
+		t.Fatal("expected getClient error")
 	}
 }
