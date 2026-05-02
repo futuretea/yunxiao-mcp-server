@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -629,4 +630,74 @@ func TestRegisterToolWrapsHandlerError(t *testing.T) {
 	if text.Text != "handler failed" {
 		t.Fatalf("text = %q, want handler failed", text.Text)
 	}
+}
+
+func TestServeSSEReturnsWorkingSSEServer(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		AccessToken:           "token",
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	sseServer := s.ServeSSE("", &http.Server{})
+	if sseServer == nil {
+		t.Fatal("ServeSSE() returned nil")
+	}
+
+	ts := httptest.NewServer(sseServer.SSEHandler())
+	defer ts.Close()
+
+	resp, err := ts.Client().Get(ts.URL)
+	if err != nil {
+		t.Fatalf("GET /sse: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("status = %d", resp.StatusCode)
+	}
+	if ct := resp.Header.Get("Content-Type"); !strings.Contains(ct, "text/event-stream") {
+		t.Fatalf("Content-Type = %q, want text/event-stream", ct)
+	}
+}
+
+func TestServeStreamableHTTPReturnsWorkingHandler(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		AccessToken:           "token",
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	streamable := s.ServeStreamableHTTP(&http.Server{})
+	if streamable == nil {
+		t.Fatal("ServeStreamableHTTP() returned nil")
+	}
+
+	ts := httptest.NewServer(streamable)
+	defer ts.Close()
+
+	resp, err := ts.Client().Get(ts.URL)
+	if err != nil {
+		t.Fatalf("GET /mcp: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("status = %d", resp.StatusCode)
+	}
+}
+
+func TestCloseIsNoOp(t *testing.T) {
+	s := newTestServer(nil, nil)
+	s.Close() // should not panic
 }
