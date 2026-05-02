@@ -2,6 +2,7 @@ package yunxiao
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -496,5 +497,39 @@ func TestClientPostJSONWithMetadataReturnsMarshalError(t *testing.T) {
 	_, err = client.PostJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": make(chan int)})
 	if err == nil {
 		t.Fatal("PostJSONWithMetadata() expected marshal error")
+	}
+}
+
+type errorReader struct{}
+
+func (e errorReader) Read(_ []byte) (int, error) {
+	return 0, fmt.Errorf("read error")
+}
+func (e errorReader) Close() error { return nil }
+
+type errorBodyTransport struct{}
+
+func (t errorBodyTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	return &http.Response{
+		StatusCode: 200,
+		Body:       errorReader{},
+		Header:     http.Header{},
+		Request:    req,
+	}, nil
+}
+
+func TestClientRequestReturnsReadError(t *testing.T) {
+	client, err := NewClient("https://example.com", "token", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+	client.httpClient = &http.Client{Transport: errorBodyTransport{}}
+
+	_, err = client.Request(context.Background(), http.MethodGet, "/test", nil, nil)
+	if err == nil {
+		t.Fatal("Request() expected read error")
+	}
+	if !strings.Contains(err.Error(), "read response body") {
+		t.Fatalf("error = %v", err)
 	}
 }
