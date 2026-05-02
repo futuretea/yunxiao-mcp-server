@@ -52,6 +52,24 @@ func TestShouldEnableToolDisabledTakesPriority(t *testing.T) {
 	}
 }
 
+func TestNewServerRejectsNilStaticConfig(t *testing.T) {
+	_, err := NewServer(Configuration{})
+	if err == nil {
+		t.Fatal("NewServer() expected error for nil StaticConfig")
+	}
+}
+
+func TestNewServerRejectsInvalidBaseURL(t *testing.T) {
+	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               "://invalid-url",
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+	}})
+	if err == nil {
+		t.Fatal("NewServer() expected error for invalid base URL")
+	}
+}
+
 func TestNewServerRegistersTools(t *testing.T) {
 	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
 		BaseURL:               config.DefaultBaseURL,
