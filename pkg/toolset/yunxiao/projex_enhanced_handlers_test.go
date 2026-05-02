@@ -319,6 +319,42 @@ func TestHandleGetSprintOverviewRejectsEmptyCategories(t *testing.T) {
 	}
 }
 
+func TestHandleGetSprintOverviewWithAssigneeAndSubject(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, _ = w.Write([]byte(`{"id":"sp-1"}`))
+			return
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if !strings.Contains(conditions, `"fieldIdentifier":"assignedTo"`) {
+			t.Fatalf("missing assignedTo in conditions = %q", conditions)
+		}
+		if !strings.Contains(conditions, `"fieldIdentifier":"subject"`) {
+			t.Fatalf("missing subject in conditions = %q", conditions)
+		}
+		if !strings.Contains(conditions, `"fieldIdentifier":"sprint"`) {
+			t.Fatalf("missing sprint in conditions = %q", conditions)
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	_, err := handleGetSprintOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"sprintId":       "sp-1",
+		"categories":     "Task",
+		"assignedTo":     "user-1",
+		"subject":        "auth",
+	})
+	if err != nil {
+		t.Fatalf("handleGetSprintOverview() error = %v", err)
+	}
+}
+
 func TestHandleGetMyProjectWorkitemsBuildsAssignedSearch(t *testing.T) {
 	seen := map[string]int{}
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
@@ -496,6 +532,34 @@ func TestHandleGetProjectWorkitemBoardWithSprintFilter(t *testing.T) {
 	}
 }
 
+func TestHandleGetProjectWorkitemBoardWithAssigneeAndSubject(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		conditions, _ := body["conditions"].(string)
+		if !strings.Contains(conditions, `"fieldIdentifier":"assignedTo"`) {
+			t.Fatalf("missing assignedTo in conditions = %q", conditions)
+		}
+		if !strings.Contains(conditions, `"fieldIdentifier":"subject"`) {
+			t.Fatalf("missing subject in conditions = %q", conditions)
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+
+	_, err := handleGetProjectWorkitemBoard(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"id":             "project-1",
+		"category":       "Task",
+		"assignedTo":     "user-1",
+		"subject":        "login",
+	})
+	if err != nil {
+		t.Fatalf("handleGetProjectWorkitemBoard() error = %v", err)
+	}
+}
+
 func TestMergeConditions(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -507,8 +571,10 @@ func TestMergeConditions(t *testing.T) {
 		{"existing empty", "", `[{"field":"a"}]`, `[{"field":"a"}]`},
 		{"extra empty", `[{"field":"a"}]`, "", `[{"field":"a"}]`},
 		{"both arrays", `[{"field":"a"}]`, `[{"field":"b"}]`, `[{"field":"a"},{"field":"b"}]`},
-		{"existing object preserved", `{"conditionGroups":[]}`, `[{"field":"a"}]`, `{"conditionGroups":[]}`},
-		{"extra object preserved existing", `[{"field":"a"}]`, `{"conditionGroups":[]}`, `[{"field":"a"}]`},
+		{"both objects", `{"conditionGroups":[[{"field":"a"}]]}`, `{"conditionGroups":[[{"field":"b"}]]}`, `{"conditionGroups":[[{"field":"a"},{"field":"b"}]]}`},
+		{"existing object extra array", `{"conditionGroups":[[{"field":"a"}]]}`, `[{"field":"b"}]`, `{"conditionGroups":[[{"field":"a"}]]}`},
+		{"existing array extra object", `[{"field":"a"}]`, `{"conditionGroups":[[{"field":"b"}]]}`, `[{"field":"a"}]`},
+		{"existing invalid json", `not-json`, `[{"field":"b"}]`, `not-json`},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
