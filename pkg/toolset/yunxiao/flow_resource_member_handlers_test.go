@@ -37,4 +37,13 @@ func TestHandleListResourceMembersRequiresParams(t *testing.T) {
 	}); err == nil {
 		t.Fatal("handleListResourceMembers() expected missing resourceId error")
 	}
+	if _, err := handleListResourceMembers(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleListResourceMembers(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
+		t.Fatal("expected missing resourceType error")
+	}
+	if _, err := handleListResourceMembers(context.Background(), "invalid-client", map[string]any{}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 }
