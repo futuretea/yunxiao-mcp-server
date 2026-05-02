@@ -135,6 +135,7 @@ func expectedProjexToolNames() []string {
 		"get_project_overview",
 		"get_project_workitem_summary",
 		"get_project_workitem_context",
+		"get_sprint_overview",
 		"get_project_risk_dashboard",
 		"get_project_member_task_status",
 		"list_project_members",

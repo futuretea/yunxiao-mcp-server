@@ -306,6 +306,81 @@ func responsePayload(resp *Response) any {
 	return payload
 }
 
+func handleGetSprintOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, projectID, err := requiredOrganizationAndID(params)
+	if err != nil {
+		return "", err
+	}
+	sprintID, err := requiredString(params, "sprintId")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	categories := splitCSV(optionalStringDefault(params, "categories", "Task,Bug"))
+	if len(categories) == 0 {
+		return "", fmt.Errorf("categories must include at least one category")
+	}
+
+	sprintPath := projexProjectPath(organizationID, projectID) + "/sprints/" + url.PathEscape(strings.TrimSpace(sprintID))
+	sprintResp, err := c.Request(ctx, http.MethodGet, sprintPath, nil, nil)
+	if err != nil {
+		return "", fmt.Errorf("sprint: %w", err)
+	}
+
+	overview := map[string]any{
+		"sprint":     responsePayload(sprintResp),
+		"filters":    sprintOverviewFilters(params, categories),
+		"categories": map[string]any{},
+	}
+	categoryPayloads := overview["categories"].(map[string]any)
+	for _, category := range categories {
+		payload, err := searchSprintWorkitems(ctx, c, organizationID, projectID, sprintID, category, params)
+		if err != nil {
+			return "", err
+		}
+		categoryPayloads[category] = payload
+	}
+	return marshalPretty(overview)
+}
+
+func searchSprintWorkitems(ctx context.Context, c *Client, organizationID, projectID, sprintID, category string, params map[string]any) (any, error) {
+	body := projectWorkitemSummaryBody(projectID, category, params)
+	conditions := buildWorkitemConditions(map[string]any{
+		"sprint": sprintID,
+	})
+	if conditions != "" {
+		if existing, ok := body["conditions"].(string); ok && existing != "" {
+			var existingArr []map[string]any
+			var newArr []map[string]any
+			_ = json.Unmarshal([]byte(existing), &existingArr)
+			_ = json.Unmarshal([]byte(conditions), &newArr)
+			merged := append(existingArr, newArr...)
+			mergedBytes, _ := json.Marshal(merged)
+			body["conditions"] = string(mergedBytes)
+		} else {
+			body["conditions"] = conditions
+		}
+	}
+	path := projexOrganizationPath(organizationID) + "/workitems:search"
+	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", category, err)
+	}
+	return responsePayload(resp), nil
+}
+
+func sprintOverviewFilters(params map[string]any, categories []string) map[string]any {
+	return map[string]any{
+		"categories":  categories,
+		"status":      optionalStringDefault(params, "status", ""),
+		"sampleLimit": normalizedSampleLimit(params),
+	}
+}
+
 func marshalPretty(value any) (string, error) {
 	formatted, err := json.MarshalIndent(value, "", "  ")
 	if err != nil {

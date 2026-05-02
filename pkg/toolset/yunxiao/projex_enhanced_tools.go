@@ -62,6 +62,19 @@ func projexEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetProjectWorkitemContext,
 		},
+		{
+			Tool: mcp.NewTool("get_sprint_overview",
+				mcp.WithDescription("Get a sprint overview with work item samples and totals by category for one project sprint."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("sprintId", mcp.Required(), mcp.Description("Sprint ID.")),
+				mcp.WithString("categories", mcp.Description("Comma-separated work item categories. Defaults to Task,Bug.")),
+				mcp.WithString("status", mcp.Description("Comma-separated status IDs applied to every category.")),
+				mcp.WithNumber("sampleLimit", mcp.Description("Samples returned per category. Defaults to 5, clamped to 0-200.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetSprintOverview,
+		},
 	}
 	tools = append(tools, projexInsightTools()...)
 	return tools
