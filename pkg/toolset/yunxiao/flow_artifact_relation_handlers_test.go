@@ -129,12 +129,24 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetPipelineScanReportURL(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleGetPipelineScanReportURL(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "reportPath": "/r"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 	_, err := handleGetPipelineArtifactURL(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 		"filePath":       "/artifacts/build.tgz",
 	})
 	if err == nil {
 		t.Fatal("handleGetPipelineArtifactURL() expected missing fileName error")
+	}
+	if _, err := handleGetPipelineArtifactURL(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "filePath": "/a", "fileName": "a"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+	if _, err := handleGetPipelineArtifactURL(context.Background(), client, map[string]any{"filePath": "/a", "fileName": "a"}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetPipelineArtifactURL(context.Background(), client, map[string]any{"organizationId": "org-1", "fileName": "a"}); err == nil {
+		t.Fatal("expected missing filePath error")
 	}
 	_, err = handleGetPipelineEmasArtifactURL(context.Background(), client, map[string]any{
 		"organizationId":    "org-1",
@@ -146,10 +158,44 @@ func TestFlowArtifactRelationHandlersRequireParams(t *testing.T) {
 	if err == nil {
 		t.Fatal("handleGetPipelineEmasArtifactURL() expected missing serviceConnectionId error")
 	}
+	if _, err := handleGetPipelineEmasArtifactURL(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "emasJobInstanceId": "emas-1", "md5": "abc123", "pipelineId": "1", "pipelineRunId": "1", "serviceConnectionId": "1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 	if _, err := handleListPipelineRelations(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
 	}
+	if _, err := handleListPipelineRelations(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1", "relObjectType": "VARIABLE_GROUP"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
 	if _, err := handleGetLastInstance(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing params error")
+	}
+	if _, err := handleGetLastInstance(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "pipelineId": "p-1"}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestRequiredPipelineEmasArtifactURLQueryRequiresAllParams(t *testing.T) {
+	base := map[string]any{
+		"organizationId":      "org-1",
+		"emasJobInstanceId":   "emas-1",
+		"md5":                 "abc123",
+		"pipelineId":          "1",
+		"pipelineRunId":       "1",
+		"serviceConnectionId": "1",
+	}
+	if _, _, err := requiredPipelineEmasArtifactURLQuery(base); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	for _, key := range []string{"organizationId", "emasJobInstanceId", "md5", "pipelineId", "pipelineRunId", "serviceConnectionId"} {
+		params := make(map[string]any, len(base))
+		for k, v := range base {
+			params[k] = v
+		}
+		delete(params, key)
+		if _, _, err := requiredPipelineEmasArtifactURLQuery(params); err == nil {
+			t.Fatalf("expected missing %s error", key)
+		}
 	}
 }
