@@ -2,8 +2,12 @@ package cmd
 
 import (
 	"bytes"
+	"context"
+	"net"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -71,6 +75,33 @@ func TestRootCommandValidatesEnabledToolsBeforeServing(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), `unknown MCP tool "not_a_tool"`) {
 		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestRootCommandStartsAndShutsDownHTTPServer(t *testing.T) {
+	restoreLogger := preserveLogger()
+	t.Cleanup(restoreLogger)
+
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		t.Fatalf("listen: %v", err)
+	}
+	port := listener.Addr().(*net.TCPAddr).Port
+	listener.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+
+	command := NewMCPServer(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{
+		"--port", strconv.Itoa(port),
+		"--access-token", "token",
+	})
+	command.SetContext(ctx)
+
+	err = command.Execute()
+	if err != nil {
+		t.Fatalf("Execute() error = %v", err)
 	}
 }
 
