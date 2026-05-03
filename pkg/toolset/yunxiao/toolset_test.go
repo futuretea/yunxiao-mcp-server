@@ -338,14 +338,8 @@ func TestGetProjectFocusedToolsIncludesPlatformAndProjex(t *testing.T) {
 func TestGetProjectFocusedToolsHidesSupersededTools(t *testing.T) {
 	tools := (&Toolset{ReadOnly: true}).GetProjectFocusedTools(nil)
 	for _, tool := range tools {
-		if tool.Tool.Name == "get_project" {
-			t.Fatal("project-focused tools should hide get_project")
-		}
-		if tool.Tool.Name == "get_sprint" {
-			t.Fatal("project-focused tools should hide get_sprint")
-		}
-		if tool.Tool.Name == "list_work_item_comments" {
-			t.Fatal("project-focused tools should hide list_work_item_comments")
+		if _, ok := projectFocusedHiddenTools[tool.Tool.Name]; ok {
+			t.Fatalf("project-focused tools should hide %q", tool.Tool.Name)
 		}
 	}
 }
@@ -353,7 +347,16 @@ func TestGetProjectFocusedToolsHidesSupersededTools(t *testing.T) {
 func TestGetProjectFocusedToolsIncludesEnhancedAlternatives(t *testing.T) {
 	tools := (&Toolset{ReadOnly: true}).GetProjectFocusedTools(nil)
 
-	want := []string{"get_project_overview", "get_sprint_overview"}
+	want := []string{
+		"get_project_overview",
+		"get_sprint_overview",
+		"get_project_workitem_detail",
+		"get_work_item_type_overview",
+		"get_project_workitem_context",
+		"get_organization_overview",
+		"get_organization_department_overview",
+		"get_organization_group_overview",
+	}
 	for _, w := range want {
 		found := false
 		for _, tool := range tools {

@@ -35,11 +35,28 @@ var projectFocusedDomains = map[string]struct{}{
 	"projex":   {},
 }
 
-// projectFocusedHiddenTools are raw projex tools superseded by enhanced alternatives.
+// projectFocusedHiddenTools are raw tools superseded by enhanced alternatives.
 var projectFocusedHiddenTools = map[string]struct{}{
-	"get_project":             {},
-	"get_sprint":              {},
-	"list_work_item_comments": {},
+	// Projex
+	"get_project":                     {},
+	"get_sprint":                      {},
+	"get_workitem":                    {},
+	"get_work_item_type":              {},
+	"list_work_item_comments":         {},
+	"list_workitem_activities":        {},
+	"list_workitem_attachments":       {},
+	"list_workitem_relation_records":  {},
+	"list_versions":                   {},
+	"list_milestones":                 {},
+	"list_labels":                     {},
+	"get_work_item_type_field_config": {},
+	"get_work_item_workflow":          {},
+
+	// Platform
+	"get_organization":                      {},
+	"get_organization_department_info":      {},
+	"get_organization_department_ancestors": {},
+	"get_organization_group":                {},
 }
 
 // Toolset exposes Yunxiao OpenAPI tools.
