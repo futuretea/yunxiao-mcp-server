@@ -19,8 +19,8 @@ func codeupRepositoryTagTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_tags",
 				mcp.WithDescription("List tags in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size.")),
 				mcp.WithString("search", mcp.Description("Tag search keyword.")),
@@ -38,8 +38,8 @@ func codeupRepositoryMemberTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_repository_members",
 				mcp.WithDescription("List members of a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithNumber("accessLevel", mcp.Description("Minimum access level: 20, 30, or 40.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -53,8 +53,8 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_protected_branches",
 				mcp.WithDescription("List protected branch rules in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListProtectedBranches,
@@ -62,8 +62,8 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_push_rules",
 				mcp.WithDescription("List push rules in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListPushRules,

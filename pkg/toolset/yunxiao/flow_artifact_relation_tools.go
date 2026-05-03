@@ -10,10 +10,10 @@ func flowArtifactRelationTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_pipeline_relations",
-				mcp.WithDescription("List Flow pipeline related objects."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
-				mcp.WithString("relObjectType", mcp.Required(), mcp.Description("Related object type, such as VARIABLE_GROUP.")),
+				mcp.WithDescription("List objects related to a Flow pipeline, such as variable groups. Use this to discover pipeline dependencies and linked resources."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string). Use list_pipelines to find the pipeline ID.")),
+				mcp.WithString("relObjectType", mcp.Required(), mcp.Description("Related object type. Example: VARIABLE_GROUP.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListPipelineRelations,
