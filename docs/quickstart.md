@@ -131,14 +131,22 @@ This guide provides common MCP conversation patterns for AI assistants using the
 
 **Recommended flow**:
 1. `get_application_overview` — application info, environments, and recent orchestrations in one call.
-2. If specific environment details are needed: `get_environment` with the environment name.
+2. If specific environment details are needed: `get_environment_overview` with the app and environment name.
 
-**Example**:
+**Example step 1**:
 ```json
 {
   "appName": "my-app",
   "envLimit": 5,
   "orchestrationLimit": 5
+}
+```
+
+**Example step 2**:
+```json
+{
+  "appName": "my-app",
+  "envName": "dev"
 }
 ```
 

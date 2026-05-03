@@ -197,3 +197,172 @@ func TestApplicationOverviewFilters(t *testing.T) {
 		t.Fatalf("orchestrationLimit = %v", filters["orchestrationLimit"])
 	}
 }
+
+func TestHandleGetEnvironmentOverviewRequiresOrganizationId(t *testing.T) {
+	_, err := handleGetEnvironmentOverview(context.Background(), nil, map[string]any{
+		"appName": "app-1",
+		"envName": "dev",
+	})
+	if err == nil || !strings.Contains(err.Error(), "organizationId is required") {
+		t.Fatalf("expected organizationId required error, got %v", err)
+	}
+}
+
+func TestHandleGetEnvironmentOverviewRequiresAppName(t *testing.T) {
+	_, err := handleGetEnvironmentOverview(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"envName":        "dev",
+	})
+	if err == nil || !strings.Contains(err.Error(), "appName is required") {
+		t.Fatalf("expected appName required error, got %v", err)
+	}
+}
+
+func TestHandleGetEnvironmentOverviewRequiresEnvName(t *testing.T) {
+	_, err := handleGetEnvironmentOverview(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+	})
+	if err == nil || !strings.Contains(err.Error(), "envName is required") {
+		t.Fatalf("expected envName required error, got %v", err)
+	}
+}
+
+func TestHandleGetEnvironmentOverviewRequiresClient(t *testing.T) {
+	_, err := handleGetEnvironmentOverview(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"envName":        "dev",
+	})
+	if err == nil || !strings.Contains(err.Error(), "yunxiao client is not configured") {
+		t.Fatalf("expected client error, got %v", err)
+	}
+}
+
+func TestHandleGetEnvironmentOverviewReturnsErrorOnEnvFailure(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"error":"boom"}`))
+	})
+	_, err := handleGetEnvironmentOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"envName":        "dev",
+	})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+func TestHandleGetEnvironmentOverviewReturnsErrorOnVariableGroupsFailure(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/variableGroups") {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"vg boom"}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"id":"env-1"}`))
+	})
+	_, err := handleGetEnvironmentOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"envName":        "dev",
+	})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+func TestHandleGetEnvironmentOverviewReturnsErrorOnOrchestrationFailure(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, ":latestAvailable") {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"orch boom"}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"id":"env-1"}`))
+	})
+	_, err := handleGetEnvironmentOverview(context.Background(), client, map[string]any{
+		"organizationId":        "org-1",
+		"appName":               "app-1",
+		"envName":               "dev",
+		"includeVariableGroups": false,
+	})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+func TestHandleGetEnvironmentOverviewSuccessAllSections(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/oapi/v1/appstack/organizations/org-1/apps/app-1/envs/dev":
+			_, _ = w.Write([]byte(`{"id":"env-1"}`))
+		case strings.HasSuffix(r.URL.Path, "/variableGroups"):
+			_, _ = w.Write([]byte(`["vg-1"]`))
+		case strings.HasSuffix(r.URL.Path, ":latestAvailable"):
+			_, _ = w.Write([]byte(`{"sn":"1"}`))
+		default:
+			t.Fatalf("unexpected path %q", r.URL.Path)
+		}
+	})
+
+	result, err := handleGetEnvironmentOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"envName":        "dev",
+	})
+	if err != nil {
+		t.Fatalf("handleGetEnvironmentOverview() error = %v", err)
+	}
+	if !strings.Contains(result, `"environment"`) {
+		t.Fatalf("result missing environment: %q", result)
+	}
+	if !strings.Contains(result, `"variableGroups"`) {
+		t.Fatalf("result missing variableGroups: %q", result)
+	}
+	if !strings.Contains(result, `"latestOrchestration"`) {
+		t.Fatalf("result missing latestOrchestration: %q", result)
+	}
+}
+
+func TestHandleGetEnvironmentOverviewSkipsSectionsWhenDisabled(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/appstack/organizations/org-1/apps/app-1/envs/dev" {
+			_, _ = w.Write([]byte(`{"id":"env-1"}`))
+			return
+		}
+		t.Fatalf("unexpected request to %q", r.URL.Path)
+	})
+
+	result, err := handleGetEnvironmentOverview(context.Background(), client, map[string]any{
+		"organizationId":             "org-1",
+		"appName":                    "app-1",
+		"envName":                    "dev",
+		"includeVariableGroups":      false,
+		"includeLatestOrchestration": false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetEnvironmentOverview() error = %v", err)
+	}
+	if strings.Contains(result, `"variableGroups"`) {
+		t.Fatalf("result should not contain variableGroups: %q", result)
+	}
+	if strings.Contains(result, `"latestOrchestration"`) {
+		t.Fatalf("result should not contain latestOrchestration: %q", result)
+	}
+}
+
+func TestEnvironmentOverviewFilters(t *testing.T) {
+	params := map[string]any{
+		"includeVariableGroups":      false,
+		"includeLatestOrchestration": false,
+	}
+	filters := environmentOverviewFilters(params)
+	if filters["includeVariableGroups"].(bool) != false {
+		t.Fatalf("includeVariableGroups = %v", filters["includeVariableGroups"])
+	}
+	if filters["includeLatestOrchestration"].(bool) != false {
+		t.Fatalf("includeLatestOrchestration = %v", filters["includeLatestOrchestration"])
+	}
+}

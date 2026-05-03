@@ -242,6 +242,7 @@ func expectedAppStackToolNames() []string {
 		"find_task_operation_log",
 		"list_change_orders_by_origin",
 		"get_application_overview",
+		"get_environment_overview",
 	}
 }
 

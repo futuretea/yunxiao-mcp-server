@@ -7,6 +7,7 @@ This document describes the enhanced aggregation tools in the Appstack (applicat
 | Tool | Purpose | API Calls |
 |------|---------|-----------|
 | `get_application_overview` | Application dashboard with basic info, environments, and recent orchestrations | 1 + up to 2 |
+| `get_environment_overview` | Environment dashboard with basic info, variable groups, and latest orchestration | 1 + up to 2 |
 
 ## Common Behaviors
 
@@ -35,5 +36,24 @@ Sub-sections use `page`/`perPage` parameters with a default page size of 5 (cont
   "includeOrchestrations": true,
   "envLimit": 5,
   "orchestrationLimit": 5
+}
+```
+
+### get_environment_overview
+
+**When to use**: You want a quick snapshot of an Appstack environment — its basic info plus variable groups and latest orchestration.
+
+**Parameters**:
+- `organizationId`, `appName`, `envName`: required
+- `includeVariableGroups`: toggle variable groups, default true
+- `includeLatestOrchestration`: toggle latest orchestration, default true
+
+**Example**:
+```json
+{
+  "appName": "my-app",
+  "envName": "dev",
+  "includeVariableGroups": true,
+  "includeLatestOrchestration": true
 }
 ```

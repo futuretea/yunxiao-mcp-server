@@ -21,5 +21,17 @@ func appstackEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetApplicationOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_environment_overview",
+				mcp.WithDescription("Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application unique name.")),
+				mcp.WithString("envName", mcp.Required(), mcp.Description("Environment name.")),
+				mcp.WithBoolean("includeVariableGroups", mcp.Description("Whether to include environment variable groups. Defaults to true.")),
+				mcp.WithBoolean("includeLatestOrchestration", mcp.Description("Whether to include the latest available orchestration. Defaults to true.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetEnvironmentOverview,
+		},
 	}
 }

@@ -1,6 +1,6 @@
 # Appstack Tools
 
-This document describes the 51 read-only MCP tools in the appstack domain.
+This document describes the 52 read-only MCP tools in the appstack domain.
 
 ## Pagination
 
@@ -24,6 +24,7 @@ Tools in this domain use the following pagination scheme(s):
 | `list_resource_instances` | List AppStack resource instances in a resource pool. |
 | `get_resource_instance` | Get an AppStack resource instance by pool and instance name. |
 | `get_application_overview` | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
+| `get_environment_overview` | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. |
 | `get_global_var` | Get an AppStack global variable group. |
 | `list_global_vars` | Search AppStack global variable groups. |
 | `search_releases` | Search AppStack releases in a Yunxiao organization. |
@@ -219,6 +220,20 @@ Tools in this domain use the following pagination scheme(s):
 | `includeOrchestrations` | boolean | No | Whether to include recent orchestrations. Defaults to true. |
 | `envLimit` | number | No | Max environments returned. Defaults to 5. |
 | `orchestrationLimit` | number | No | Max orchestrations returned. Defaults to 5. |
+
+### get_environment_overview
+
+**Description**: Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `appName` | string | Yes | Application unique name. |
+| `envName` | string | Yes | Environment name. |
+| `includeVariableGroups` | boolean | No | Whether to include environment variable groups. Defaults to true. |
+| `includeLatestOrchestration` | boolean | No | Whether to include the latest available orchestration. Defaults to true. |
 
 ### get_global_var
 
