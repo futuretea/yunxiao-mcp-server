@@ -7,6 +7,7 @@ This document describes the enhanced aggregation tools in the Flow (CI/CD pipeli
 | Tool | Purpose | API Calls |
 |------|---------|-----------|
 | `get_pipeline_overview` | Pipeline dashboard with basic info, latest run, and recent run history | 2 + up to 1 |
+| `get_pipeline_run_overview` | Pipeline run details with pipeline jobs by category | 1 + up to 1 |
 
 ## Common Behaviors
 
@@ -35,3 +36,24 @@ Run history uses `page`/`perPage` parameters with a default page size of 5 (cont
 ```
 
 **Note**: The `latestRun` section is always included because it uses a dedicated lightweight endpoint.
+
+### get_pipeline_run_overview
+
+**When to use**: You want a quick snapshot of a specific pipeline run — its details plus the pipeline jobs that provide context for understanding the run.
+
+**Parameters**:
+- `organizationId`, `pipelineId`, `pipelineRunId`: required
+- `includeJobs`: toggle pipeline jobs list, default true
+- `category`: task category for job listing, default `DEPLOY`
+
+**Example**:
+```json
+{
+  "pipelineId": "pipeline-1",
+  "pipelineRunId": "run-1",
+  "includeJobs": true,
+  "category": "DEPLOY"
+}
+```
+
+**Note**: Pipeline jobs are fetched from the pipeline scope (not the run scope) because Yunxiao does not provide a run-scoped job listing endpoint. The jobs section shows the pipeline's job structure for context.

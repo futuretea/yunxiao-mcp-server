@@ -19,5 +19,17 @@ func flowEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetPipelineOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_pipeline_run_overview",
+				mcp.WithDescription("Get a comprehensive overview of a Flow pipeline run including run details and pipeline jobs by category in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
+				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID.")),
+				mcp.WithBoolean("includeJobs", mcp.Description("Whether to include pipeline jobs by category. Defaults to true.")),
+				mcp.WithString("category", mcp.Description("Task category for job listing. Defaults to DEPLOY.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipelineRunOverview,
+		},
 	}
 }

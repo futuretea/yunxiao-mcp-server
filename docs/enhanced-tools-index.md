@@ -34,6 +34,7 @@ See [`codeup-enhanced-tools.md`](codeup-enhanced-tools.md) for detailed paramete
 | Tool | What it combines | When to use |
 |------|-----------------|-------------|
 | `get_pipeline_overview` | `get_pipeline` + latest run + recent run history | Pipeline status check |
+| `get_pipeline_run_overview` | `get_pipeline_run` + pipeline jobs by category | Pipeline run details |
 
 See [`flow-enhanced-tools.md`](flow-enhanced-tools.md) for detailed parameters and examples.
 
@@ -58,7 +59,7 @@ See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed para
 
 ## Quick Reference
 
-**Total enhanced tools**: 19 across 5 domains.
+**Total enhanced tools**: 20 across 5 domains.
 
 **Base tools they replace**: ~39 raw API calls.
 

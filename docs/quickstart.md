@@ -185,6 +185,23 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Check Pipeline Run
+
+**User asks**: "How did pipeline run #123 go?"
+
+**Recommended flow**:
+1. `get_pipeline_run_overview` — run details plus pipeline jobs by category in one call.
+
+**Example**:
+```json
+{
+  "pipelineId": "pipeline-1",
+  "pipelineRunId": "run-1",
+  "includeJobs": true,
+  "category": "DEPLOY"
+}
+```
+
 ## Pattern: Check Application Status
 
 **User asks**: "Tell me about application Z."
