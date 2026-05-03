@@ -19,8 +19,7 @@ func handleListAllWorkItemTypes(ctx context.Context, client any, params map[stri
 	query := url.Values{}
 	setOptionalString(query, params, "categories")
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitemTypes"
-	return c.GetJSON(ctx, path, query)
+	return c.GetJSON(ctx, projexOrganizationPath(organizationID)+"/workitemTypes", query)
 }
 
 func handleListWorkItemTypes(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -41,8 +40,7 @@ func handleListWorkItemTypes(ctx context.Context, client any, params map[string]
 	query := url.Values{}
 	query.Set("category", category)
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/projects/" + url.PathEscape(projectID) + "/workitemTypes"
-	return c.GetJSON(ctx, path, query)
+	return c.GetJSON(ctx, projexProjectPath(organizationID, projectID)+"/workitemTypes", query)
 }
 
 func handleGetWorkItemType(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -56,7 +54,7 @@ func handleGetWorkItemType(ctx context.Context, client any, params map[string]an
 		return "", err
 	}
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
+	path := projexOrganizationPath(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -74,7 +72,7 @@ func handleListWorkItemRelationWorkItemTypes(ctx context.Context, client any, pa
 	query := url.Values{}
 	setOptionalString(query, params, "relationType")
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID) + "/relationWorkitemTypes"
+	path := projexOrganizationPath(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID) + "/relationWorkitemTypes"
 	return c.GetJSON(ctx, path, query)
 }
 
@@ -131,5 +129,5 @@ func requiredOrganizationProjectAndWorkItemType(params map[string]any) (string, 
 }
 
 func workItemTypeProjectPath(organizationID, projectID, workItemTypeID string) string {
-	return "/projex/organizations/" + url.PathEscape(organizationID) + "/projects/" + url.PathEscape(projectID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
+	return projexProjectPath(organizationID, projectID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
 }

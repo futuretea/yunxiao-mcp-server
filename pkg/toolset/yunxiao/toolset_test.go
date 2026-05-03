@@ -302,3 +302,27 @@ func TestGetProjectFocusedToolsIncludesEnhancedAlternatives(t *testing.T) {
 		}
 	}
 }
+
+func TestReadOnlyModeExcludesWriteTools(t *testing.T) {
+	ts := &Toolset{ReadOnly: true}
+	all := ts.GetTools(nil)
+	for _, tool := range all {
+		if _, ok := writeToolNames[tool.Tool.Name]; ok {
+			t.Fatalf("read-only mode should exclude write tool %q", tool.Tool.Name)
+		}
+	}
+}
+
+func TestWriteModeIncludesWriteTools(t *testing.T) {
+	ts := &Toolset{ReadOnly: false}
+	all := ts.GetTools(nil)
+	names := make(map[string]bool, len(all))
+	for _, tool := range all {
+		names[tool.Tool.Name] = true
+	}
+	for want := range writeToolNames {
+		if !names[want] {
+			t.Fatalf("write mode should include write tool %q", want)
+		}
+	}
+}

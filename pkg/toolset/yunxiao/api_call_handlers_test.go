@@ -55,7 +55,10 @@ func TestHandleCallYunxiaoAPIPostRequest(t *testing.T) {
 }
 
 func TestHandleCallYunxiaoAPIRejectsInvalidMethod(t *testing.T) {
-	_, err := handleCallYunxiaoAPI(context.Background(), nil, map[string]any{
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request with invalid method")
+	})
+	_, err := handleCallYunxiaoAPI(context.Background(), client, map[string]any{
 		"path":   "/test",
 		"method": "DELETE",
 	})
@@ -65,7 +68,10 @@ func TestHandleCallYunxiaoAPIRejectsInvalidMethod(t *testing.T) {
 }
 
 func TestHandleCallYunxiaoAPIRejectsBlockedPath(t *testing.T) {
-	_, err := handleCallYunxiaoAPI(context.Background(), nil, map[string]any{
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request with blocked path")
+	})
+	_, err := handleCallYunxiaoAPI(context.Background(), client, map[string]any{
 		"path": "/projex/organizations/org-1/workitems/wi-1/deletefile/1",
 	})
 	if err == nil || !strings.Contains(err.Error(), "blocked") {
@@ -74,7 +80,10 @@ func TestHandleCallYunxiaoAPIRejectsBlockedPath(t *testing.T) {
 }
 
 func TestHandleCallYunxiaoAPIRejectsInvalidQueryParams(t *testing.T) {
-	_, err := handleCallYunxiaoAPI(context.Background(), nil, map[string]any{
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request with invalid queryParams")
+	})
+	_, err := handleCallYunxiaoAPI(context.Background(), client, map[string]any{
 		"path":        "/test",
 		"queryParams": "not-json",
 	})
@@ -84,7 +93,10 @@ func TestHandleCallYunxiaoAPIRejectsInvalidQueryParams(t *testing.T) {
 }
 
 func TestHandleCallYunxiaoAPIRejectsInvalidBody(t *testing.T) {
-	_, err := handleCallYunxiaoAPI(context.Background(), nil, map[string]any{
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request with invalid body")
+	})
+	_, err := handleCallYunxiaoAPI(context.Background(), client, map[string]any{
 		"path": "/test",
 		"body": "not-json",
 	})

@@ -51,7 +51,7 @@ func handleListTestcaseRepositories(ctx context.Context, client any, params map[
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 
-	resp, err := c.Request(ctx, http.MethodPost, "/projex/organizations/"+url.PathEscape(organizationID)+"/projects/repo/list", query, nil)
+	resp, err := c.Request(ctx, http.MethodPost, projexOrganizationPath(organizationID)+"/projects/repo/list", query, nil)
 	if err != nil {
 		return "", err
 	}

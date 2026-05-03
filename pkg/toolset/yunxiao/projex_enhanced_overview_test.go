@@ -377,8 +377,19 @@ func TestHandleGetProjectWorkitemContextReturnsWorkflowError(t *testing.T) {
 	}
 }
 
-func TestHandleGetWorkItemTypeOverviewRequiresOrganizationId(t *testing.T) {
+func TestHandleGetWorkItemTypeOverviewRequiresClient(t *testing.T) {
 	_, err := handleGetWorkItemTypeOverview(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"workItemTypeId": "type-1",
+	})
+	if err == nil || !strings.Contains(err.Error(), "yunxiao client is not configured") {
+		t.Fatalf("expected client error, got %v", err)
+	}
+}
+
+func TestHandleGetWorkItemTypeOverviewRequiresOrganizationId(t *testing.T) {
+	_, err := handleGetWorkItemTypeOverview(context.Background(), &Client{}, map[string]any{
 		"projectId":      "project-1",
 		"workItemTypeId": "type-1",
 	})
@@ -388,7 +399,7 @@ func TestHandleGetWorkItemTypeOverviewRequiresOrganizationId(t *testing.T) {
 }
 
 func TestHandleGetWorkItemTypeOverviewRequiresProjectId(t *testing.T) {
-	_, err := handleGetWorkItemTypeOverview(context.Background(), nil, map[string]any{
+	_, err := handleGetWorkItemTypeOverview(context.Background(), &Client{}, map[string]any{
 		"organizationId": "org-1",
 		"workItemTypeId": "type-1",
 	})
@@ -398,23 +409,12 @@ func TestHandleGetWorkItemTypeOverviewRequiresProjectId(t *testing.T) {
 }
 
 func TestHandleGetWorkItemTypeOverviewRequiresWorkItemTypeId(t *testing.T) {
-	_, err := handleGetWorkItemTypeOverview(context.Background(), nil, map[string]any{
+	_, err := handleGetWorkItemTypeOverview(context.Background(), &Client{}, map[string]any{
 		"organizationId": "org-1",
 		"projectId":      "project-1",
 	})
 	if err == nil || !strings.Contains(err.Error(), "workItemTypeId is required") {
 		t.Fatalf("expected workItemTypeId required error, got %v", err)
-	}
-}
-
-func TestHandleGetWorkItemTypeOverviewRequiresClient(t *testing.T) {
-	_, err := handleGetWorkItemTypeOverview(context.Background(), nil, map[string]any{
-		"organizationId": "org-1",
-		"projectId":      "project-1",
-		"workItemTypeId": "type-1",
-	})
-	if err == nil || !strings.Contains(err.Error(), "yunxiao client is not configured") {
-		t.Fatalf("expected client error, got %v", err)
 	}
 }
 

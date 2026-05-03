@@ -7,7 +7,7 @@ import (
 )
 
 func projexTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 37)
+	tools := make([]toolset.ServerTool, 0, 41)
 	tools = append(tools, projexProjectTools()...)
 	tools = append(tools, projexEnhancedTools()...)
 	tools = append(tools, projexProjectMetadataTools()...)
@@ -18,6 +18,7 @@ func projexTools() []toolset.ServerTool {
 	tools = append(tools, projexWorkitemMetadataTools()...)
 	tools = append(tools, projexMilestoneTestcaseTools()...)
 	tools = append(tools, projexWorkitemTypeTools()...)
+	tools = append(tools, projexWriteTools()...)
 	return tools
 }
 
@@ -100,7 +101,7 @@ func projexWorkitemTools() []toolset.ServerTool {
 			Tool: mcp.NewTool("list_work_item_comments",
 				mcp.WithDescription("List comments for a Projex work item."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("workItemId", mcp.Required(), mcp.Description("Work item ID.")),
+				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size.")),
 				mcp.WithReadOnlyHintAnnotation(true),

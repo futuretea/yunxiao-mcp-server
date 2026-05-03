@@ -1,6 +1,11 @@
 package yunxiao
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+var errNoCategories = errors.New("categories must include at least one category")
 
 func getClient(client any) (*Client, error) {
 	c, ok := client.(*Client)

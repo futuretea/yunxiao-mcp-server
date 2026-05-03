@@ -174,6 +174,15 @@ func (c *Client) PostJSONWithMetadata(ctx context.Context, path string, body any
 	return prettyResponseJSON(resp), nil
 }
 
+// PutJSONWithMetadata sends a PUT request and includes pagination metadata in the response.
+func (c *Client) PutJSONWithMetadata(ctx context.Context, path string, body any) (string, error) {
+	resp, err := c.Request(ctx, http.MethodPut, path, nil, body)
+	if err != nil {
+		return "", err
+	}
+	return prettyResponseJSON(resp), nil
+}
+
 // Request sends an authenticated Yunxiao OpenAPI request.
 func (c *Client) Request(ctx context.Context, method, path string, query url.Values, body any) (*Response, error) {
 	accessToken := c.accessToken

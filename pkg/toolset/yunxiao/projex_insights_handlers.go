@@ -11,18 +11,18 @@ import (
 )
 
 func handleGetProjectRiskDashboard(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
+	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
-	c, err := getClient(client)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
 
 	categories := splitCSV(optionalStringDefault(params, "categories", "Risk,Bug,Task"))
 	if len(categories) == 0 {
-		return "", fmt.Errorf("categories must include at least one category")
+		return "", errNoCategories
 	}
 
 	dashboard := map[string]any{
@@ -42,11 +42,11 @@ func handleGetProjectRiskDashboard(ctx context.Context, client any, params map[s
 }
 
 func handleGetProjectMemberTaskStatus(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
+	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
-	c, err := getClient(client)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -211,19 +211,13 @@ func projectMembersFromResponse(resp *Response, limit int) (map[string]any, []st
 }
 
 func searchProjectWorkitems(ctx context.Context, c *Client, organizationID, projectID, category string, params map[string]any) (any, error) {
-	body := projectInsightWorkitemBody(projectID, category, params)
+	body := projectWorkitemSummaryBody(projectID, category, params)
 	path := projexOrganizationPath(organizationID) + "/workitems:search"
 	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", category, err)
 	}
 	return responsePayload(resp), nil
-}
-
-func projectInsightWorkitemBody(projectID, category string, params map[string]any) map[string]any {
-	body := projectWorkitemSummaryBody(projectID, category, params)
-	body["perPage"] = normalizedSampleLimit(params)
-	return body
 }
 
 func parseStatusGroups(params map[string]any) (map[string]string, error) {

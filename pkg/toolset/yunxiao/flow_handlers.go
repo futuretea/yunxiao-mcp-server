@@ -26,8 +26,7 @@ func handleListPipelines(ctx context.Context, client any, params map[string]any)
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines"
-	return c.GetJSONWithMetadata(ctx, path, query)
+	return c.GetJSONWithMetadata(ctx, flowOrganizationPath(organizationID)+"/pipelines", query)
 }
 
 func handleGetPipeline(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -41,8 +40,7 @@ func handleGetPipeline(ctx context.Context, client any, params map[string]any) (
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID)
-	return c.GetJSON(ctx, path, nil)
+	return c.GetJSON(ctx, flowPipelinePath(organizationID, pipelineID), nil)
 }
 
 func handleListPipelineRuns(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -64,8 +62,7 @@ func handleListPipelineRuns(ctx context.Context, client any, params map[string]a
 	setOptionalString(query, params, "status")
 	setOptionalInt(query, params, "triggerMode")
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID) + "/runs"
-	return c.GetJSONWithMetadata(ctx, path, query)
+	return c.GetJSONWithMetadata(ctx, flowPipelinePath(organizationID, pipelineID)+"/runs", query)
 }
 
 func handleGetPipelineRun(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -83,7 +80,7 @@ func handleGetPipelineRun(ctx context.Context, client any, params map[string]any
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID) + "/runs/" + url.PathEscape(pipelineRunID)
+	path := flowPipelinePath(organizationID, pipelineID) + "/runs/" + url.PathEscape(pipelineRunID)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -98,8 +95,7 @@ func handleGetLatestPipelineRun(ctx context.Context, client any, params map[stri
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID) + "/runs/latestPipelineRun"
-	return c.GetJSON(ctx, path, nil)
+	return c.GetJSON(ctx, flowPipelinePath(organizationID, pipelineID)+"/runs/latestPipelineRun", nil)
 }
 
 func handleListPipelineJobsByCategory(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -117,7 +113,7 @@ func handleListPipelineJobsByCategory(ctx context.Context, client any, params ma
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID) + "/listTasksByCategory/" + url.PathEscape(category)
+	path := flowPipelinePath(organizationID, pipelineID) + "/listTasksByCategory/" + url.PathEscape(category)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -147,8 +143,7 @@ func handleListPipelineJobHistorys(ctx context.Context, client any, params map[s
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/getComponentsWithoutButtons"
-	return c.GetJSONWithMetadata(ctx, path, query)
+	return c.GetJSONWithMetadata(ctx, flowOrganizationPath(organizationID)+"/pipelines/getComponentsWithoutButtons", query)
 }
 
 func handleGetPipelineJobRunLog(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -170,6 +165,14 @@ func handleGetPipelineJobRunLog(ctx context.Context, client any, params map[stri
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID) + "/runs/" + url.PathEscape(pipelineRunID) + "/job/" + url.PathEscape(jobID) + "/log"
+	path := flowPipelinePath(organizationID, pipelineID) + "/runs/" + url.PathEscape(pipelineRunID) + "/job/" + url.PathEscape(jobID) + "/log"
 	return c.GetJSON(ctx, path, nil)
+}
+
+func flowOrganizationPath(organizationID string) string {
+	return "/flow/organizations/" + url.PathEscape(organizationID)
+}
+
+func flowPipelinePath(organizationID, pipelineID string) string {
+	return flowOrganizationPath(organizationID) + "/pipelines/" + url.PathEscape(pipelineID)
 }

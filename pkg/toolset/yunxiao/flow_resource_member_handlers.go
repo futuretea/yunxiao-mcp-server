@@ -24,6 +24,6 @@ func handleListResourceMembers(ctx context.Context, client any, params map[strin
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/resourceMembers/resourceTypes/" + url.PathEscape(resourceType) + "/resourceIds/" + url.PathEscape(resourceID)
+	path := flowOrganizationPath(organizationID) + "/resourceMembers/resourceTypes/" + url.PathEscape(resourceType) + "/resourceIds/" + url.PathEscape(resourceID)
 	return c.GetJSON(ctx, path, nil)
 }

@@ -65,44 +65,43 @@ func setOptionalBoolBody(body map[string]any, params map[string]any, key string)
 	}
 }
 
-func setOptionalStringArrayBody(body map[string]any, params map[string]any, key string) {
-	switch value := params[key].(type) {
+func trimmedNonEmptyStrings(value any) []string {
+	switch v := value.(type) {
 	case []any:
-		values := make([]string, 0, len(value))
-		for _, item := range value {
-			if item, ok := item.(string); ok && strings.TrimSpace(item) != "" {
-				values = append(values, strings.TrimSpace(item))
+		result := make([]string, 0, len(v))
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				s = strings.TrimSpace(s)
+				if s != "" {
+					result = append(result, s)
+				}
 			}
 		}
-		if len(values) > 0 {
-			body[key] = values
-		}
+		return result
 	case []string:
-		values := make([]string, 0, len(value))
-		for _, item := range value {
-			if strings.TrimSpace(item) != "" {
-				values = append(values, strings.TrimSpace(item))
+		result := make([]string, 0, len(v))
+		for _, item := range v {
+			item = strings.TrimSpace(item)
+			if item != "" {
+				result = append(result, item)
 			}
 		}
-		if len(values) > 0 {
-			body[key] = values
-		}
+		return result
+	}
+	return nil
+}
+
+func setOptionalStringArrayBody(body map[string]any, params map[string]any, key string) {
+	if values := trimmedNonEmptyStrings(params[key]); len(values) > 0 {
+		body[key] = values
 	}
 }
 
 func setOptionalStringArrayQuery(query url.Values, params map[string]any, key string) {
 	switch value := params[key].(type) {
-	case []any:
-		for _, item := range value {
-			if item, ok := item.(string); ok && strings.TrimSpace(item) != "" {
-				query.Add(key, strings.TrimSpace(item))
-			}
-		}
-	case []string:
-		for _, item := range value {
-			if strings.TrimSpace(item) != "" {
-				query.Add(key, item)
-			}
+	case []any, []string:
+		for _, item := range trimmedNonEmptyStrings(value) {
+			query.Add(key, item)
 		}
 	case string:
 		for _, item := range splitCSV(value) {
@@ -142,4 +141,11 @@ func setOptionalBool(query url.Values, params map[string]any, key string) {
 	if ok {
 		query.Set(key, strconv.FormatBool(value))
 	}
+}
+
+func pageOneLimitQuery(params map[string]any, limitKey string, defaultLimit int) url.Values {
+	query := url.Values{}
+	query.Set("page", "1")
+	query.Set("perPage", strconv.Itoa(optionalIntDefault(params, limitKey, defaultLimit)))
+	return query
 }

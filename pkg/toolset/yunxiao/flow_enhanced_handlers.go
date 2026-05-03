@@ -3,7 +3,6 @@ package yunxiao
 import (
 	"context"
 	"net/url"
-	"strconv"
 )
 
 func handleGetPipelineOverview(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -16,7 +15,7 @@ func handleGetPipelineOverview(ctx context.Context, client any, params map[strin
 		return "", err
 	}
 
-	pipelinePath := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID)
+	pipelinePath := flowPipelinePath(organizationID, pipelineID)
 
 	pipeline, err := getProjectOverviewSection(ctx, c, "pipeline", pipelinePath, nil)
 	if err != nil {
@@ -35,7 +34,7 @@ func handleGetPipelineOverview(ctx context.Context, client any, params map[strin
 	overview["latestRun"] = latestRun
 
 	if optionalBoolDefault(params, "includeRuns", true) {
-		runs, err := getProjectOverviewSection(ctx, c, "runs", pipelinePath+"/runs", pipelineRunQuery(params))
+		runs, err := getProjectOverviewSection(ctx, c, "runs", pipelinePath+"/runs", pageOneLimitQuery(params, "runLimit", 5))
 		if err != nil {
 			return "", err
 		}
@@ -52,13 +51,6 @@ func pipelineOverviewFilters(params map[string]any) map[string]any {
 	}
 }
 
-func pipelineRunQuery(params map[string]any) url.Values {
-	query := url.Values{}
-	query.Set("page", "1")
-	query.Set("perPage", strconv.Itoa(optionalIntDefault(params, "runLimit", 5)))
-	return query
-}
-
 func handleGetPipelineRunOverview(ctx context.Context, client any, params map[string]any) (string, error) {
 	organizationID, pipelineID, err := requiredOrganizationAndPipeline(params)
 	if err != nil {
@@ -73,7 +65,7 @@ func handleGetPipelineRunOverview(ctx context.Context, client any, params map[st
 		return "", err
 	}
 
-	pipelinePath := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID)
+	pipelinePath := flowPipelinePath(organizationID, pipelineID)
 	runPath := pipelinePath + "/runs/" + url.PathEscape(pipelineRunID)
 
 	run, err := getProjectOverviewSection(ctx, c, "run", runPath, nil)

@@ -21,8 +21,7 @@ func handleGetPipelineScanReportURL(ctx context.Context, client any, params map[
 	}
 
 	query := url.Values{"reportPath": []string{reportPath}}
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/getPipelineScanReportUrl"
-	return c.GetJSON(ctx, path, query)
+	return c.GetJSON(ctx, flowOrganizationPath(organizationID)+"/pipelines/getPipelineScanReportUrl", query)
 }
 
 func handleGetPipelineArtifactURL(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -45,8 +44,7 @@ func handleGetPipelineArtifactURL(ctx context.Context, client any, params map[st
 	}
 
 	query := url.Values{"filePath": []string{filePath}, "fileName": []string{fileName}}
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/getArtifactDownloadUrl"
-	return c.GetJSON(ctx, path, query)
+	return c.GetJSON(ctx, flowOrganizationPath(organizationID)+"/pipelines/getArtifactDownloadUrl", query)
 }
 
 func handleGetPipelineEmasArtifactURL(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -60,8 +58,7 @@ func handleGetPipelineEmasArtifactURL(ctx context.Context, client any, params ma
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/getEmasArtifactDownloadUrl"
-	return c.GetJSON(ctx, path, query)
+	return c.GetJSON(ctx, flowOrganizationPath(organizationID)+"/pipelines/getEmasArtifactDownloadUrl", query)
 }
 
 func requiredPipelineEmasArtifactURLQuery(params map[string]any) (string, url.Values, error) {
@@ -115,7 +112,7 @@ func handleListPipelineRelations(ctx context.Context, client any, params map[str
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/pipelines/" + url.PathEscape(pipelineID) + "/pipelineObjRel/" + url.PathEscape(relObjectType) + "/list"
+	path := flowPipelinePath(organizationID, pipelineID) + "/pipelineObjRel/" + url.PathEscape(relObjectType) + "/list"
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -130,6 +127,6 @@ func handleGetLastInstance(ctx context.Context, client any, params map[string]an
 		return "", err
 	}
 
-	path := "/flow/organizations/" + url.PathEscape(organizationID) + "/createServiceConnection/" + url.PathEscape(pipelineID) + "/getLastInstance"
+	path := flowOrganizationPath(organizationID) + "/createServiceConnection/" + url.PathEscape(pipelineID) + "/getLastInstance"
 	return c.GetJSON(ctx, path, nil)
 }

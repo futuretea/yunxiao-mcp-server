@@ -177,21 +177,6 @@ func TestPipelineOverviewFilters(t *testing.T) {
 	}
 }
 
-func TestPipelineRunQuery(t *testing.T) {
-	q := pipelineRunQuery(map[string]any{"runLimit": float64(7)})
-	if q.Get("page") != "1" {
-		t.Fatalf("page = %q", q.Get("page"))
-	}
-	if q.Get("perPage") != "7" {
-		t.Fatalf("perPage = %q", q.Get("perPage"))
-	}
-
-	q2 := pipelineRunQuery(map[string]any{})
-	if q2.Get("perPage") != "5" {
-		t.Fatalf("default perPage = %q", q2.Get("perPage"))
-	}
-}
-
 func TestHandleGetPipelineRunOverviewRequiresOrganizationId(t *testing.T) {
 	_, err := handleGetPipelineRunOverview(context.Background(), nil, map[string]any{
 		"pipelineId":    "pipeline-1",

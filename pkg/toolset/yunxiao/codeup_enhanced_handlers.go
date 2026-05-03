@@ -3,7 +3,6 @@ package yunxiao
 import (
 	"context"
 	"net/url"
-	"strconv"
 )
 
 func handleGetRepositoryOverview(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -29,7 +28,7 @@ func handleGetRepositoryOverview(ctx context.Context, client any, params map[str
 	}
 
 	if optionalBoolDefault(params, "includeBranches", true) {
-		branches, err := getProjectOverviewSection(ctx, c, "branches", repoPath+"/branches", repositoryLimitQuery(params, "branchLimit", 5))
+		branches, err := getProjectOverviewSection(ctx, c, "branches", repoPath+"/branches", pageOneLimitQuery(params, "branchLimit", 5))
 		if err != nil {
 			return "", err
 		}
@@ -46,7 +45,7 @@ func handleGetRepositoryOverview(ctx context.Context, client any, params map[str
 	}
 
 	if optionalBoolDefault(params, "includeCommits", true) && refName != "" {
-		commitQuery := repositoryLimitQuery(params, "commitLimit", 5)
+		commitQuery := pageOneLimitQuery(params, "commitLimit", 5)
 		commitQuery.Set("refName", refName)
 		commits, err := getProjectOverviewSection(ctx, c, "commits", repoPath+"/commits", commitQuery)
 		if err != nil {
@@ -56,7 +55,7 @@ func handleGetRepositoryOverview(ctx context.Context, client any, params map[str
 	}
 
 	if optionalBoolDefault(params, "includeMergeRequests", true) {
-		mrQuery := repositoryLimitQuery(params, "mrLimit", 5)
+		mrQuery := pageOneLimitQuery(params, "mrLimit", 5)
 		mrQuery.Set("state", optionalStringDefault(params, "mrState", "opened"))
 		mrQuery.Add("repositoryIds", repositoryID)
 		mrs, err := getProjectOverviewSection(ctx, c, "mergeRequests", codeupOrganizationPath(organizationID)+"/mergeRequests", mrQuery)
@@ -80,13 +79,6 @@ func repositoryOverviewFilters(params map[string]any) map[string]any {
 		"mrLimit":              optionalIntDefault(params, "mrLimit", 5),
 		"mrState":              optionalStringDefault(params, "mrState", "opened"),
 	}
-}
-
-func repositoryLimitQuery(params map[string]any, limitKey string, defaultLimit int) url.Values {
-	query := url.Values{}
-	query.Set("page", "1")
-	query.Set("perPage", strconv.Itoa(optionalIntDefault(params, limitKey, defaultLimit)))
-	return query
 }
 
 func handleGetChangeRequestOverview(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -172,7 +164,7 @@ func handleGetCommitOverview(ctx context.Context, client any, params map[string]
 	}
 
 	if optionalBoolDefault(params, "includeStatuses", true) {
-		statusQuery := repositoryLimitQuery(params, "statusLimit", 5)
+		statusQuery := pageOneLimitQuery(params, "statusLimit", 5)
 		statuses, err := getProjectOverviewSection(ctx, c, "statuses", commitPath+"/statuses", statusQuery)
 		if err != nil {
 			return "", err
@@ -181,7 +173,7 @@ func handleGetCommitOverview(ctx context.Context, client any, params map[string]
 	}
 
 	if optionalBoolDefault(params, "includeCheckRuns", true) {
-		checkRunQuery := repositoryLimitQuery(params, "checkRunLimit", 5)
+		checkRunQuery := pageOneLimitQuery(params, "checkRunLimit", 5)
 		checkRunQuery.Set("ref", sha)
 		checkRuns, err := getProjectOverviewSection(ctx, c, "checkRuns", repoPath+"/checkRuns", checkRunQuery)
 		if err != nil {
@@ -230,7 +222,7 @@ func handleGetBranchOverview(ctx context.Context, client any, params map[string]
 	}
 
 	if optionalBoolDefault(params, "includeCommits", true) {
-		commitQuery := repositoryLimitQuery(params, "commitLimit", 5)
+		commitQuery := pageOneLimitQuery(params, "commitLimit", 5)
 		commitQuery.Set("refName", branchName)
 		commits, err := getProjectOverviewSection(ctx, c, "commits", repoPath+"/commits", commitQuery)
 		if err != nil {
@@ -240,7 +232,7 @@ func handleGetBranchOverview(ctx context.Context, client any, params map[string]
 	}
 
 	if optionalBoolDefault(params, "includeMergeRequests", true) {
-		mrQuery := repositoryLimitQuery(params, "mrLimit", 5)
+		mrQuery := pageOneLimitQuery(params, "mrLimit", 5)
 		mrQuery.Set("state", optionalStringDefault(params, "mrState", "opened"))
 		mrQuery.Add("repositoryIds", repositoryID)
 		mrQuery.Set("targetBranch", branchName)

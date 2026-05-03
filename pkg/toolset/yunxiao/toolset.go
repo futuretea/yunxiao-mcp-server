@@ -58,6 +58,14 @@ var projectFocusedHiddenTools = map[string]struct{}{
 	"get_organization_group":                {},
 }
 
+// writeToolNames are tools that perform mutations and are excluded in read-only mode.
+var writeToolNames = map[string]struct{}{
+	"create_workitem":        {},
+	"update_workitem":        {},
+	"update_workitem_status": {},
+	"add_workitem_comment":   {},
+}
+
 // Toolset exposes Yunxiao OpenAPI tools.
 type Toolset struct {
 	ReadOnly bool
@@ -81,7 +89,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 	tools = append(tools, withDomain(appstackTools(), "appstack")...)
 	tools = append(tools, withDomain(lingmaTools(), "lingma")...)
 	tools = append(tools, withDomain(apiCallTools(), "api")...)
-	return tools
+	return t.filterReadOnly(tools)
 }
 
 // GetMinimalTools returns only the most essential query tools.
@@ -109,6 +117,19 @@ func (t *Toolset) GetProjectFocusedTools(client any) []toolset.ServerTool {
 			continue
 		}
 		filtered = append(filtered, tool)
+	}
+	return filtered
+}
+
+func (t *Toolset) filterReadOnly(tools []toolset.ServerTool) []toolset.ServerTool {
+	if !t.ReadOnly {
+		return tools
+	}
+	filtered := make([]toolset.ServerTool, 0, len(tools))
+	for _, tool := range tools {
+		if _, ok := writeToolNames[tool.Tool.Name]; !ok {
+			filtered = append(filtered, tool)
+		}
 	}
 	return filtered
 }

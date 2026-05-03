@@ -9,6 +9,11 @@ import (
 )
 
 func handleCallYunxiaoAPI(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
 	path, err := requiredString(params, "path")
 	if err != nil {
 		return "", err
@@ -41,11 +46,6 @@ func handleCallYunxiaoAPI(ctx context.Context, client any, params map[string]any
 		if err := json.Unmarshal([]byte(b), &body); err != nil {
 			return "", fmt.Errorf("invalid body JSON: %w", err)
 		}
-	}
-
-	c, err := getClient(client)
-	if err != nil {
-		return "", err
 	}
 
 	resp, err := c.Request(ctx, method, path, query, body)

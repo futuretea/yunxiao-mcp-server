@@ -3,7 +3,6 @@ package yunxiao
 import (
 	"context"
 	"net/url"
-	"strconv"
 )
 
 func handleGetOrganizationOverview(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -29,10 +28,7 @@ func handleGetOrganizationOverview(ctx context.Context, client any, params map[s
 	}
 
 	if optionalBoolDefault(params, "includeDepartments", true) {
-		deptQuery := url.Values{}
-		deptQuery.Set("page", "1")
-		deptQuery.Set("perPage", strconv.Itoa(optionalIntDefault(params, "departmentLimit", 5)))
-		depts, err := c.GetJSONWithMetadata(ctx, orgPath+"/departments", deptQuery)
+		depts, err := c.GetJSONWithMetadata(ctx, orgPath+"/departments", pageOneLimitQuery(params, "departmentLimit", 5))
 		if err != nil {
 			return "", err
 		}
@@ -40,10 +36,7 @@ func handleGetOrganizationOverview(ctx context.Context, client any, params map[s
 	}
 
 	if optionalBoolDefault(params, "includeMembers", true) {
-		memberQuery := url.Values{}
-		memberQuery.Set("page", "1")
-		memberQuery.Set("perPage", strconv.Itoa(optionalIntDefault(params, "memberLimit", 5)))
-		members, err := c.GetJSONWithMetadata(ctx, orgPath+"/members", memberQuery)
+		members, err := c.GetJSONWithMetadata(ctx, orgPath+"/members", pageOneLimitQuery(params, "memberLimit", 5))
 		if err != nil {
 			return "", err
 		}
@@ -51,10 +44,7 @@ func handleGetOrganizationOverview(ctx context.Context, client any, params map[s
 	}
 
 	if optionalBoolDefault(params, "includeGroups", true) {
-		groupQuery := url.Values{}
-		groupQuery.Set("page", "1")
-		groupQuery.Set("perPage", strconv.Itoa(optionalIntDefault(params, "groupLimit", 5)))
-		groups, err := c.GetJSONWithMetadata(ctx, orgPath+"/groups", groupQuery)
+		groups, err := c.GetJSONWithMetadata(ctx, orgPath+"/groups", pageOneLimitQuery(params, "groupLimit", 5))
 		if err != nil {
 			return "", err
 		}
@@ -146,10 +136,7 @@ func handleGetOrganizationGroupOverview(ctx context.Context, client any, params 
 	}
 
 	if optionalBoolDefault(params, "includeMembers", true) {
-		memberQuery := url.Values{}
-		memberQuery.Set("page", "1")
-		memberQuery.Set("perPage", strconv.Itoa(optionalIntDefault(params, "memberLimit", 5)))
-		members, err := c.GetJSONWithMetadata(ctx, groupPath+"/members", memberQuery)
+		members, err := c.GetJSONWithMetadata(ctx, groupPath+"/members", pageOneLimitQuery(params, "memberLimit", 5))
 		if err != nil {
 			return "", err
 		}

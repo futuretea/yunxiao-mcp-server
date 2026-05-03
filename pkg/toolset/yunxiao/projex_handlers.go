@@ -29,8 +29,7 @@ func handleSearchProjects(ctx context.Context, client any, params map[string]any
 		}
 	}
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/projects:search"
-	return c.PostJSONWithMetadata(ctx, path, body)
+	return c.PostJSONWithMetadata(ctx, projexOrganizationPath(organizationID)+"/projects:search", body)
 }
 
 func handleGetProject(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -48,8 +47,7 @@ func handleGetProject(ctx context.Context, client any, params map[string]any) (s
 		return "", err
 	}
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/projects/" + url.PathEscape(projectID)
-	return c.GetJSON(ctx, path, nil)
+	return c.GetJSON(ctx, projexProjectPath(organizationID, projectID), nil)
 }
 
 func handleListSprints(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -69,8 +67,7 @@ func handleListSprints(ctx context.Context, client any, params map[string]any) (
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/projects/" + url.PathEscape(projectID) + "/sprints"
-	return c.GetJSONWithMetadata(ctx, path, query)
+	return c.GetJSONWithMetadata(ctx, projexProjectPath(organizationID, projectID)+"/sprints", query)
 }
 
 func handleGetSprint(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -92,7 +89,7 @@ func handleGetSprint(ctx context.Context, client any, params map[string]any) (st
 		return "", err
 	}
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/projects/" + url.PathEscape(projectID) + "/sprints/" + url.PathEscape(sprintID)
+	path := projexProjectPath(organizationID, projectID) + "/sprints/" + url.PathEscape(sprintID)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -130,8 +127,7 @@ func handleSearchWorkitems(ctx context.Context, client any, params map[string]an
 		}
 	}
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitems:search"
-	return c.PostJSONWithMetadata(ctx, path, body)
+	return c.PostJSONWithMetadata(ctx, projexOrganizationPath(organizationID)+"/workitems:search", body)
 }
 
 func handleGetWorkitem(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -149,8 +145,7 @@ func handleGetWorkitem(ctx context.Context, client any, params map[string]any) (
 		return "", err
 	}
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitems/" + url.PathEscape(workitemID)
-	return c.GetJSON(ctx, path, nil)
+	return c.GetJSON(ctx, projexWorkitemPath(organizationID, workitemID), nil)
 }
 
 func handleListWorkItemComments(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -159,7 +154,7 @@ func handleListWorkItemComments(ctx context.Context, client any, params map[stri
 		return "", err
 	}
 
-	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "workItemId")
+	organizationID, workitemID, err := requiredOrganizationAndNamedID(params, "workitemId")
 	if err != nil {
 		return "", err
 	}
@@ -168,6 +163,5 @@ func handleListWorkItemComments(ctx context.Context, client any, params map[stri
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitems/" + url.PathEscape(workItemID) + "/comments"
-	return c.GetJSONWithMetadata(ctx, path, query)
+	return c.GetJSONWithMetadata(ctx, projexWorkitemPath(organizationID, workitemID)+"/comments", query)
 }

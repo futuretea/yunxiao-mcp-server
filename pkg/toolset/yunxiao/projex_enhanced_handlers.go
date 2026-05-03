@@ -9,11 +9,11 @@ import (
 )
 
 func handleGetProjectOverview(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
+	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
-	c, err := getClient(client)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -40,18 +40,18 @@ func handleGetProjectOverview(ctx context.Context, client any, params map[string
 }
 
 func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
+	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
-	c, err := getClient(client)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
 
 	categories := splitCSV(optionalStringDefault(params, "categories", "Req,Task,Bug,Risk"))
 	if len(categories) == 0 {
-		return "", fmt.Errorf("categories must include at least one category")
+		return "", errNoCategories
 	}
 
 	result, err := buildCategoryResult(ctx, categories, projectWorkitemSummaryFilters(params, categories),
@@ -65,15 +65,15 @@ func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map
 }
 
 func handleGetProjectWorkitemContext(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
 	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
 	category, err := requiredString(params, "category")
-	if err != nil {
-		return "", err
-	}
-	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
@@ -90,6 +90,10 @@ func handleGetProjectWorkitemContext(ctx context.Context, client any, params map
 }
 
 func handleGetMyProjectWorkitems(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
 	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
@@ -98,14 +102,10 @@ func handleGetMyProjectWorkitems(ctx context.Context, client any, params map[str
 	if err != nil {
 		return "", err
 	}
-	c, err := getClient(client)
-	if err != nil {
-		return "", err
-	}
 
 	categories := splitCSV(optionalStringDefault(params, "categories", "Task,Bug"))
 	if len(categories) == 0 {
-		return "", fmt.Errorf("categories must include at least one category")
+		return "", errNoCategories
 	}
 
 	relation := optionalStringDefault(params, "relation", "assigned")
@@ -130,6 +130,10 @@ func handleGetMyProjectWorkitems(ctx context.Context, client any, params map[str
 }
 
 func handleGetSprintOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
 	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
@@ -138,14 +142,10 @@ func handleGetSprintOverview(ctx context.Context, client any, params map[string]
 	if err != nil {
 		return "", err
 	}
-	c, err := getClient(client)
-	if err != nil {
-		return "", err
-	}
 
 	categories := splitCSV(optionalStringDefault(params, "categories", "Task,Bug"))
 	if len(categories) == 0 {
-		return "", fmt.Errorf("categories must include at least one category")
+		return "", errNoCategories
 	}
 
 	sprintPath := projexProjectPath(organizationID, projectID) + "/sprints/" + url.PathEscape(strings.TrimSpace(sprintID))
@@ -166,15 +166,15 @@ func handleGetSprintOverview(ctx context.Context, client any, params map[string]
 }
 
 func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
 	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
 	category, err := requiredString(params, "category")
-	if err != nil {
-		return "", err
-	}
-	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
@@ -215,15 +215,15 @@ func handleGetProjectWorkitemBoard(ctx context.Context, client any, params map[s
 }
 
 func handleGetProjectWorkitemDetail(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
 	organizationID, err := requiredString(params, "organizationId")
 	if err != nil {
 		return "", err
 	}
 	workitemID, err := requiredString(params, "workitemId")
-	if err != nil {
-		return "", err
-	}
-	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
@@ -249,16 +249,16 @@ func handleGetProjectWorkitemDetail(ctx context.Context, client any, params map[
 }
 
 func handleGetWorkItemTypeOverview(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, workItemTypeID, err := requiredOrganizationProjectAndWorkItemType(params)
-	if err != nil {
-		return "", err
-	}
 	c, err := getClient(client)
 	if err != nil {
 		return "", err
 	}
+	organizationID, projectID, workItemTypeID, err := requiredOrganizationProjectAndWorkItemType(params)
+	if err != nil {
+		return "", err
+	}
 
-	typePath := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
+	typePath := projexOrganizationPath(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
 	workItemType, err := getProjectOverviewSection(ctx, c, "workItemType", typePath, nil)
 	if err != nil {
 		return "", err

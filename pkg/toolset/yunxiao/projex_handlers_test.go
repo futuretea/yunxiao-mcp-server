@@ -231,7 +231,7 @@ func TestHandleListWorkItemCommentsBuildsPathAndQuery(t *testing.T) {
 
 	result, err := handleListWorkItemComments(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"workItemId":     "workitem-1",
+		"workitemId":     "workitem-1",
 		"page":           float64(2),
 		"perPage":        float64(20),
 	})
@@ -318,7 +318,7 @@ func TestProjexHandlersRequireParams(t *testing.T) {
 	if _, err := handleListWorkItemComments(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing organizationId error")
 	}
-	if _, err := handleListWorkItemComments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workItemId": "wi-1"}); err == nil {
+	if _, err := handleListWorkItemComments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 }

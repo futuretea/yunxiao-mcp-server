@@ -325,8 +325,8 @@ func TestRepositoryOverviewFilters(t *testing.T) {
 	}
 }
 
-func TestRepositoryLimitQuery(t *testing.T) {
-	q := repositoryLimitQuery(map[string]any{"branchLimit": float64(7)}, "branchLimit", 5)
+func TestPageOneLimitQuery(t *testing.T) {
+	q := pageOneLimitQuery(map[string]any{"branchLimit": float64(7)}, "branchLimit", 5)
 	if q.Get("page") != "1" {
 		t.Fatalf("page = %q", q.Get("page"))
 	}
@@ -334,7 +334,7 @@ func TestRepositoryLimitQuery(t *testing.T) {
 		t.Fatalf("perPage = %q", q.Get("perPage"))
 	}
 
-	q2 := repositoryLimitQuery(map[string]any{}, "branchLimit", 5)
+	q2 := pageOneLimitQuery(map[string]any{}, "branchLimit", 5)
 	if q2.Get("perPage") != "5" {
 		t.Fatalf("default perPage = %q", q2.Get("perPage"))
 	}
