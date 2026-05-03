@@ -172,10 +172,10 @@ This guide provides common MCP conversation patterns for AI assistants using the
 **User asks**: "What was the last deployment for application Z?"
 
 **Recommended flow**:
-1. `list_appstack_deployments` with the application name or ID, sorted by `gmtCreate` descending.
-2. `get_appstack_deployment` for the specific deployment ID if needed.
+1. `list_change_order_versions` with the application name, sorted by creation time descending.
+2. `get_change_order` for the specific change order serial number if needed.
 
-**Tip**: Appstack tools use keyset pagination (`nextToken`). Omit `nextToken` on the first request; subsequent requests use the token from the previous response.
+**Tip**: Appstack change orders represent deployment records. Use `current` and `pageSize` for pagination on this endpoint.
 
 ## Pattern: Audit and Compliance
 
