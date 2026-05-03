@@ -18,7 +18,7 @@ func codeupRepositoryTagTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_tags",
-				mcp.WithDescription("List tags in a CodeUp repository."),
+				mcp.WithDescription("List tags (version markers) in a CodeUp repository. Use this to discover release versions."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
@@ -37,7 +37,7 @@ func codeupRepositoryMemberTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_repository_members",
-				mcp.WithDescription("List members of a CodeUp repository."),
+				mcp.WithDescription("List members who have access to a CodeUp repository. Use this to discover user IDs for assignment or review."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithNumber("accessLevel", mcp.Description("Minimum access level: 20, 30, or 40.")),
@@ -52,7 +52,7 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_protected_branches",
-				mcp.WithDescription("List protected branch rules in a CodeUp repository."),
+				mcp.WithDescription("List protected branch rules in a CodeUp repository. Protected branches enforce review and CI requirements before merging."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -61,7 +61,7 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("list_push_rules",
-				mcp.WithDescription("List push rules in a CodeUp repository."),
+				mcp.WithDescription("List push rules (commit restrictions) in a CodeUp repository. Push rules enforce commit message formats and file path restrictions."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID (numeric ID or full path like org/repo). Use list_repositories to find the repository ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),

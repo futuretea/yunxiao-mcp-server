@@ -10,10 +10,10 @@ func codeupMergeRequestTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_merge_requests",
-				mcp.WithDescription("List legacy CodeUp merge requests in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithNumber("page", mcp.Description("Page number.")),
-				mcp.WithNumber("perPage", mcp.Description("Page size from 1 to 100.")),
+				mcp.WithDescription("List legacy CodeUp merge requests across repositories in a Yunxiao organization. For change requests (new merge request format), use list_change_requests instead."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithNumber("page", mcp.Description("Page number for pagination. Starts at 1.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size for pagination. Supports 1-100.")),
 				mcp.WithArray("repositoryIds", mcp.Description("Repository IDs as strings to preserve int64 precision."), mcp.WithStringItems()),
 				mcp.WithArray("authorUserIds", mcp.Description("Author user IDs."), mcp.WithStringItems()),
 				mcp.WithArray("assigneeUserIds", mcp.Description("Assignee user IDs."), mcp.WithStringItems()),
