@@ -85,6 +85,8 @@ func TestLoadConfigReadsPrefixedEnvironment(t *testing.T) {
 }
 
 func TestLoadConfigReadsLegacyEnvironment(t *testing.T) {
+	t.Setenv("YUNXIAO_MCP_ACCESS_TOKEN", "")
+	t.Setenv("YUNXIAO_MCP_BASE_URL", "")
 	t.Setenv("YUNXIAO_ACCESS_TOKEN", "legacy-token")
 	t.Setenv("YUNXIAO_API_BASE_URL", "https://legacy.example.com")
 
@@ -121,6 +123,8 @@ func TestLoadConfigPrefixedEnvironmentOverridesLegacyEnvironment(t *testing.T) {
 }
 
 func TestLoadConfigLegacyEnvironmentOverridesConfigFile(t *testing.T) {
+	t.Setenv("YUNXIAO_MCP_ACCESS_TOKEN", "")
+	t.Setenv("YUNXIAO_MCP_BASE_URL", "")
 	t.Setenv("YUNXIAO_ACCESS_TOKEN", "legacy-token")
 	t.Setenv("YUNXIAO_API_BASE_URL", "https://legacy.example.com")
 
@@ -218,6 +222,11 @@ func TestLoadConfigNormalizesToolFilters(t *testing.T) {
 }
 
 func TestLoadConfigUsesNewViperWhenNil(t *testing.T) {
+	t.Setenv("YUNXIAO_MCP_ACCESS_TOKEN", "")
+	t.Setenv("YUNXIAO_MCP_BASE_URL", "")
+	t.Setenv("YUNXIAO_ACCESS_TOKEN", "")
+	t.Setenv("YUNXIAO_API_BASE_URL", "")
+
 	cfg, err := LoadConfig("", nil)
 	if err != nil {
 		t.Fatalf("LoadConfig() error = %v", err)
