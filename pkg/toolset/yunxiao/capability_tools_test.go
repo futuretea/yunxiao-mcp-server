@@ -59,4 +59,3 @@ func TestIsReadOnlyTool(t *testing.T) {
 		t.Error("expected some non-read-only tools")
 	}
 }
-

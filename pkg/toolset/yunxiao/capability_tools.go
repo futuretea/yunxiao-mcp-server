@@ -52,9 +52,9 @@ func handleDescribeToolset(ctx context.Context, client any, params map[string]an
 	catalog := make([]map[string]any, 0, len(domains))
 	for _, d := range domains {
 		catalog = append(catalog, map[string]any{
-			"domain":      d,
-			"toolCount":   len(domainTools[d]),
-			"tools":       domainTools[d],
+			"domain":    d,
+			"toolCount": len(domainTools[d]),
+			"tools":     domainTools[d],
 		})
 	}
 

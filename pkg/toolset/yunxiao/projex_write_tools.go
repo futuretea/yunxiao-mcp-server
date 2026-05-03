@@ -55,7 +55,6 @@ func projexWriteTools() []toolset.ServerTool {
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID (numeric string). Find it via search_workitems or get_project_workitem_summary.")),
 				mcp.WithString("content", mcp.Required(), mcp.Description("Comment content (plain text or rich text format supported by Yunxiao).")),
-
 			),
 			Handler: handleAddWorkitemComment,
 		},
