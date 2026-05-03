@@ -89,6 +89,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 	tools = append(tools, withDomain(appstackTools(), "appstack")...)
 	tools = append(tools, withDomain(lingmaTools(), "lingma")...)
 	tools = append(tools, withDomain(apiCallTools(), "api")...)
+	tools = append(tools, withDomain(capabilityTools(), "meta")...)
 	return t.filterReadOnly(tools)
 }
 

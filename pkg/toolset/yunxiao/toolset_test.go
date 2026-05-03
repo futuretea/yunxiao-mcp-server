@@ -37,6 +37,7 @@ func expectedToolNames() []string {
 	names = append(names, expectedAppStackToolNames()...)
 	names = append(names, expectedLingmaToolNames()...)
 	names = append(names, "call_yunxiao_api")
+	names = append(names, "describe_toolset")
 	return names
 }
 
