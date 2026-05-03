@@ -2,6 +2,12 @@
 
 This document describes the 37 read-only MCP tools in the codeup domain.
 
+## Pagination
+
+Tools in this domain use the following pagination scheme(s):
+
+- Offset (page/perPage)
+
 ## Tool Inventory
 
 | Tool | Description |
@@ -48,6 +54,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 
 **Description**: List CodeUp SSH keys in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -73,6 +81,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 
 **Description**: List CodeUp SSH keys for a Yunxiao user.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -87,6 +97,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 ### list_webhooks
 
 **Description**: List CodeUp webhooks in a repository.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -113,6 +125,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 
 **Description**: List CodeUp commit statuses for a repository commit.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -126,6 +140,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 ### list_check_runs
 
 **Description**: List CodeUp check runs for a repository ref.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -176,6 +192,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 
 **Description**: List legacy CodeUp merge requests in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -210,6 +228,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 
 **Description**: List CodeUp template repositories in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -222,6 +242,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 ### list_namespaces
 
 **Description**: List CodeUp namespaces or groups in a Yunxiao organization.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -259,6 +281,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 ### list_tags
 
 **Description**: List tags in a CodeUp repository.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -334,6 +358,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 
 **Description**: List CodeUp repositories in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -360,6 +386,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 ### list_branches
 
 **Description**: List branches in a CodeUp repository.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -415,6 +443,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 
 **Description**: List commits in a CodeUp repository.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -462,6 +492,8 @@ This document describes the 37 read-only MCP tools in the codeup domain.
 ### list_change_requests
 
 **Description**: List CodeUp merge requests in a Yunxiao organization.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 

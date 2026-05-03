@@ -2,6 +2,12 @@
 
 This document describes the 14 read-only MCP tools in the flow domain.
 
+## Pagination
+
+Tools in this domain use the following pagination scheme(s):
+
+- Offset (page/perPage)
+
 ## Tool Inventory
 
 | Tool | Description |
@@ -98,6 +104,8 @@ This document describes the 14 read-only MCP tools in the flow domain.
 
 **Description**: List Flow pipelines in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -126,6 +134,8 @@ This document describes the 14 read-only MCP tools in the flow domain.
 ### list_pipeline_runs
 
 **Description**: List Flow pipeline runs.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -178,6 +188,8 @@ This document describes the 14 read-only MCP tools in the flow domain.
 ### list_pipeline_job_historys
 
 **Description**: List Flow pipeline job execution history.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 

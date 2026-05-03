@@ -2,6 +2,14 @@
 
 This document describes the 50 read-only MCP tools in the appstack domain.
 
+## Pagination
+
+Tools in this domain use the following pagination scheme(s):
+
+- Keyset (nextToken)
+- Offset (current/pageSize)
+- Offset (page/perPage)
+
 ## Tool Inventory
 
 | Tool | Description |
@@ -61,6 +69,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: Search AppStack application templates.
 
+**Pagination**: Keyset (nextToken)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -77,6 +87,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### list_environments
 
 **Description**: List AppStack environments for an application.
+
+**Pagination**: Keyset (nextToken)
 
 **Parameters**:
 
@@ -107,6 +119,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: List members of an AppStack application.
 
+**Pagination**: Offset (current/pageSize)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -119,6 +133,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### list_application_sources
 
 **Description**: List source repositories attached to an AppStack application.
+
+**Pagination**: Keyset (nextToken)
 
 **Parameters**:
 
@@ -161,6 +177,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: List AppStack resource instances in a resource pool.
 
+**Pagination**: Keyset (nextToken)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -202,6 +220,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: Search AppStack global variable groups.
 
+**Pagination**: Offset (current/pageSize)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -214,6 +234,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### search_releases
 
 **Description**: Search AppStack releases in a Yunxiao organization.
+
+**Pagination**: Keyset (nextToken)
 
 **Parameters**:
 
@@ -340,6 +362,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: List change requests attached to an AppStack system release.
 
+**Pagination**: Offset (current/pageSize)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -353,6 +377,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### list_release_executions
 
 **Description**: List execution records for an AppStack system release.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -372,6 +398,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: List AppStack systems in a Yunxiao organization.
 
+**Pagination**: Offset (current/pageSize)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -383,6 +411,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### list_attached_apps
 
 **Description**: List applications attached to an AppStack system.
+
+**Pagination**: Offset (current/pageSize)
 
 **Parameters**:
 
@@ -397,6 +427,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: List members of an AppStack system.
 
+**Pagination**: Offset (current/pageSize)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -409,6 +441,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### list_applications
 
 **Description**: List AppStack applications in a Yunxiao organization.
+
+**Pagination**: Keyset (nextToken)
 
 **Parameters**:
 
@@ -567,6 +601,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: List AppStack release stage execution records.
 
+**Pagination**: Keyset (nextToken)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -642,6 +678,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 **Description**: List execution records for an AppStack change request.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -671,6 +709,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### list_change_order_versions
 
 **Description**: List AppStack change order versions.
+
+**Pagination**: Offset (current/pageSize)
 
 **Parameters**:
 
@@ -712,6 +752,8 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 ### list_change_order_job_logs
 
 **Description**: List logs for an AppStack change order job.
+
+**Pagination**: Offset (current/pageSize)
 
 **Parameters**:
 

@@ -18,9 +18,10 @@ type Param struct {
 }
 
 type Tool struct {
-	Name        string
-	Description string
-	Params      []Param
+	Name           string
+	Description    string
+	Params         []Param
+	PaginationMode string
 }
 
 func main() {
@@ -154,7 +155,42 @@ func extractTools(filename string) ([]Tool, error) {
 		return true
 	})
 
+	for i := range tools {
+		tools[i].PaginationMode = detectPaginationMode(tools[i].Params)
+	}
 	return tools, nil
+}
+
+func detectPaginationMode(params []Param) string {
+	hasNextToken := false
+	hasCurrent := false
+	hasPageSize := false
+	hasPage := false
+	hasPerPage := false
+	for _, p := range params {
+		switch p.Name {
+		case "nextToken":
+			hasNextToken = true
+		case "current":
+			hasCurrent = true
+		case "pageSize":
+			hasPageSize = true
+		case "page":
+			hasPage = true
+		case "perPage":
+			hasPerPage = true
+		}
+	}
+	if hasNextToken {
+		return "Keyset (nextToken)"
+	}
+	if hasCurrent || hasPageSize {
+		return "Offset (current/pageSize)"
+	}
+	if hasPage || hasPerPage {
+		return "Offset (page/perPage)"
+	}
+	return ""
 }
 
 func extractParam(call *ast.CallExpr, funcName string) *Param {
@@ -218,6 +254,25 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 	b.WriteString(fmt.Sprintf("# %s Tools\n\n", strings.Title(domain)))
 	b.WriteString(fmt.Sprintf("This document describes the %d read-only MCP tools in the %s domain.\n\n", len(tools), domain))
 
+	paginationModes := map[string]struct{}{}
+	for _, t := range tools {
+		if t.PaginationMode != "" {
+			paginationModes[t.PaginationMode] = struct{}{}
+		}
+	}
+	if len(paginationModes) > 0 {
+		modes := make([]string, 0, len(paginationModes))
+		for m := range paginationModes {
+			modes = append(modes, m)
+		}
+		b.WriteString("## Pagination\n\n")
+		b.WriteString("Tools in this domain use the following pagination scheme(s):\n\n")
+		for _, m := range modes {
+			b.WriteString(fmt.Sprintf("- %s\n", m))
+		}
+		b.WriteString("\n")
+	}
+
 	b.WriteString("## Tool Inventory\n\n")
 	b.WriteString("| Tool | Description |\n")
 	b.WriteString("|------|-------------|\n")
@@ -229,6 +284,9 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 	for _, t := range tools {
 		b.WriteString(fmt.Sprintf("### %s\n\n", t.Name))
 		b.WriteString(fmt.Sprintf("**Description**: %s\n\n", t.Description))
+		if t.PaginationMode != "" {
+			b.WriteString(fmt.Sprintf("**Pagination**: %s\n\n", t.PaginationMode))
+		}
 		if len(t.Params) > 0 {
 			b.WriteString("**Parameters**:\n\n")
 			b.WriteString("| Name | Type | Required | Description |\n")

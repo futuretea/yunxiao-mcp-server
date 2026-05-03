@@ -2,6 +2,12 @@
 
 This document describes the 6 read-only MCP tools in the lingma domain.
 
+## Pagination
+
+Tools in this domain use the following pagination scheme(s):
+
+- Offset (page/perPage)
+
 ## Tool Inventory
 
 | Tool | Description |
@@ -16,6 +22,8 @@ This document describes the 6 read-only MCP tools in the lingma domain.
 ### list_knowledge_bases
 
 **Description**: List Tongyi Lingma knowledge bases.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -34,6 +42,8 @@ This document describes the 6 read-only MCP tools in the lingma domain.
 
 **Description**: List Tongyi Lingma knowledge base files.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -49,6 +59,8 @@ This document describes the 6 read-only MCP tools in the lingma domain.
 ### list_kb_members
 
 **Description**: List Tongyi Lingma knowledge base members.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -66,6 +78,8 @@ This document describes the 6 read-only MCP tools in the lingma domain.
 
 **Description**: Get Tongyi Lingma daily usage data for a department.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -81,6 +95,8 @@ This document describes the 6 read-only MCP tools in the lingma domain.
 
 **Description**: List Tongyi Lingma developer members.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -94,6 +110,8 @@ This document describes the 6 read-only MCP tools in the lingma domain.
 ### get_developer_usage
 
 **Description**: Get Tongyi Lingma daily usage data for developers.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 

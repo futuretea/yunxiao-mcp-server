@@ -2,6 +2,12 @@
 
 This document describes the 45 read-only MCP tools in the projex domain.
 
+## Pagination
+
+Tools in this domain use the following pagination scheme(s):
+
+- Offset (page/perPage)
+
 ## Tool Inventory
 
 | Tool | Description |
@@ -90,6 +96,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 
 **Description**: Get a compact Projex project overview with common project-management lists in one read-only call.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -130,6 +138,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 ### get_project_workitem_context
 
 **Description**: Get project work item metadata context: types, labels, members, and optional fields/workflow for one type.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -202,6 +212,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 
 **Description**: Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -269,6 +281,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 
 **Description**: List milestones in a Projex project.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -282,6 +296,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 ### list_testcase_repositories
 
 **Description**: List Projex testcase repositories in a Yunxiao organization.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -328,6 +344,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 ### search_testcases
 
 **Description**: Search Projex testcases in one testcase repository.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -435,6 +453,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 
 **Description**: Search Projex projects in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -477,6 +497,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 
 **Description**: List Projex sprints in a project.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -491,6 +513,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 ### search_workitems
 
 **Description**: Search work items in one Projex project space.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -537,6 +561,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 ### list_work_item_comments
 
 **Description**: List comments for a Projex work item.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -621,6 +647,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 
 **Description**: List versions in a Projex project.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -681,6 +709,8 @@ This document describes the 45 read-only MCP tools in the projex domain.
 ### list_labels
 
 **Description**: List labels in a Projex project.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 

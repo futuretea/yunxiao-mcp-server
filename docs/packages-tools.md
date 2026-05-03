@@ -2,6 +2,12 @@
 
 This document describes the 3 read-only MCP tools in the packages domain.
 
+## Pagination
+
+Tools in this domain use the following pagination scheme(s):
+
+- Offset (page/perPage)
+
 ## Tool Inventory
 
 | Tool | Description |
@@ -13,6 +19,8 @@ This document describes the 3 read-only MCP tools in the packages domain.
 ### list_package_repositories
 
 **Description**: List Packages repositories in a Yunxiao organization.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -27,6 +35,8 @@ This document describes the 3 read-only MCP tools in the packages domain.
 ### list_artifacts
 
 **Description**: List artifacts in a Packages repository.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 

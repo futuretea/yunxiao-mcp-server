@@ -2,6 +2,13 @@
 
 This document describes the 23 read-only MCP tools in the platform domain.
 
+## Pagination
+
+Tools in this domain use the following pagination scheme(s):
+
+- Keyset (nextToken)
+- Offset (page/perPage)
+
 ## Tool Inventory
 
 | Tool | Description |
@@ -34,6 +41,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 
 **Description**: List audit logs in a Yunxiao organization.
 
+**Pagination**: Keyset (nextToken)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -49,6 +58,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 ### list_enterprise_departments
 
 **Description**: List enterprise departments visible to the current Yunxiao user.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -72,6 +83,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 
 **Description**: List groups in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -94,6 +107,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 ### list_organization_group_members
 
 **Description**: List members in a Yunxiao organization group.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -141,6 +156,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 
 **Description**: Get Yunxiao organizations visible to the current user.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -151,6 +168,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 ### list_organizations
 
 **Description**: List Yunxiao organizations visible to the current user.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -172,6 +191,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 ### list_organization_departments
 
 **Description**: List departments in a Yunxiao organization.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
@@ -208,6 +229,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 
 **Description**: List members in a Yunxiao organization.
 
+**Pagination**: Offset (page/perPage)
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -241,6 +264,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 ### search_organization_members
 
 **Description**: Search members in a Yunxiao organization.
+
+**Pagination**: Keyset (nextToken)
 
 **Parameters**:
 
@@ -280,6 +305,8 @@ This document describes the 23 read-only MCP tools in the platform domain.
 ### list_users
 
 **Description**: List Yunxiao users.
+
+**Pagination**: Offset (page/perPage)
 
 **Parameters**:
 
