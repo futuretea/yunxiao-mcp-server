@@ -6,7 +6,7 @@ LDFLAGS := -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Version=$
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Commit=$(COMMIT) \
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Date=$(DATE)
 
-.PHONY: build test lint format tidy ci smoke clean coverage
+.PHONY: build test lint format tidy ci smoke clean coverage docs
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o bin/$(BINARY_NAME) ./cmd/yunxiao-mcp-server
@@ -40,6 +40,9 @@ coverage:
 coverage-check:
 	go test -coverprofile=coverage.out ./...
 	@go tool cover -func=coverage.out | awk 'END {print $$3}' | tr -d '%' | awk '{if ($$1 < 98.0) {print "Coverage " $$1 "% is below 98% threshold"; exit 1} else {print "Coverage " $$1 "% meets threshold"}}'
+
+docs:
+	go run scripts/gen-tool-docs.go
 
 clean:
 	rm -rf bin coverage.out
