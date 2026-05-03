@@ -320,6 +320,66 @@ This guide provides common MCP conversation patterns for AI assistants using the
 
 **Tip**: Appstack change orders represent deployment records. Use `current` and `pageSize` for pagination on this endpoint.
 
+## Pattern: Check Test Case Status
+
+**User asks**: "Show me test cases for repository X."
+
+**Recommended flow**:
+1. `search_testcases` with `testRepoId` and optional `subject` filter.
+2. `get_testcase` with `testcaseId` for detailed test case content.
+
+**Example step 1**:
+```json
+{
+  "testRepoId": "repo-1",
+  "subject": "login",
+  "page": 1,
+  "perPage": 10
+}
+```
+
+**Example step 2**:
+```json
+{
+  "testRepoId": "repo-1",
+  "testcaseId": "tc-123"
+}
+```
+
+## Pattern: Browse Artifacts
+
+**User asks**: "What artifacts are in package repository Y?"
+
+**Recommended flow**:
+1. `list_artifacts` with the package repository ID.
+2. `get_artifact` for detailed artifact metadata if needed.
+
+**Example step 1**:
+```json
+{
+  "packageRepositoryId": "repo-1",
+  "page": 1,
+  "perPage": 10
+}
+```
+
+## Pattern: Browse Knowledge Bases
+
+**User asks**: "Show me files in knowledge base Z."
+
+**Recommended flow**:
+1. `list_knowledge_bases` to find the knowledge base ID.
+2. `list_kb_files` with the knowledge base ID.
+
+**Example step 2**:
+```json
+{
+  "knowledgeBaseId": "kb-1",
+  "page": 1,
+  "perPage": 10
+}
+```
+
 ## Pattern: Audit and Compliance
 
 **User asks**: "Show me recent audit logs."

@@ -6,7 +6,7 @@ This project is GA-ready for local MCP use as a read-only Yunxiao OpenAPI server
 
 - Transports: stdio, Streamable HTTP, SSE, and `/healthz`.
 - Authentication: a startup default Yunxiao token, with request-level HTTP/SSE token override through `x-yunxiao-token` or `yunxiao_access_token`.
-- Tool surface: 180 read-only MCP tools: 169 Yunxiao OpenAPI tools plus 11 enhanced aggregation tools (9 Projex, 1 Codeup, 1 Flow), all registered with MCP read-only annotations and covered by `TestToolsetIncludesBaseReadTools`.
+- Tool surface: 191 read-only MCP tools: 169 Yunxiao OpenAPI tools plus 22 enhanced aggregation tools (10 Projex, 4 Codeup, 2 Flow, 3 Appstack, 3 Platform), all registered with MCP read-only annotations and covered by `TestToolsetIncludesBaseReadTools`.
 - Safety boundary: read-only API access only. Endpoints with create, update, delete, execute, approve, refuse, or other state-changing semantics are not exposed, even when Yunxiao models them as `GET`.
 
 ## Release Gate
