@@ -9,7 +9,7 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
 - HTTP health endpoint：`/healthz`
 - Cobra CLI 与 YAML/env/flag 配置加载
 - Yunxiao OpenAPI token 认证：启动时默认 token，HTTP/SSE 请求级 `x-yunxiao-token` 或 `yunxiao_access_token` 覆盖
-- **124 个只读 MCP 工具**，覆盖 7 个领域：
+- **125 个只读 MCP 工具**，覆盖 7 个领域，外加 1 个元能力工具：
   - **Projex**（项目管理）：项目、迭代、工作项、里程碑、测试用例等
   - **Codeup**（代码托管）：仓库、分支、提交、合并请求、代码评审等
   - **Flow**（CI/CD）：流水线、运行记录、构建任务等
@@ -17,7 +17,9 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
   - **Platform**（组织管理）：组织、部门、成员、角色等
   - **Packages**（制品管理）：制品仓库、制品版本等
   - **Lingma**（智能研发）：知识库、成员用量等
+- **1 个元能力工具**：`describe_toolset` — 返回完整工具目录，按领域分组，帮助 LLM 在调用前发现可用工具
 - **22 个增强聚合工具**：将多个 OpenAPI 调用合并为单次用户友好的操作。例如 `get_project_overview` 同时返回项目信息、成员、迭代、里程碑和标签；`get_repository_overview` 聚合仓库详情、分支、近期提交和合并请求。
+- **友好的错误提示**：API 错误会自动转换为可操作建议（如身份验证失败、资源不存在、参数无效等），减少 LLM 的试错成本。
 - 工具启用/禁用过滤，支持 `--minimal` 精简模式和 `--project-focused` 项目聚焦模式。
 
 ## 快速开始
