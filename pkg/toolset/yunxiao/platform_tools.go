@@ -7,7 +7,7 @@ import (
 )
 
 func platformTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 23)
+	tools := make([]toolset.ServerTool, 0, 24)
 	tools = append(tools, platformBasicTools()...)
 	tools = append(tools, platformDepartmentTools()...)
 	tools = append(tools, platformEnterpriseDepartmentTools()...)
@@ -16,6 +16,7 @@ func platformTools() []toolset.ServerTool {
 	tools = append(tools, platformRoleAndUserTools()...)
 	tools = append(tools, platformAuditTools()...)
 	tools = append(tools, platformMetadataTools()...)
+	tools = append(tools, platformEnhancedTools()...)
 	return tools
 }
 

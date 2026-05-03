@@ -42,11 +42,19 @@ See [`flow-enhanced-tools.md`](flow-enhanced-tools.md) for detailed parameters a
 
 See [`appstack-enhanced-tools.md`](appstack-enhanced-tools.md) for detailed parameters and examples.
 
+## Platform (Organization Management)
+
+| Tool | What it combines | When to use |
+|------|-----------------|-------------|
+| `get_organization_overview` | `get_organization` + departments + members + groups + roles | Organization snapshot |
+
+See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed parameters and examples.
+
 ## Quick Reference
 
-**Total enhanced tools**: 12 across 4 domains.
+**Total enhanced tools**: 13 across 5 domains.
 
-**Base tools they replace**: ~27 raw API calls.
+**Base tools they replace**: ~31 raw API calls.
 
 **Common patterns**:
 - Most enhanced tools accept `organizationId` (optional, auto-injected) and a domain-specific ID.

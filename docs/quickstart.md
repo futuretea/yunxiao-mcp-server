@@ -142,6 +142,23 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Organization Overview
+
+**User asks**: "Tell me about my organization."
+
+**Recommended flow**:
+1. `get_organization_overview` — organization info, departments, members, groups, and roles in one call.
+2. If specific member details are needed: `get_organization_member_info` with the member ID.
+
+**Example**:
+```json
+{
+  "departmentLimit": 5,
+  "memberLimit": 5,
+  "groupLimit": 5
+}
+```
+
 ## Pattern: Check Recent Deployments
 
 **User asks**: "What was the last deployment for application Z?"
