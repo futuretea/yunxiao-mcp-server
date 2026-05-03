@@ -2,6 +2,31 @@
 
 This guide provides common MCP conversation patterns for AI assistants using the Yunxiao toolset. Each pattern shows the recommended sequence of tool calls for a typical user question.
 
+## Contents
+
+- [Understand a Project](#pattern-understand-a-project)
+- [Track Sprint Progress](#pattern-track-sprint-progress)
+- [Find and Inspect a Work Item](#pattern-find-and-inspect-a-work-item)
+- [My Tasks in a Project](#pattern-my-tasks-in-a-project)
+- [Check Work Item Type Configuration](#pattern-check-work-item-type-configuration)
+- [Member Workload](#pattern-member-workload)
+- [Browse Code Repositories](#pattern-browse-code-repositories)
+- [Review a Change Request](#pattern-review-a-change-request)
+- [Check Branch Status](#pattern-check-branch-status)
+- [Check Commit Status](#pattern-check-commit-status)
+- [Check Pipeline Status](#pattern-check-pipeline-status)
+- [Check Pipeline Run](#pattern-check-pipeline-run)
+- [Check Application Status](#pattern-check-application-status)
+- [Organization Overview](#pattern-organization-overview)
+- [Department Overview](#pattern-department-overview)
+- [Group Overview](#pattern-group-overview)
+- [Check Release Status](#pattern-check-release-status)
+- [Check Recent Deployments](#pattern-check-recent-deployments)
+- [Check Test Case Status](#pattern-check-test-case-status)
+- [Browse Artifacts](#pattern-browse-artifacts)
+- [Browse Knowledge Bases](#pattern-browse-knowledge-bases)
+- [Audit and Compliance](#pattern-audit-and-compliance)
+
 ## Pattern: Understand a Project
 
 **User asks**: "Tell me about project X."

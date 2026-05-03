@@ -63,7 +63,7 @@ See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed para
 
 **Total enhanced tools**: 22 across 5 domains.
 
-**Base tools they replace**: ~42 raw API calls.
+**Base tools they replace**: ~76 raw API calls.
 
 **Common patterns**:
 - Most enhanced tools accept `organizationId` (optional, auto-injected) and a domain-specific ID.
