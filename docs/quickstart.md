@@ -278,6 +278,22 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Group Overview
+
+**User asks**: "Who is in group X?"
+
+**Recommended flow**:
+1. `get_organization_group_overview` — group info and members in one call.
+
+**Example**:
+```json
+{
+  "groupId": "group-1",
+  "includeMembers": true,
+  "memberLimit": 10
+}
+```
+
 ## Pattern: Check Release Status
 
 **User asks**: "Tell me about release X in system Y."

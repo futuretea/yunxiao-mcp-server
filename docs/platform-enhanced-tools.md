@@ -8,6 +8,7 @@ This document describes the enhanced aggregation tools in the Platform (organiza
 |------|---------|-----------|
 | `get_organization_overview` | Organization dashboard with basic info, departments, members, groups, and roles | 1 + up to 4 |
 | `get_organization_department_overview` | Department info with ancestor chain | 1 + up to 1 |
+| `get_organization_group_overview` | Group info with member list | 1 + up to 1 |
 
 ## Common Behaviors
 
@@ -41,6 +42,25 @@ Sub-sections use `page`/`perPage` parameters with a default page size of 5 (cont
 ```
 
 **Note**: The `roles` section returns all organization roles without pagination limits.
+
+### get_organization_group_overview
+
+**When to use**: You want a quick snapshot of an organization group — its basic info plus the members in the group.
+
+**Parameters**:
+- `organizationId`: optional, defaults to user's sole organization
+- `groupId`: required
+- `includeMembers`: toggle members list, default true
+- `memberLimit`: control section size, default 5
+
+**Example**:
+```json
+{
+  "groupId": "group-1",
+  "includeMembers": true,
+  "memberLimit": 10
+}
+```
 
 ### get_organization_department_overview
 

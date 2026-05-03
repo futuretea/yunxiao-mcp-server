@@ -33,5 +33,16 @@ func platformEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetOrganizationDepartmentOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_organization_group_overview",
+				mcp.WithDescription("Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("groupId", mcp.Required(), mcp.Description("Group ID.")),
+				mcp.WithBoolean("includeMembers", mcp.Description("Whether to include group members. Defaults to true.")),
+				mcp.WithNumber("memberLimit", mcp.Description("Max members returned. Defaults to 5.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetOrganizationGroupOverview,
+		},
 	}
 }

@@ -55,14 +55,15 @@ See [`appstack-enhanced-tools.md`](appstack-enhanced-tools.md) for detailed para
 |------|-----------------|-------------|
 | `get_organization_overview` | `get_organization` + departments + members + groups + roles | Organization snapshot |
 | `get_organization_department_overview` | `get_organization_department_info` + ancestors | Department snapshot |
+| `get_organization_group_overview` | `get_organization_group` + members | Group snapshot |
 
 See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed parameters and examples.
 
 ## Quick Reference
 
-**Total enhanced tools**: 21 across 5 domains.
+**Total enhanced tools**: 22 across 5 domains.
 
-**Base tools they replace**: ~41 raw API calls.
+**Base tools they replace**: ~42 raw API calls.
 
 **Common patterns**:
 - Most enhanced tools accept `organizationId` (optional, auto-injected) and a domain-specific ID.

@@ -122,3 +122,46 @@ func organizationDepartmentOverviewFilters(params map[string]any) map[string]any
 		"includeAncestors": optionalBoolDefault(params, "includeAncestors", true),
 	}
 }
+
+func handleGetOrganizationGroupOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, groupID, err := requiredOrganizationAndNamedID(params, "groupId")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	groupPath := organizationPath(organizationID) + "/groups/" + encodePathValue(groupID)
+
+	group, err := c.GetJSON(ctx, groupPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"group":   group,
+		"filters": organizationGroupOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeMembers", true) {
+		memberQuery := url.Values{}
+		memberQuery.Set("page", "1")
+		memberQuery.Set("perPage", strconv.Itoa(optionalIntDefault(params, "memberLimit", 5)))
+		members, err := c.GetJSONWithMetadata(ctx, groupPath+"/members", memberQuery)
+		if err != nil {
+			return "", err
+		}
+		overview["members"] = members
+	}
+
+	return marshalPretty(overview)
+}
+
+func organizationGroupOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeMembers": optionalBoolDefault(params, "includeMembers", true),
+		"memberLimit":    optionalIntDefault(params, "memberLimit", 5),
+	}
+}
