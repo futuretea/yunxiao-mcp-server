@@ -73,7 +73,7 @@ func (t *Toolset) GetDescription() string {
 }
 
 func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 198)
+	tools := make([]toolset.ServerTool, 0, 200)
 	tools = append(tools, withDomain(platformTools(), "platform")...)
 	tools = append(tools, withDomain(codeupTools(), "codeup")...)
 	tools = append(tools, withDomain(flowTools(), "flow")...)
@@ -81,6 +81,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 	tools = append(tools, withDomain(packageTools(), "packages")...)
 	tools = append(tools, withDomain(appstackTools(), "appstack")...)
 	tools = append(tools, withDomain(lingmaTools(), "lingma")...)
+	tools = append(tools, withDomain(apiCallTools(), "api")...)
 	return tools
 }
 
