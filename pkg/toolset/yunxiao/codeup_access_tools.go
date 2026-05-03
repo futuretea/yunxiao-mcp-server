@@ -31,7 +31,7 @@ func codeupSSHKeyTools() []toolset.ServerTool {
 			Tool: mcp.NewTool("list_user_ssh_keys",
 				mcp.WithDescription("List SSH keys registered for a specific Yunxiao user in CodeUp."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
-				mcp.WithString("userId", mcp.Required(), mcp.Description("Yunxiao user ID.")),
+				mcp.WithString("userId", mcp.Required(), mcp.Description("Yunxiao user ID. Use list_organization_members or search_organization_members to discover valid user IDs.")),
 				mcp.WithNumber("page", mcp.Description("Page number for pagination. Starts at 1.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size for pagination. Supports 1-100.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field: created_at or updated_at.")),

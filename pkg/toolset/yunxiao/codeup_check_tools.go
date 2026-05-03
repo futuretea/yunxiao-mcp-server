@@ -13,7 +13,7 @@ func codeupCheckTools() []toolset.ServerTool {
 				mcp.WithDescription("List commit statuses (CI checks) for a specific commit in a CodeUp repository. Use this to verify whether a commit has passed automated checks."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("sha", mcp.Required(), mcp.Description("Commit SHA.")),
+				mcp.WithString("sha", mcp.Required(), mcp.Description("Commit SHA (full 40-character hash). Use list_commits to discover valid SHAs.")),
 				mcp.WithNumber("page", mcp.Description("Page number for pagination. Starts at 1.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size for pagination. Supports 1-100.")),
 				mcp.WithReadOnlyHintAnnotation(true),

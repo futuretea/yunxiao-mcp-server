@@ -11,7 +11,7 @@ func platformEnterpriseDepartmentTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_enterprise_departments",
 				mcp.WithDescription("List enterprise departments visible to the current Yunxiao user."),
-				mcp.WithString("parentId", mcp.Description("Parent department ID.")),
+				mcp.WithString("parentId", mcp.Description("Parent department ID. Use list_organization_departments with an empty parentId to discover top-level departments, then drill down by setting this to a discovered department ID.")),
 				mcp.WithNumber("page", mcp.Description("Page number for pagination. Starts at 1.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size for pagination. Supports 1-100. Defaults to 100 when omitted.")),
 				mcp.WithReadOnlyHintAnnotation(true),
