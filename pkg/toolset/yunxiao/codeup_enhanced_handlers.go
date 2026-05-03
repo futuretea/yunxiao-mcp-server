@@ -88,3 +88,58 @@ func repositoryLimitQuery(params map[string]any, limitKey string, defaultLimit i
 	query.Set("perPage", strconv.Itoa(optionalIntDefault(params, limitKey, defaultLimit)))
 	return query
 }
+
+func handleGetChangeRequestOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, repositoryID, localID, err := requiredOrganizationRepositoryAndLocalID(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	crPath := changeRequestPath(organizationID, repositoryID, localID)
+
+	cr, err := c.GetJSON(ctx, crPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"changeRequest": cr,
+		"filters":       changeRequestOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includePatchSets", true) {
+		patches, err := c.GetJSON(ctx, crPath+"/diffs/patches", nil)
+		if err != nil {
+			return "", err
+		}
+		overview["patchSets"] = patches
+	}
+
+	if optionalBoolDefault(params, "includeComments", true) {
+		body := map[string]any{
+			"comment_type": "GLOBAL_COMMENT",
+			"state":        optionalStringDefault(params, "commentState", "OPENED"),
+			"resolved":     optionalBoolDefault(params, "commentResolved", false),
+		}
+		comments, err := c.PostJSONWithMetadata(ctx, crPath+"/comments/list", body)
+		if err != nil {
+			return "", err
+		}
+		overview["comments"] = comments
+	}
+
+	return marshalPretty(overview)
+}
+
+func changeRequestOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includePatchSets": optionalBoolDefault(params, "includePatchSets", true),
+		"includeComments":  optionalBoolDefault(params, "includeComments", true),
+		"commentState":     optionalStringDefault(params, "commentState", "OPENED"),
+		"commentResolved":  optionalBoolDefault(params, "commentResolved", false),
+	}
+}

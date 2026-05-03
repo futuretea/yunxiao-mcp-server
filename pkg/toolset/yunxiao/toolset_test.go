@@ -108,6 +108,7 @@ func expectedCodeUpToolNames() []string {
 		"list_change_request_comments",
 		"get_change_request_comment",
 		"get_repository_overview",
+		"get_change_request_overview",
 	}
 }
 

@@ -45,4 +45,25 @@ When `refName` is omitted and `includeCommits` is true, the tool attempts to rea
 }
 ```
 
-**Note**: Merge requests are filtered to the specified repository using the `repositoryIds` query parameter.
+### get_change_request_overview
+
+**When to use**: You want a quick snapshot of a change request (merge request) — its basic info plus patch sets and comments.
+
+**Parameters**:
+- `organizationId`, `repositoryId`, `localId`: required
+- `includePatchSets`: toggle patch sets list, default true
+- `includeComments`: toggle comments list, default true
+- `commentState`: comment state filter, default `OPENED`
+- `commentResolved`: whether to include resolved comments, default false
+
+**Example**:
+```json
+{
+  "repositoryId": "org/repo",
+  "localId": "1",
+  "includePatchSets": true,
+  "includeComments": true
+}
+```
+
+**Note**: Comments are fetched via POST with `comment_type` set to `GLOBAL_COMMENT`. Merge requests are filtered to the specified repository using the `repositoryIds` query parameter.

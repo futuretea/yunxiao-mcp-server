@@ -1,6 +1,6 @@
 # Codeup Tools
 
-This document describes the 38 read-only MCP tools in the codeup domain.
+This document describes the 39 read-only MCP tools in the codeup domain.
 
 ## Pagination
 
@@ -21,6 +21,7 @@ Tools in this domain use the following pagination scheme(s):
 | `list_check_runs` | List CodeUp check runs for a repository ref. |
 | `get_check_run` | Get a CodeUp check run by ID. |
 | `get_repository_overview` | Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. |
+| `get_change_request_overview` | Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call. |
 | `list_group_members` | List CodeUp group members. |
 | `get_member_https_clone_username` | Get a CodeUp user's HTTPS clone username. |
 | `list_merge_requests` | List legacy CodeUp merge requests in a Yunxiao organization. |
@@ -184,6 +185,22 @@ Tools in this domain use the following pagination scheme(s):
 | `commitLimit` | number | No | Max commits returned. Defaults to 5. |
 | `mrLimit` | number | No | Max merge requests returned. Defaults to 5. |
 | `mrState` | string | No | Merge request state filter: opened, merged, or closed. Defaults to opened. |
+
+### get_change_request_overview
+
+**Description**: Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `localId` | string | Yes | Change request local ID. |
+| `includePatchSets` | boolean | No | Whether to include patch sets. Defaults to true. |
+| `includeComments` | boolean | No | Whether to include comments. Defaults to true. |
+| `commentState` | string | No | Comment state filter: OPENED or RESOLVED. Defaults to OPENED. |
+| `commentResolved` | boolean | No | Whether to show resolved comments. Defaults to false. |
 
 ### list_group_members
 

@@ -109,6 +109,30 @@ This guide provides common MCP conversation patterns for AI assistants using the
 1. `get_repository_overview` — repository info, branches, recent commits, and open merge requests in one call.
 2. If deeper commit history is needed: `list_commits` with a larger `perPage`.
 
+## Pattern: Review a Change Request
+
+**User asks**: "Show me the change request about feature X."
+
+**Recommended flow**:
+1. `list_change_requests` with `subject=feature-x` to find the change request local ID.
+2. `get_change_request_overview` with the `localId` to get full context (patch sets and comments).
+
+**Example step 1**:
+```json
+{
+  "repositoryId": "org/repo",
+  "state": "opened"
+}
+```
+
+**Example step 2**:
+```json
+{
+  "repositoryId": "org/repo",
+  "localId": "1"
+}
+```
+
 ## Pattern: Check Pipeline Status
 
 **User asks**: "How is pipeline X doing?"

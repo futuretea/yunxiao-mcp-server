@@ -25,5 +25,19 @@ func codeupEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetRepositoryOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_change_request_overview",
+				mcp.WithDescription("Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("localId", mcp.Required(), mcp.Description("Change request local ID.")),
+				mcp.WithBoolean("includePatchSets", mcp.Description("Whether to include patch sets. Defaults to true.")),
+				mcp.WithBoolean("includeComments", mcp.Description("Whether to include comments. Defaults to true.")),
+				mcp.WithString("commentState", mcp.Description("Comment state filter: OPENED or RESOLVED. Defaults to OPENED.")),
+				mcp.WithBoolean("commentResolved", mcp.Description("Whether to show resolved comments. Defaults to false.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetChangeRequestOverview,
+		},
 	}
 }
