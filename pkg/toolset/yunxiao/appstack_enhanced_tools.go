@@ -33,5 +33,19 @@ func appstackEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetEnvironmentOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_release_overview",
+				mcp.WithDescription("Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("systemName", mcp.Required(), mcp.Description("System name.")),
+				mcp.WithString("sn", mcp.Required(), mcp.Description("Release serial number.")),
+				mcp.WithBoolean("includeMembers", mcp.Description("Whether to include release members. Defaults to true.")),
+				mcp.WithBoolean("includeProducts", mcp.Description("Whether to include release products. Defaults to true.")),
+				mcp.WithBoolean("includeChangeRequests", mcp.Description("Whether to include attached change requests. Defaults to true.")),
+				mcp.WithNumber("changeRequestLimit", mcp.Description("Max change requests returned. Defaults to 5.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetReleaseOverview,
+		},
 	}
 }

@@ -40,6 +40,7 @@ See [`flow-enhanced-tools.md`](flow-enhanced-tools.md) for detailed parameters a
 |------|-----------------|-------------|
 | `get_application_overview` | `get_application` + environments + orchestrations | Application snapshot |
 | `get_environment_overview` | `get_environment` + variable groups + latest orchestration | Environment snapshot |
+| `get_release_overview` | `get_release` + members + products + change requests | Release snapshot |
 
 See [`appstack-enhanced-tools.md`](appstack-enhanced-tools.md) for detailed parameters and examples.
 
@@ -53,9 +54,9 @@ See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed para
 
 ## Quick Reference
 
-**Total enhanced tools**: 14 across 5 domains.
+**Total enhanced tools**: 15 across 5 domains.
 
-**Base tools they replace**: ~33 raw API calls.
+**Base tools they replace**: ~36 raw API calls.
 
 **Common patterns**:
 - Most enhanced tools accept `organizationId` (optional, auto-injected) and a domain-specific ID.

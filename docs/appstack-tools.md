@@ -1,6 +1,6 @@
 # Appstack Tools
 
-This document describes the 52 read-only MCP tools in the appstack domain.
+This document describes the 53 read-only MCP tools in the appstack domain.
 
 ## Pagination
 
@@ -25,6 +25,7 @@ Tools in this domain use the following pagination scheme(s):
 | `get_resource_instance` | Get an AppStack resource instance by pool and instance name. |
 | `get_application_overview` | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
 | `get_environment_overview` | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. |
+| `get_release_overview` | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. |
 | `get_global_var` | Get an AppStack global variable group. |
 | `list_global_vars` | Search AppStack global variable groups. |
 | `search_releases` | Search AppStack releases in a Yunxiao organization. |
@@ -234,6 +235,22 @@ Tools in this domain use the following pagination scheme(s):
 | `envName` | string | Yes | Environment name. |
 | `includeVariableGroups` | boolean | No | Whether to include environment variable groups. Defaults to true. |
 | `includeLatestOrchestration` | boolean | No | Whether to include the latest available orchestration. Defaults to true. |
+
+### get_release_overview
+
+**Description**: Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `systemName` | string | Yes | System name. |
+| `sn` | string | Yes | Release serial number. |
+| `includeMembers` | boolean | No | Whether to include release members. Defaults to true. |
+| `includeProducts` | boolean | No | Whether to include release products. Defaults to true. |
+| `includeChangeRequests` | boolean | No | Whether to include attached change requests. Defaults to true. |
+| `changeRequestLimit` | number | No | Max change requests returned. Defaults to 5. |
 
 ### get_global_var
 

@@ -109,3 +109,64 @@ func applicationOverviewFilters(params map[string]any) map[string]any {
 		"orchestrationLimit":    optionalIntDefault(params, "orchestrationLimit", 5),
 	}
 }
+
+func handleGetReleaseOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, systemName, sn, err := requiredSystemRelease(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	releasePath := appstackSystemReleasePath(organizationID, systemName, sn)
+
+	release, err := c.GetJSON(ctx, releasePath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"release": release,
+		"filters": releaseOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeMembers", true) {
+		members, err := c.GetJSON(ctx, releasePath+"/members", nil)
+		if err != nil {
+			return "", err
+		}
+		overview["members"] = members
+	}
+
+	if optionalBoolDefault(params, "includeProducts", true) {
+		products, err := c.GetJSON(ctx, releasePath+"/products", nil)
+		if err != nil {
+			return "", err
+		}
+		overview["products"] = products
+	}
+
+	if optionalBoolDefault(params, "includeChangeRequests", true) {
+		crQuery := url.Values{}
+		crQuery.Set("current", "1")
+		crQuery.Set("pageSize", strconv.Itoa(optionalIntDefault(params, "changeRequestLimit", 5)))
+		crs, err := c.GetJSON(ctx, releasePath+"/changeRequests", crQuery)
+		if err != nil {
+			return "", err
+		}
+		overview["changeRequests"] = crs
+	}
+
+	return marshalPretty(overview)
+}
+
+func releaseOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeMembers":        optionalBoolDefault(params, "includeMembers", true),
+		"includeProducts":       optionalBoolDefault(params, "includeProducts", true),
+		"includeChangeRequests": optionalBoolDefault(params, "includeChangeRequests", true),
+		"changeRequestLimit":    optionalIntDefault(params, "changeRequestLimit", 5),
+	}
+}

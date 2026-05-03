@@ -243,6 +243,7 @@ func expectedAppStackToolNames() []string {
 		"list_change_orders_by_origin",
 		"get_application_overview",
 		"get_environment_overview",
+		"get_release_overview",
 	}
 }
 

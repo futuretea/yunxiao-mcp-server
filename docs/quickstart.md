@@ -167,6 +167,22 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Check Release Status
+
+**User asks**: "Tell me about release X in system Y."
+
+**Recommended flow**:
+1. `get_release_overview` — release info, members, products, and attached change requests in one call.
+
+**Example**:
+```json
+{
+  "systemName": "my-system",
+  "sn": "rel-1",
+  "changeRequestLimit": 5
+}
+```
+
 ## Pattern: Check Recent Deployments
 
 **User asks**: "What was the last deployment for application Z?"

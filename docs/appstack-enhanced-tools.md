@@ -57,3 +57,28 @@ Sub-sections use `page`/`perPage` parameters with a default page size of 5 (cont
   "includeLatestOrchestration": true
 }
 ```
+
+### get_release_overview
+
+**When to use**: You want a quick snapshot of an Appstack system release — its basic info plus members, products, and attached change requests.
+
+**Parameters**:
+- `organizationId`, `systemName`, `sn`: required
+- `includeMembers`: toggle members list, default true
+- `includeProducts`: toggle products list, default true
+- `includeChangeRequests`: toggle change requests list, default true
+- `changeRequestLimit`: max change requests returned, default 5
+
+**Example**:
+```json
+{
+  "systemName": "my-system",
+  "sn": "rel-1",
+  "includeMembers": true,
+  "includeProducts": true,
+  "includeChangeRequests": true,
+  "changeRequestLimit": 5
+}
+```
+
+**Note**: Change requests use `current`/`pageSize` pagination.
