@@ -127,7 +127,7 @@ func platformRoleAndUserTools() []toolset.ServerTool {
 				mcp.WithDescription("List Yunxiao users."),
 				mcp.WithString("filter", mcp.Description("Fuzzy filter for username, login, email, or phone.")),
 				mcp.WithString("status", mcp.Description("User status: enabled or deleted.")),
-				mcp.WithString("deptId", mcp.Description("Department ID.")),
+				mcp.WithString("deptId", mcp.Description("Department ID. Use list_organization_departments to discover valid IDs.")),
 				mcp.WithNumber("page", mcp.Description("Page number for pagination. Starts at 1.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size for pagination. Supports 1-100. Defaults to 100 when omitted.")),
 				mcp.WithReadOnlyHintAnnotation(true),

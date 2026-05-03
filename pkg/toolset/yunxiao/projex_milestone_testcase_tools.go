@@ -20,7 +20,7 @@ func projexMilestoneTools() []toolset.ServerTool {
 			Tool: mcp.NewTool("list_milestones",
 				mcp.WithDescription("List milestones (planning checkpoints) in a Projex project. Milestones track progress against goals, distinct from sprints (time-boxed iterations) and versions (releases)."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
-				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID. Use search_projects to discover valid IDs.")),
 				mcp.WithString("status", mcp.Description("Comma-separated milestone status IDs.")),
 				mcp.WithNumber("page", mcp.Description("Page number for pagination. Starts at 1.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size for pagination. Supports 1-100. Defaults to 100 when omitted.")),
