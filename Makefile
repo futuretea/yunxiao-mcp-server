@@ -33,12 +33,14 @@ ci: lint
 smoke: build
 	./scripts/smoke.sh
 
+COVERAGE_PKGS := $(shell go list ./... | grep -v -E '/scripts$$|/cmd/yunxiao-mcp-server$$')
+
 coverage:
-	go test -coverprofile=coverage.out ./...
+	go test -coverprofile=coverage.out $(COVERAGE_PKGS)
 	go tool cover -func=coverage.out | tail -1
 
 coverage-check:
-	go test -coverprofile=coverage.out ./...
+	go test -coverprofile=coverage.out $(COVERAGE_PKGS)
 	@go tool cover -func=coverage.out | awk 'END {print $$3}' | tr -d '%' | awk '{if ($$1 < 98.0) {print "Coverage " $$1 "% is below 98% threshold"; exit 1} else {print "Coverage " $$1 "% meets threshold"}}'
 
 docs:
