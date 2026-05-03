@@ -70,7 +70,7 @@ func flowPipelineJobTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_pipeline_jobs_by_category",
 				mcp.WithDescription("List jobs (tasks) within a Flow pipeline grouped by category. Use this after identifying a pipeline to see its build, deploy, and test stages."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
 				mcp.WithString("category", mcp.Required(), mcp.Description("Task category. Common value: DEPLOY (for deployment tasks).")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -80,7 +80,7 @@ func flowPipelineJobTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_pipeline_job_historys",
 				mcp.WithDescription("List execution history for a specific Flow pipeline job. Use this to track how a particular job (e.g., a deploy step) has performed across multiple runs."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
 				mcp.WithString("category", mcp.Required(), mcp.Description("Task category. Common value: DEPLOY (for deployment tasks).")),
 				mcp.WithString("identifier", mcp.Required(), mcp.Description("Pipeline job identifier (string). Use list_pipeline_jobs_by_category to discover job identifiers.")),

@@ -11,7 +11,7 @@ func projexInsightTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project_risk_dashboard",
 				mcp.WithDescription("Get a read-only project risk dashboard with category samples, overdue work items, and optional high-priority/stale sections. Best used for project health checks and sprint retrospectives."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("categories", mcp.Description("Comma-separated categories for category totals. Defaults to Risk,Bug,Task.")),
 				mcp.WithString("subject", mcp.Description("Subject contains filter applied to every section.")),
@@ -33,7 +33,7 @@ func projexInsightTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project_member_task_status",
 				mcp.WithDescription("Get per-member task status for one project with assigned, overdue, and optional status-group sections. Useful for workload balancing and identifying blocked team members."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("assigneeIds", mcp.Description("Comma-separated assignee user IDs. Defaults to project members up to memberLimit.")),
 				mcp.WithString("categories", mcp.Description("Comma-separated work item categories. Defaults to Task,Bug.")),

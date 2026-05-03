@@ -11,7 +11,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project_overview",
 				mcp.WithDescription("Get a compact Projex project overview with members, sprints, milestones, versions, and labels in one read-only call. This is the best starting point when exploring a new project."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithBoolean("includeMembers", mcp.Description("Whether to include project members. Defaults to true.")),
 				mcp.WithBoolean("includeSprints", mcp.Description("Whether to include sprints. Defaults to true.")),
@@ -29,7 +29,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project_workitem_summary",
 				mcp.WithDescription("Summarize Projex work items by category for one project with samples and pagination totals. This is ideal for dashboards and overviews. For detailed searching with complex filters, use search_workitems instead."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("categories", mcp.Description("Comma-separated work item categories. Defaults to Req,Task,Bug,Risk.")),
 				mcp.WithString("subject", mcp.Description("Subject contains filter applied to every category.")),
@@ -48,7 +48,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project_workitem_context",
 				mcp.WithDescription("Get project work item metadata context: types, labels, members, and optional field/workflow configuration for one type. Use this before creating or updating work items to discover valid IDs for status, priority, labels, and members."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Req, Task, Bug, or Risk.")),
 				mcp.WithString("workItemTypeId", mcp.Description("Optional work item type ID (numeric string) for field and workflow metadata. Use list_work_item_types to find available types.")),
@@ -65,7 +65,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_sprint_overview",
 				mcp.WithDescription("Get a sprint overview with work item samples and totals by category for one project sprint. Combines sprint metadata with categorized work item summaries in a single call."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("sprintId", mcp.Required(), mcp.Description("Sprint ID (string). Use list_sprints to discover sprint IDs in the project.")),
 				mcp.WithString("categories", mcp.Description("Comma-separated work item categories. Defaults to Task,Bug.")),
@@ -81,7 +81,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_my_project_workitems",
 				mcp.WithDescription("Get work items assigned to or created by a specific user for one project, grouped by category. Useful for workload review and stand-up summaries."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("userId", mcp.Required(), mcp.Description("User ID (string) to filter work items by. Use list_project_members to find user IDs in the project.")),
 				mcp.WithString("relation", mcp.Description("Filter relation: assigned or created. Defaults to assigned.")),
@@ -95,7 +95,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project_workitem_board",
 				mcp.WithDescription("Get a Kanban-style board view of work items grouped by status for one project. Returns work items organized by their current status columns. For flat search results, use search_workitems instead."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Task or Bug.")),
 				mcp.WithString("sprint", mcp.Description("Optional sprint ID to filter work items.")),
@@ -111,7 +111,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project_workitem_detail",
 				mcp.WithDescription("Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. Use this when you need the full picture of one specific work item."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID (numeric string). Find it via search_workitems or get_project_workitem_summary.")),
 				mcp.WithBoolean("includeActivities", mcp.Description("Whether to include activity history. Defaults to true.")),
 				mcp.WithBoolean("includeRelations", mcp.Description("Whether to include relation records. Defaults to true.")),
@@ -127,7 +127,7 @@ func projexEnhancedTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_work_item_type_overview",
 				mcp.WithDescription("Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. Use this to understand the schema and lifecycle of a specific work item type."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID (numeric string). Use list_work_item_types to find available types.")),
 				mcp.WithBoolean("includeFieldConfig", mcp.Description("Whether to include field configuration. Defaults to true.")),
