@@ -18,10 +18,10 @@ func projexMilestoneTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_milestones",
-				mcp.WithDescription("List milestones in a Projex project."),
+				mcp.WithDescription("List milestones (planning checkpoints) in a Projex project. Milestones track progress against goals, distinct from sprints (time-boxed iterations) and versions (releases)."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
-				mcp.WithString("status", mcp.Description("Comma-separated milestone statuses.")),
+				mcp.WithString("status", mcp.Description("Comma-separated milestone status IDs.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -35,7 +35,7 @@ func projexTestcaseReadTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_testcase_repositories",
-				mcp.WithDescription("List Projex testcase repositories in a Yunxiao organization."),
+				mcp.WithDescription("List Projex testcase repositories in a Yunxiao organization. A testcase repository is a container for organizing test cases."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size.")),
@@ -45,20 +45,20 @@ func projexTestcaseReadTools() []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("list_directories",
-				mcp.WithDescription("List testcase directories in a Projex testcase repository."),
+				mcp.WithDescription("List directories (folders) within a Projex testcase repository."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("testRepoId", mcp.Required(), mcp.Description("Testcase repository ID.")),
+				mcp.WithString("testRepoId", mcp.Required(), mcp.Description("Testcase repository ID (string). Use list_testcase_repositories to discover available repositories.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListDirectories,
 		},
 		{
 			Tool: mcp.NewTool("search_testcases",
-				mcp.WithDescription("Search Projex testcases in one testcase repository."),
+				mcp.WithDescription("Search test cases within a single Projex testcase repository."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("testRepoId", mcp.Required(), mcp.Description("Testcase repository ID.")),
-				mcp.WithString("directoryId", mcp.Description("Directory ID filter.")),
-				mcp.WithString("subject", mcp.Description("Testcase subject contains filter.")),
+				mcp.WithString("testRepoId", mcp.Required(), mcp.Description("Testcase repository ID (string). Use list_testcase_repositories to discover available repositories.")),
+				mcp.WithString("directoryId", mcp.Description("Directory ID (string) to filter by. Use list_directories to discover directory IDs.")),
+				mcp.WithString("subject", mcp.Description("Filter by testcase subject/title (contains match).")),
 				mcp.WithString("conditions", mcp.Description("Advanced conditions JSON string. Overrides simple filters.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field: gmtCreate or name.")),
 				mcp.WithString("sort", mcp.Description("Sort direction: asc or desc.")),
@@ -75,7 +75,7 @@ func projexTestPlanReadTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_test_plans",
-				mcp.WithDescription("List Projex test plans in a Yunxiao organization."),
+				mcp.WithDescription("List test plans in a Yunxiao organization. A test plan groups test cases for execution tracking."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -83,7 +83,7 @@ func projexTestPlanReadTools() []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("get_test_result_list",
-				mcp.WithDescription("Get testcase result summaries in a Projex test plan directory."),
+				mcp.WithDescription("Get test execution result summaries for a specific directory within a test plan."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("testPlanIdentifier", mcp.Required(), mcp.Description("Test plan ID.")),
 				mcp.WithString("directoryIdentifier", mcp.Required(), mcp.Description("Test plan directory ID.")),
