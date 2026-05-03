@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -88,6 +89,35 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("Yunxiao API error: %s %s returned status %d: %s", e.Method, e.URL, e.StatusCode, e.Body)
 }
 
+// friendlyAPIError wraps an APIError with actionable guidance for LLM consumers.
+// Non-API errors are returned unchanged.
+func friendlyAPIError(err error) error {
+	var apiErr *APIError
+	if !errors.As(err, &apiErr) {
+		return err
+	}
+
+	var suggestion string
+	switch apiErr.StatusCode {
+	case http.StatusUnauthorized:
+		suggestion = "Authentication failed. Verify that your access token is valid and not expired."
+	case http.StatusForbidden:
+		suggestion = "Access denied. Your token may not have permission for this resource."
+	case http.StatusNotFound:
+		suggestion = "Resource not found. Verify that the project ID, work item ID, pipeline ID, or other identifiers are correct. Use search_projects, search_workitems, or list_pipelines to find valid IDs."
+	case http.StatusBadRequest:
+		suggestion = "Invalid request parameters. Check that required fields are present, IDs are correct, and enum values are valid. Use the corresponding get_*_context or list_* tools to discover valid values."
+	case http.StatusTooManyRequests:
+		suggestion = "Rate limit exceeded. Wait a moment before retrying."
+	case http.StatusInternalServerError, http.StatusBadGateway, http.StatusServiceUnavailable:
+		suggestion = "Yunxiao service temporarily unavailable. Retry the request later."
+	default:
+		return err
+	}
+
+	return fmt.Errorf("%w\n\nSuggestion: %s", apiErr, suggestion)
+}
+
 // NewClient creates a Yunxiao OpenAPI client.
 func NewClient(baseURL, accessToken string, timeout time.Duration) (*Client, error) {
 	parsed, err := normalizeAPIBaseURL(baseURL)
@@ -151,7 +181,7 @@ func normalizeAPIBaseURL(raw string) (*url.URL, error) {
 func (c *Client) GetJSON(ctx context.Context, path string, query url.Values) (string, error) {
 	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
 	if err != nil {
-		return "", err
+		return "", friendlyAPIError(err)
 	}
 	return prettyJSON(resp.Body), nil
 }
@@ -160,7 +190,7 @@ func (c *Client) GetJSON(ctx context.Context, path string, query url.Values) (st
 func (c *Client) GetJSONWithMetadata(ctx context.Context, path string, query url.Values) (string, error) {
 	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
 	if err != nil {
-		return "", err
+		return "", friendlyAPIError(err)
 	}
 	return prettyResponseJSON(resp), nil
 }
@@ -169,7 +199,7 @@ func (c *Client) GetJSONWithMetadata(ctx context.Context, path string, query url
 func (c *Client) PostJSONWithMetadata(ctx context.Context, path string, body any) (string, error) {
 	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
 	if err != nil {
-		return "", err
+		return "", friendlyAPIError(err)
 	}
 	return prettyResponseJSON(resp), nil
 }
@@ -178,7 +208,7 @@ func (c *Client) PostJSONWithMetadata(ctx context.Context, path string, body any
 func (c *Client) PutJSONWithMetadata(ctx context.Context, path string, body any) (string, error) {
 	resp, err := c.Request(ctx, http.MethodPut, path, nil, body)
 	if err != nil {
-		return "", err
+		return "", friendlyAPIError(err)
 	}
 	return prettyResponseJSON(resp), nil
 }
