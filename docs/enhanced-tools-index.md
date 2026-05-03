@@ -34,13 +34,21 @@ See [`codeup-enhanced-tools.md`](codeup-enhanced-tools.md) for detailed paramete
 
 See [`flow-enhanced-tools.md`](flow-enhanced-tools.md) for detailed parameters and examples.
 
+## Appstack (Application Deployment)
+
+| Tool | What it combines | When to use |
+|------|-----------------|-------------|
+| `get_application_overview` | `get_application` + environments + orchestrations | Application snapshot |
+
+See [`appstack-enhanced-tools.md`](appstack-enhanced-tools.md) for detailed parameters and examples.
+
 ## Quick Reference
 
-**Total enhanced tools**: 11 across 3 domains.
+**Total enhanced tools**: 12 across 4 domains.
 
-**Base tools they replace**: ~25 raw API calls.
+**Base tools they replace**: ~27 raw API calls.
 
 **Common patterns**:
 - Most enhanced tools accept `organizationId` (optional, auto-injected) and a domain-specific ID.
 - Section toggles (`includeXxx`) let you control API load.
-- Limit parameters (`sampleLimit`, `branchLimit`, `runLimit`) default to small values (5) to keep responses concise.
+- Limit parameters (`sampleLimit`, `branchLimit`, `runLimit`, `envLimit`) default to small values (5) to keep responses concise.

@@ -1,14 +1,14 @@
 # Appstack Tools
 
-This document describes the 50 read-only MCP tools in the appstack domain.
+This document describes the 51 read-only MCP tools in the appstack domain.
 
 ## Pagination
 
 Tools in this domain use the following pagination scheme(s):
 
+- Keyset (nextToken)
 - Offset (current/pageSize)
 - Offset (page/perPage)
-- Keyset (nextToken)
 
 ## Tool Inventory
 
@@ -23,6 +23,7 @@ Tools in this domain use the following pagination scheme(s):
 | `get_deploy_group` | Get an AppStack deploy group by pool and group name. |
 | `list_resource_instances` | List AppStack resource instances in a resource pool. |
 | `get_resource_instance` | Get an AppStack resource instance by pool and instance name. |
+| `get_application_overview` | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
 | `get_global_var` | Get an AppStack global variable group. |
 | `list_global_vars` | Search AppStack global variable groups. |
 | `search_releases` | Search AppStack releases in a Yunxiao organization. |
@@ -203,6 +204,21 @@ Tools in this domain use the following pagination scheme(s):
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `poolName` | string | Yes | Resource pool name. |
 | `instanceName` | string | Yes | Resource instance name. |
+
+### get_application_overview
+
+**Description**: Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `appName` | string | Yes | Application unique name. |
+| `includeEnvironments` | boolean | No | Whether to include environment list. Defaults to true. |
+| `includeOrchestrations` | boolean | No | Whether to include recent orchestrations. Defaults to true. |
+| `envLimit` | number | No | Max environments returned. Defaults to 5. |
+| `orchestrationLimit` | number | No | Max orchestrations returned. Defaults to 5. |
 
 ### get_global_var
 

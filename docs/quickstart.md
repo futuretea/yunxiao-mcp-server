@@ -125,6 +125,23 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Check Application Status
+
+**User asks**: "Tell me about application Z."
+
+**Recommended flow**:
+1. `get_application_overview` — application info, environments, and recent orchestrations in one call.
+2. If specific environment details are needed: `get_environment` with the environment name.
+
+**Example**:
+```json
+{
+  "appName": "my-app",
+  "envLimit": 5,
+  "orchestrationLimit": 5
+}
+```
+
 ## Pattern: Check Recent Deployments
 
 **User asks**: "What was the last deployment for application Z?"

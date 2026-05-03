@@ -240,6 +240,7 @@ func expectedAppStackToolNames() []string {
 		"list_change_order_job_logs",
 		"find_task_operation_log",
 		"list_change_orders_by_origin",
+		"get_application_overview",
 	}
 }
 
