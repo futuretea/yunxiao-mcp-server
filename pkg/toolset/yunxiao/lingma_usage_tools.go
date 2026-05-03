@@ -10,12 +10,12 @@ func lingmaUsageTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("list_developer_members",
-				mcp.WithDescription("List Tongyi Lingma developer members."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithDescription("List Tongyi Lingma developer members in a Yunxiao organization. Use this to analyze AI coding assistant adoption across teams."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
 				mcp.WithString("departmentId", mcp.Description("Department ID filter.")),
 				mcp.WithString("userId", mcp.Description("User ID filter.")),
-				mcp.WithNumber("page", mcp.Description("Page number.")),
-				mcp.WithNumber("perPage", mcp.Description("Page size. Default is 100.")),
+				mcp.WithNumber("page", mcp.Description("Page number for pagination. Starts at 1.")),
+				mcp.WithNumber("perPage", mcp.Description("Page size for pagination. Supports 1-100. Defaults to 100 when omitted.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListDeveloperMembers,
