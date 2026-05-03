@@ -2,15 +2,27 @@
 
 This document describes the 53 read-only MCP tools in the appstack domain.
 
+## Enhanced Tools
+
+These tools combine multiple Yunxiao OpenAPI calls into single, user-centric operations. Prefer them when available.
+
+| Tool | Description |
+|------|-------------|
+| `get_application_overview` | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
+| `get_environment_overview` | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. |
+| `get_release_overview` | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. |
+
 ## Pagination
 
 Tools in this domain use the following pagination scheme(s):
 
+- Keyset (nextToken)
 - Offset (current/pageSize)
 - Offset (page/perPage)
-- Keyset (nextToken)
 
 ## Tool Inventory
+
+Tools marked in **bold** are enhanced aggregation tools.
 
 | Tool | Description |
 |------|-------------|
@@ -23,9 +35,9 @@ Tools in this domain use the following pagination scheme(s):
 | `get_deploy_group` | Get an AppStack deploy group by pool and group name. |
 | `list_resource_instances` | List AppStack resource instances in a resource pool. |
 | `get_resource_instance` | Get an AppStack resource instance by pool and instance name. |
-| `get_application_overview` | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
-| `get_environment_overview` | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. |
-| `get_release_overview` | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. |
+| **`get_application_overview`** | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
+| **`get_environment_overview`** | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. |
+| **`get_release_overview`** | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. |
 | `get_global_var` | Get an AppStack global variable group. |
 | `list_global_vars` | Search AppStack global variable groups. |
 | `search_releases` | Search AppStack releases in a Yunxiao organization. |
@@ -211,6 +223,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -226,6 +240,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -239,6 +255,8 @@ Tools in this domain use the following pagination scheme(s):
 ### get_release_overview
 
 **Description**: Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call.
+
+**Type**: Enhanced aggregation tool
 
 **Parameters**:
 

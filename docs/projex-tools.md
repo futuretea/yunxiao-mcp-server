@@ -1,6 +1,21 @@
 # Projex Tools
 
-This document describes the 45 read-only MCP tools in the projex domain.
+This document describes the 46 read-only MCP tools in the projex domain.
+
+## Enhanced Tools
+
+These tools combine multiple Yunxiao OpenAPI calls into single, user-centric operations. Prefer them when available.
+
+| Tool | Description |
+|------|-------------|
+| `get_project_overview` | Get a compact Projex project overview with common project-management lists in one read-only call. |
+| `get_project_workitem_summary` | Summarize Projex work items by category for one project with samples and pagination totals. |
+| `get_project_workitem_context` | Get project work item metadata context: types, labels, members, and optional fields/workflow for one type. |
+| `get_sprint_overview` | Get a sprint overview with work item samples and totals by category for one project sprint. |
+| `get_my_project_workitems` | Get work items assigned to or created by a specific user for one project, grouped by category. |
+| `get_project_workitem_board` | Get a Kanban-style board view of work items grouped by status for one project. |
+| `get_project_workitem_detail` | Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. |
+| `get_work_item_type_overview` | Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. |
 
 ## Pagination
 
@@ -10,18 +25,21 @@ Tools in this domain use the following pagination scheme(s):
 
 ## Tool Inventory
 
+Tools marked in **bold** are enhanced aggregation tools.
+
 | Tool | Description |
 |------|-------------|
 | `list_current_user_effort_records` | List actual effort records for the current user. |
 | `list_effort_records` | List actual effort records for a Projex work item. |
 | `list_estimated_efforts` | List estimated effort records for a Projex work item. |
-| `get_project_overview` | Get a compact Projex project overview with common project-management lists in one read-only call. |
-| `get_project_workitem_summary` | Summarize Projex work items by category for one project with samples and pagination totals. |
-| `get_project_workitem_context` | Get project work item metadata context: types, labels, members, and optional fields/workflow for one type. |
-| `get_sprint_overview` | Get a sprint overview with work item samples and totals by category for one project sprint. |
-| `get_my_project_workitems` | Get work items assigned to or created by a specific user for one project, grouped by category. |
-| `get_project_workitem_board` | Get a Kanban-style board view of work items grouped by status for one project. |
-| `get_project_workitem_detail` | Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. |
+| **`get_project_overview`** | Get a compact Projex project overview with common project-management lists in one read-only call. |
+| **`get_project_workitem_summary`** | Summarize Projex work items by category for one project with samples and pagination totals. |
+| **`get_project_workitem_context`** | Get project work item metadata context: types, labels, members, and optional fields/workflow for one type. |
+| **`get_sprint_overview`** | Get a sprint overview with work item samples and totals by category for one project sprint. |
+| **`get_my_project_workitems`** | Get work items assigned to or created by a specific user for one project, grouped by category. |
+| **`get_project_workitem_board`** | Get a Kanban-style board view of work items grouped by status for one project. |
+| **`get_project_workitem_detail`** | Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. |
+| **`get_work_item_type_overview`** | Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. |
 | `get_project_risk_dashboard` | Get a read-only project risk dashboard with category samples, overdue work items, and optional high-priority/stale sections. |
 | `get_project_member_task_status` | Get per-member task status for one project with assigned, overdue, and optional status-group sections. |
 | `list_milestones` | List milestones in a Projex project. |
@@ -96,6 +114,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a compact Projex project overview with common project-management lists in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -118,6 +138,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Summarize Projex work items by category for one project with samples and pagination totals.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -138,6 +160,8 @@ Tools in this domain use the following pagination scheme(s):
 ### get_project_workitem_context
 
 **Description**: Get project work item metadata context: types, labels, members, and optional fields/workflow for one type.
+
+**Type**: Enhanced aggregation tool
 
 **Pagination**: Offset (page/perPage)
 
@@ -160,6 +184,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a sprint overview with work item samples and totals by category for one project sprint.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -178,6 +204,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get work items assigned to or created by a specific user for one project, grouped by category.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -193,6 +221,8 @@ Tools in this domain use the following pagination scheme(s):
 ### get_project_workitem_board
 
 **Description**: Get a Kanban-style board view of work items grouped by status for one project.
+
+**Type**: Enhanced aggregation tool
 
 **Parameters**:
 
@@ -212,6 +242,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -227,6 +259,22 @@ Tools in this domain use the following pagination scheme(s):
 | `includeComments` | boolean | No | Whether to include comments. Defaults to true. |
 | `page` | number | No | Page number for comments. Defaults to 1. |
 | `perPage` | number | No | Page size for comments. Defaults to 20. |
+
+### get_work_item_type_overview
+
+**Description**: Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call.
+
+**Type**: Enhanced aggregation tool
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `projectId` | string | Yes | Project ID. |
+| `workItemTypeId` | string | Yes | Work item type ID. |
+| `includeFieldConfig` | boolean | No | Whether to include field configuration. Defaults to true. |
+| `includeWorkflow` | boolean | No | Whether to include workflow metadata. Defaults to true. |
 
 ### get_project_risk_dashboard
 

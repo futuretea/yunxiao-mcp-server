@@ -1,6 +1,17 @@
 # Codeup Tools
 
-This document describes the 39 read-only MCP tools in the codeup domain.
+This document describes the 41 read-only MCP tools in the codeup domain.
+
+## Enhanced Tools
+
+These tools combine multiple Yunxiao OpenAPI calls into single, user-centric operations. Prefer them when available.
+
+| Tool | Description |
+|------|-------------|
+| `get_repository_overview` | Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. |
+| `get_change_request_overview` | Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call. |
+| `get_commit_overview` | Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call. |
+| `get_branch_overview` | Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call. |
 
 ## Pagination
 
@@ -9,6 +20,8 @@ Tools in this domain use the following pagination scheme(s):
 - Offset (page/perPage)
 
 ## Tool Inventory
+
+Tools marked in **bold** are enhanced aggregation tools.
 
 | Tool | Description |
 |------|-------------|
@@ -20,8 +33,10 @@ Tools in this domain use the following pagination scheme(s):
 | `list_commit_statuses` | List CodeUp commit statuses for a repository commit. |
 | `list_check_runs` | List CodeUp check runs for a repository ref. |
 | `get_check_run` | Get a CodeUp check run by ID. |
-| `get_repository_overview` | Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. |
-| `get_change_request_overview` | Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call. |
+| **`get_repository_overview`** | Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. |
+| **`get_change_request_overview`** | Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call. |
+| **`get_commit_overview`** | Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call. |
+| **`get_branch_overview`** | Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call. |
 | `list_group_members` | List CodeUp group members. |
 | `get_member_https_clone_username` | Get a CodeUp user's HTTPS clone username. |
 | `list_merge_requests` | List legacy CodeUp merge requests in a Yunxiao organization. |
@@ -171,6 +186,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -190,6 +207,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -201,6 +220,43 @@ Tools in this domain use the following pagination scheme(s):
 | `includeComments` | boolean | No | Whether to include comments. Defaults to true. |
 | `commentState` | string | No | Comment state filter: OPENED or RESOLVED. Defaults to OPENED. |
 | `commentResolved` | boolean | No | Whether to show resolved comments. Defaults to false. |
+
+### get_commit_overview
+
+**Description**: Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call.
+
+**Type**: Enhanced aggregation tool
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `sha` | string | Yes | Commit SHA. |
+| `includeStatuses` | boolean | No | Whether to include commit statuses. Defaults to true. |
+| `includeCheckRuns` | boolean | No | Whether to include check runs. Defaults to true. |
+| `statusLimit` | number | No | Max commit statuses returned. Defaults to 5. |
+| `checkRunLimit` | number | No | Max check runs returned. Defaults to 5. |
+
+### get_branch_overview
+
+**Description**: Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call.
+
+**Type**: Enhanced aggregation tool
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `branchName` | string | Yes | Branch name, such as main or feature/demo. |
+| `includeCommits` | boolean | No | Whether to include recent commits on the branch. Defaults to true. |
+| `includeMergeRequests` | boolean | No | Whether to include merge requests targeting the branch. Defaults to true. |
+| `commitLimit` | number | No | Max commits returned. Defaults to 5. |
+| `mrLimit` | number | No | Max merge requests returned. Defaults to 5. |
+| `mrState` | string | No | Merge request state filter: opened, merged, or closed. Defaults to opened. |
 
 ### list_group_members
 

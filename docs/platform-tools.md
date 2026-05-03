@@ -1,6 +1,16 @@
 # Platform Tools
 
-This document describes the 24 read-only MCP tools in the platform domain.
+This document describes the 26 read-only MCP tools in the platform domain.
+
+## Enhanced Tools
+
+These tools combine multiple Yunxiao OpenAPI calls into single, user-centric operations. Prefer them when available.
+
+| Tool | Description |
+|------|-------------|
+| `get_organization_overview` | Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call. |
+| `get_organization_department_overview` | Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call. |
+| `get_organization_group_overview` | Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call. |
 
 ## Pagination
 
@@ -11,10 +21,14 @@ Tools in this domain use the following pagination scheme(s):
 
 ## Tool Inventory
 
+Tools marked in **bold** are enhanced aggregation tools.
+
 | Tool | Description |
 |------|-------------|
 | `list_audit_logs` | List audit logs in a Yunxiao organization. |
-| `get_organization_overview` | Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call. |
+| **`get_organization_overview`** | Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call. |
+| **`get_organization_department_overview`** | Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call. |
+| **`get_organization_group_overview`** | Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call. |
 | `list_enterprise_departments` | List enterprise departments visible to the current Yunxiao user. |
 | `get_enterprise_department` | Get an enterprise department by ID. |
 | `list_organization_groups` | List groups in a Yunxiao organization. |
@@ -60,6 +74,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -72,6 +88,35 @@ Tools in this domain use the following pagination scheme(s):
 | `departmentLimit` | number | No | Max departments returned. Defaults to 5. |
 | `memberLimit` | number | No | Max members returned. Defaults to 5. |
 | `groupLimit` | number | No | Max groups returned. Defaults to 5. |
+
+### get_organization_department_overview
+
+**Description**: Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call.
+
+**Type**: Enhanced aggregation tool
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `departmentId` | string | Yes | Department ID. |
+| `includeAncestors` | boolean | No | Whether to include the ancestor chain. Defaults to true. |
+
+### get_organization_group_overview
+
+**Description**: Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call.
+
+**Type**: Enhanced aggregation tool
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `groupId` | string | Yes | Group ID. |
+| `includeMembers` | boolean | No | Whether to include group members. Defaults to true. |
+| `memberLimit` | number | No | Max members returned. Defaults to 5. |
 
 ### list_enterprise_departments
 

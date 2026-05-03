@@ -1,6 +1,15 @@
 # Flow Tools
 
-This document describes the 15 read-only MCP tools in the flow domain.
+This document describes the 16 read-only MCP tools in the flow domain.
+
+## Enhanced Tools
+
+These tools combine multiple Yunxiao OpenAPI calls into single, user-centric operations. Prefer them when available.
+
+| Tool | Description |
+|------|-------------|
+| `get_pipeline_overview` | Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call. |
+| `get_pipeline_run_overview` | Get a comprehensive overview of a Flow pipeline run including run details and pipeline jobs by category in one read-only call. |
 
 ## Pagination
 
@@ -10,6 +19,8 @@ Tools in this domain use the following pagination scheme(s):
 
 ## Tool Inventory
 
+Tools marked in **bold** are enhanced aggregation tools.
+
 | Tool | Description |
 |------|-------------|
 | `get_pipeline_scan_report_url` | Get a temporary download URL for a Flow pipeline scan report. |
@@ -17,7 +28,8 @@ Tools in this domain use the following pagination scheme(s):
 | `get_pipeline_emas_artifact_url` | Get a temporary download URL for a Flow EMAS artifact. |
 | `list_pipeline_relations` | List Flow pipeline related objects. |
 | `get_last_instance` | Get the latest Flow pipeline run instance detail. |
-| `get_pipeline_overview` | Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call. |
+| **`get_pipeline_overview`** | Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call. |
+| **`get_pipeline_run_overview`** | Get a comprehensive overview of a Flow pipeline run including run details and pipeline jobs by category in one read-only call. |
 | `list_resource_members` | List members for a Flow resource such as a pipeline or host group. |
 | `list_pipelines` | List Flow pipelines in a Yunxiao organization. |
 | `get_pipeline` | Get Flow pipeline details. |
@@ -93,6 +105,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call.
 
+**Type**: Enhanced aggregation tool
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -101,6 +115,22 @@ Tools in this domain use the following pagination scheme(s):
 | `pipelineId` | string | Yes | Pipeline ID. |
 | `includeRuns` | boolean | No | Whether to include recent run history. Defaults to true. |
 | `runLimit` | number | No | Max recent runs returned. Defaults to 5. |
+
+### get_pipeline_run_overview
+
+**Description**: Get a comprehensive overview of a Flow pipeline run including run details and pipeline jobs by category in one read-only call.
+
+**Type**: Enhanced aggregation tool
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `pipelineId` | string | Yes | Pipeline ID. |
+| `pipelineRunId` | string | Yes | Pipeline run ID. |
+| `includeJobs` | boolean | No | Whether to include pipeline jobs by category. Defaults to true. |
+| `category` | string | No | Task category for job listing. Defaults to DEPLOY. |
 
 ### list_resource_members
 
