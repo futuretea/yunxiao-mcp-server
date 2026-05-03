@@ -7,6 +7,7 @@ This document describes the enhanced aggregation tools in the Platform (organiza
 | Tool | Purpose | API Calls |
 |------|---------|-----------|
 | `get_organization_overview` | Organization dashboard with basic info, departments, members, groups, and roles | 1 + up to 4 |
+| `get_organization_department_overview` | Department info with ancestor chain | 1 + up to 1 |
 
 ## Common Behaviors
 
@@ -40,3 +41,20 @@ Sub-sections use `page`/`perPage` parameters with a default page size of 5 (cont
 ```
 
 **Note**: The `roles` section returns all organization roles without pagination limits.
+
+### get_organization_department_overview
+
+**When to use**: You want a quick snapshot of an organization department — its basic info plus the ancestor chain in the org hierarchy.
+
+**Parameters**:
+- `organizationId`: optional, defaults to user's sole organization
+- `departmentId`: required
+- `includeAncestors`: toggle ancestor chain, default true
+
+**Example**:
+```json
+{
+  "departmentId": "dept-1",
+  "includeAncestors": true
+}
+```

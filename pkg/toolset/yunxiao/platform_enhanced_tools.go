@@ -23,5 +23,15 @@ func platformEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetOrganizationOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_organization_department_overview",
+				mcp.WithDescription("Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("departmentId", mcp.Required(), mcp.Description("Department ID.")),
+				mcp.WithBoolean("includeAncestors", mcp.Description("Whether to include the ancestor chain. Defaults to true.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetOrganizationDepartmentOverview,
+		},
 	}
 }

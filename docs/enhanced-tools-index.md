@@ -52,12 +52,13 @@ See [`appstack-enhanced-tools.md`](appstack-enhanced-tools.md) for detailed para
 | Tool | What it combines | When to use |
 |------|-----------------|-------------|
 | `get_organization_overview` | `get_organization` + departments + members + groups + roles | Organization snapshot |
+| `get_organization_department_overview` | `get_organization_department_info` + ancestors | Department snapshot |
 
 See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed parameters and examples.
 
 ## Quick Reference
 
-**Total enhanced tools**: 18 across 5 domains.
+**Total enhanced tools**: 19 across 5 domains.
 
 **Base tools they replace**: ~39 raw API calls.
 

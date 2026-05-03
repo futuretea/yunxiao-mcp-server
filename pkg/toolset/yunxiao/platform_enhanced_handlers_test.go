@@ -258,3 +258,122 @@ func TestOrganizationOverviewFilters(t *testing.T) {
 		t.Fatalf("groupLimit = %v", filters["groupLimit"])
 	}
 }
+
+func TestHandleGetOrganizationDepartmentOverviewRequiresOrganizationId(t *testing.T) {
+	_, err := handleGetOrganizationDepartmentOverview(context.Background(), nil, map[string]any{
+		"departmentId": "dept-1",
+	})
+	if err == nil || !strings.Contains(err.Error(), "organizationId is required") {
+		t.Fatalf("expected organizationId required error, got %v", err)
+	}
+}
+
+func TestHandleGetOrganizationDepartmentOverviewRequiresDepartmentId(t *testing.T) {
+	_, err := handleGetOrganizationDepartmentOverview(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+	})
+	if err == nil || !strings.Contains(err.Error(), "departmentId is required") {
+		t.Fatalf("expected departmentId required error, got %v", err)
+	}
+}
+
+func TestHandleGetOrganizationDepartmentOverviewRequiresClient(t *testing.T) {
+	_, err := handleGetOrganizationDepartmentOverview(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"departmentId":   "dept-1",
+	})
+	if err == nil || !strings.Contains(err.Error(), "yunxiao client is not configured") {
+		t.Fatalf("expected client error, got %v", err)
+	}
+}
+
+func TestHandleGetOrganizationDepartmentOverviewReturnsErrorOnDeptFailure(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"error":"boom"}`))
+	})
+	_, err := handleGetOrganizationDepartmentOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"departmentId":   "dept-1",
+	})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+func TestHandleGetOrganizationDepartmentOverviewReturnsErrorOnAncestorsFailure(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/ancestors") {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"ancestors boom"}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"id":"dept-1"}`))
+	})
+	_, err := handleGetOrganizationDepartmentOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"departmentId":   "dept-1",
+	})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+func TestHandleGetOrganizationDepartmentOverviewSuccessAllSections(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/oapi/v1/platform/organizations/org-1/departments/dept-1":
+			_, _ = w.Write([]byte(`{"id":"dept-1"}`))
+		case "/oapi/v1/platform/organizations/org-1/departments/dept-1/ancestors":
+			_, _ = w.Write([]byte(`["ancestor-1"]`))
+		default:
+			t.Fatalf("unexpected path %q", r.URL.Path)
+		}
+	})
+
+	result, err := handleGetOrganizationDepartmentOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"departmentId":   "dept-1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetOrganizationDepartmentOverview() error = %v", err)
+	}
+	if !strings.Contains(result, `"department"`) {
+		t.Fatalf("result missing department: %q", result)
+	}
+	if !strings.Contains(result, `"ancestors"`) {
+		t.Fatalf("result missing ancestors: %q", result)
+	}
+}
+
+func TestHandleGetOrganizationDepartmentOverviewSkipsAncestorsWhenDisabled(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/platform/organizations/org-1/departments/dept-1" {
+			_, _ = w.Write([]byte(`{"id":"dept-1"}`))
+			return
+		}
+		t.Fatalf("unexpected request to %q", r.URL.Path)
+	})
+
+	result, err := handleGetOrganizationDepartmentOverview(context.Background(), client, map[string]any{
+		"organizationId":   "org-1",
+		"departmentId":     "dept-1",
+		"includeAncestors": false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetOrganizationDepartmentOverview() error = %v", err)
+	}
+	if strings.Contains(result, `"ancestors"`) {
+		t.Fatalf("result should not contain ancestors: %q", result)
+	}
+}
+
+func TestOrganizationDepartmentOverviewFilters(t *testing.T) {
+	params := map[string]any{
+		"includeAncestors": false,
+	}
+	filters := organizationDepartmentOverviewFilters(params)
+	if filters["includeAncestors"].(bool) != false {
+		t.Fatalf("includeAncestors = %v", filters["includeAncestors"])
+	}
+}

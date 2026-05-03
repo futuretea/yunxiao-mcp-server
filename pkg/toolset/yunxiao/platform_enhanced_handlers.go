@@ -83,3 +83,42 @@ func organizationOverviewFilters(params map[string]any) map[string]any {
 		"groupLimit":         optionalIntDefault(params, "groupLimit", 5),
 	}
 }
+
+func handleGetOrganizationDepartmentOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, departmentID, err := requiredOrganizationAndNamedID(params, "departmentId")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	deptPath := organizationPath(organizationID) + "/departments/" + url.PathEscape(departmentID)
+
+	dept, err := c.GetJSON(ctx, deptPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"department": dept,
+		"filters":    organizationDepartmentOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeAncestors", true) {
+		ancestors, err := c.GetJSON(ctx, deptPath+"/ancestors", nil)
+		if err != nil {
+			return "", err
+		}
+		overview["ancestors"] = ancestors
+	}
+
+	return marshalPretty(overview)
+}
+
+func organizationDepartmentOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeAncestors": optionalBoolDefault(params, "includeAncestors", true),
+	}
+}

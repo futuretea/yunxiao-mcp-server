@@ -65,6 +65,7 @@ func expectedPlatformToolNames() []string {
 		"get_user",
 		"list_app_extension_features",
 		"get_organization_overview",
+		"get_organization_department_overview",
 	}
 }
 

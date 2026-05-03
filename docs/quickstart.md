@@ -227,6 +227,21 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Department Overview
+
+**User asks**: "Tell me about department X in my organization."
+
+**Recommended flow**:
+1. `get_organization_department_overview` — department info and ancestor chain in one call.
+
+**Example**:
+```json
+{
+  "departmentId": "dept-1",
+  "includeAncestors": true
+}
+```
+
 ## Pattern: Check Release Status
 
 **User asks**: "Tell me about release X in system Y."
