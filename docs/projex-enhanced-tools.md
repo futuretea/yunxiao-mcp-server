@@ -15,6 +15,7 @@ This document describes the enhanced aggregation tools in the Projex (project ma
 | `get_project_workitem_detail` | Comprehensive single work item with activities, attachments, comments, relations | 1 + up to 2 + relationTypes |
 | `get_project_risk_dashboard` | Risk-focused view with overdue, high-priority, stale items | 3 + statusGroups |
 | `get_project_member_task_status` | Per-member workload and overdue tracking | 1 + 2N + statusGroups |
+| `get_work_item_type_overview` | Work item type details with field configuration and workflow | 1 + up to 2 |
 
 ## Common Behaviors
 
@@ -153,5 +154,26 @@ Simple filters (`status`, `assignedTo`, `sprint`, etc.) are translated into Yunx
 - `assigneeIds`: comma-separated user IDs; defaults to project members up to `memberLimit`
 - `statusGroups`: JSON object mapping group names to comma-separated status IDs (optional)
 - `memberLimit`: max members when `assigneeIds` is omitted, default 20
+
+### get_work_item_type_overview
+
+**When to use**: You want to understand a specific work item type — its basic information plus the field configuration and workflow in a given project.
+
+**Parameters**:
+- `organizationId`, `projectId`, `workItemTypeId`: required
+- `includeFieldConfig`: toggle field configuration, default true
+- `includeWorkflow`: toggle workflow metadata, default true
+
+**Example**:
+```json
+{
+  "projectId": "project-1",
+  "workItemTypeId": "type-1",
+  "includeFieldConfig": true,
+  "includeWorkflow": true
+}
+```
+
+**Note**: Field configuration and workflow are project-scoped. The same work item type may have different fields or workflows in different projects.
 
 **Note**: This tool issues 2 + (2 * statusGroups) requests per member. Use `memberLimit` and `sampleLimit` to control API load.

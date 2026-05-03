@@ -247,3 +247,52 @@ func handleGetProjectWorkitemDetail(ctx context.Context, client any, params map[
 
 	return marshalPretty(detail)
 }
+
+func handleGetWorkItemTypeOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, projectID, workItemTypeID, err := requiredOrganizationProjectAndWorkItemType(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	typePath := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
+	workItemType, err := getProjectOverviewSection(ctx, c, "workItemType", typePath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"workItemType": workItemType,
+		"filters":      workItemTypeOverviewFilters(params),
+	}
+
+	projectTypePath := workItemTypeProjectPath(organizationID, projectID, workItemTypeID)
+
+	if optionalBoolDefault(params, "includeFieldConfig", true) {
+		fields, err := getProjectOverviewSection(ctx, c, "fieldConfig", projectTypePath+"/fields", nil)
+		if err != nil {
+			return "", err
+		}
+		overview["fieldConfig"] = fields
+	}
+
+	if optionalBoolDefault(params, "includeWorkflow", true) {
+		workflow, err := getProjectOverviewSection(ctx, c, "workflow", projectTypePath+"/workflows", nil)
+		if err != nil {
+			return "", err
+		}
+		overview["workflow"] = workflow
+	}
+
+	return marshalPretty(overview)
+}
+
+func workItemTypeOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeFieldConfig": optionalBoolDefault(params, "includeFieldConfig", true),
+		"includeWorkflow":    optionalBoolDefault(params, "includeWorkflow", true),
+	}
+}

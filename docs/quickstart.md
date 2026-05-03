@@ -79,6 +79,23 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Check Work Item Type Configuration
+
+**User asks**: "What fields does the Task type have in project X?"
+
+**Recommended flow**:
+1. `get_work_item_type_overview` — work item type info plus field configuration and workflow in one call.
+
+**Example**:
+```json
+{
+  "projectId": "project-1",
+  "workItemTypeId": "type-1",
+  "includeFieldConfig": true,
+  "includeWorkflow": true
+}
+```
+
 ## Pattern: Member Workload
 
 **User asks**: "Who is overloaded in project X?"

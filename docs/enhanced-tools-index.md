@@ -15,6 +15,7 @@ This project provides **enhanced aggregation tools** that combine multiple Yunxi
 | `get_project_workitem_detail` | `get_workitem` + activities + attachments + comments + relations | Complete single work item view |
 | `get_project_risk_dashboard` | `search_workitems` for overdue + high-priority + stale | Risk identification |
 | `get_project_member_task_status` | `search_workitems` per member + status groups | Workload distribution |
+| `get_work_item_type_overview` | `get_work_item_type` + field config + workflow | Work item type configuration |
 
 See [`projex-enhanced-tools.md`](projex-enhanced-tools.md) for detailed parameters and examples.
 
@@ -56,7 +57,7 @@ See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed para
 
 ## Quick Reference
 
-**Total enhanced tools**: 17 across 5 domains.
+**Total enhanced tools**: 18 across 5 domains.
 
 **Base tools they replace**: ~39 raw API calls.
 

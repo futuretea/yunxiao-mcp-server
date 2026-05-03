@@ -124,6 +124,18 @@ func projexEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetProjectWorkitemDetail,
 		},
+		{
+			Tool: mcp.NewTool("get_work_item_type_overview",
+				mcp.WithDescription("Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
+				mcp.WithBoolean("includeFieldConfig", mcp.Description("Whether to include field configuration. Defaults to true.")),
+				mcp.WithBoolean("includeWorkflow", mcp.Description("Whether to include workflow metadata. Defaults to true.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetWorkItemTypeOverview,
+		},
 	}
 	tools = append(tools, projexInsightTools()...)
 	return tools

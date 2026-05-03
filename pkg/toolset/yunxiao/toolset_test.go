@@ -144,6 +144,7 @@ func expectedProjexToolNames() []string {
 		"get_my_project_workitems",
 		"get_project_workitem_board",
 		"get_project_workitem_detail",
+		"get_work_item_type_overview",
 		"get_project_risk_dashboard",
 		"get_project_member_task_status",
 		"list_project_members",
