@@ -53,5 +53,20 @@ func codeupEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetCommitOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_branch_overview",
+				mcp.WithDescription("Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("branchName", mcp.Required(), mcp.Description("Branch name, such as main or feature/demo.")),
+				mcp.WithBoolean("includeCommits", mcp.Description("Whether to include recent commits on the branch. Defaults to true.")),
+				mcp.WithBoolean("includeMergeRequests", mcp.Description("Whether to include merge requests targeting the branch. Defaults to true.")),
+				mcp.WithNumber("commitLimit", mcp.Description("Max commits returned. Defaults to 5.")),
+				mcp.WithNumber("mrLimit", mcp.Description("Max merge requests returned. Defaults to 5.")),
+				mcp.WithString("mrState", mcp.Description("Merge request state filter: opened, merged, or closed. Defaults to opened.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetBranchOverview,
+		},
 	}
 }

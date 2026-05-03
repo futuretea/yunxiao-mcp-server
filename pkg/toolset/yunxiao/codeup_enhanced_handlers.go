@@ -201,3 +201,65 @@ func commitOverviewFilters(params map[string]any) map[string]any {
 		"checkRunLimit":    optionalIntDefault(params, "checkRunLimit", 5),
 	}
 }
+
+func handleGetBranchOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, repositoryID, err := requiredOrganizationAndRepository(params)
+	if err != nil {
+		return "", err
+	}
+	branchName, err := requiredString(params, "branchName")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	repoPath := codeupRepositoryPath(organizationID, repositoryID)
+	branchPath := repoPath + "/branches/" + url.PathEscape(branchName)
+
+	branch, err := getProjectOverviewSection(ctx, c, "branch", branchPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"branch":  branch,
+		"filters": branchOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeCommits", true) {
+		commitQuery := repositoryLimitQuery(params, "commitLimit", 5)
+		commitQuery.Set("refName", branchName)
+		commits, err := getProjectOverviewSection(ctx, c, "commits", repoPath+"/commits", commitQuery)
+		if err != nil {
+			return "", err
+		}
+		overview["commits"] = commits
+	}
+
+	if optionalBoolDefault(params, "includeMergeRequests", true) {
+		mrQuery := repositoryLimitQuery(params, "mrLimit", 5)
+		mrQuery.Set("state", optionalStringDefault(params, "mrState", "opened"))
+		mrQuery.Add("repositoryIds", repositoryID)
+		mrQuery.Set("targetBranch", branchName)
+		mrs, err := getProjectOverviewSection(ctx, c, "mergeRequests", codeupOrganizationPath(organizationID)+"/mergeRequests", mrQuery)
+		if err != nil {
+			return "", err
+		}
+		overview["mergeRequests"] = mrs
+	}
+
+	return marshalPretty(overview)
+}
+
+func branchOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeCommits":       optionalBoolDefault(params, "includeCommits", true),
+		"includeMergeRequests": optionalBoolDefault(params, "includeMergeRequests", true),
+		"commitLimit":          optionalIntDefault(params, "commitLimit", 5),
+		"mrLimit":              optionalIntDefault(params, "mrLimit", 5),
+		"mrState":              optionalStringDefault(params, "mrState", "opened"),
+	}
+}

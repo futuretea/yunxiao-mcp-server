@@ -111,6 +111,7 @@ func expectedCodeUpToolNames() []string {
 		"get_repository_overview",
 		"get_change_request_overview",
 		"get_commit_overview",
+		"get_branch_overview",
 	}
 }
 

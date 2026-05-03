@@ -150,6 +150,25 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Check Branch Status
+
+**User asks**: "What's happening on the feature branch?"
+
+**Recommended flow**:
+1. `get_branch_overview` — branch details, recent commits, and merge requests targeting the branch in one call.
+
+**Example**:
+```json
+{
+  "repositoryId": "org/repo",
+  "branchName": "feature/demo",
+  "includeCommits": true,
+  "includeMergeRequests": true,
+  "commitLimit": 10,
+  "mrLimit": 5
+}
+```
+
 ## Pattern: Check Commit Status
 
 **User asks**: "What is the CI status of commit abc123?"

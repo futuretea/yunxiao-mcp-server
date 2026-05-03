@@ -9,6 +9,7 @@ This document describes the enhanced aggregation tools in the Codeup (source cod
 | `get_repository_overview` | Repository dashboard with branches, recent commits, and merge requests | 1 + up to 3 |
 | `get_change_request_overview` | Change request snapshot with patch sets and comments | 1 + up to 2 |
 | `get_commit_overview` | Commit snapshot with details, commit statuses, and check runs | 1 + up to 2 |
+| `get_branch_overview` | Branch snapshot with details, recent commits, and merge requests targeting the branch | 1 + up to 2 |
 
 ## Common Behaviors
 
@@ -94,3 +95,30 @@ When `refName` is omitted and `includeCommits` is true, the tool attempts to rea
 ```
 
 **Note**: Check runs are fetched using the commit SHA as the `ref` query parameter.
+
+### get_branch_overview
+
+**When to use**: You want a quick snapshot of a branch — its details plus recent commits and merge requests targeting it.
+
+**Parameters**:
+- `organizationId`, `repositoryId`, `branchName`: required
+- `includeCommits`: toggle recent commits list, default true
+- `includeMergeRequests`: toggle merge requests list, default true
+- `commitLimit`: max commits returned, default 5
+- `mrLimit`: max merge requests returned, default 5
+- `mrState`: merge request state filter, default `opened`
+
+**Example**:
+```json
+{
+  "repositoryId": "org/repo",
+  "branchName": "feature/demo",
+  "includeCommits": true,
+  "includeMergeRequests": true,
+  "commitLimit": 10,
+  "mrLimit": 5,
+  "mrState": "opened"
+}
+```
+
+**Note**: Merge requests are fetched from the organization-scoped legacy merge request endpoint filtered by `repositoryIds` and `targetBranch`.

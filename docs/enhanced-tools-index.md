@@ -26,6 +26,7 @@ See [`projex-enhanced-tools.md`](projex-enhanced-tools.md) for detailed paramete
 | `get_repository_overview` | `get_repository` + branches + commits + merge requests | Repository snapshot |
 | `get_change_request_overview` | `get_change_request` + patch sets + comments | Change request snapshot |
 | `get_commit_overview` | `get_commit` + commit statuses + check runs | Commit CI/CD health snapshot |
+| `get_branch_overview` | `get_branch` + recent commits + merge requests | Branch activity snapshot |
 
 See [`codeup-enhanced-tools.md`](codeup-enhanced-tools.md) for detailed parameters and examples.
 
@@ -59,9 +60,9 @@ See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed para
 
 ## Quick Reference
 
-**Total enhanced tools**: 20 across 5 domains.
+**Total enhanced tools**: 21 across 5 domains.
 
-**Base tools they replace**: ~39 raw API calls.
+**Base tools they replace**: ~41 raw API calls.
 
 **Common patterns**:
 - Most enhanced tools accept `organizationId` (optional, auto-injected) and a domain-specific ID.
