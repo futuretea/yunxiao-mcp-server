@@ -32,15 +32,5 @@ func codeupCheckTools() []toolset.ServerTool {
 			),
 			Handler: handleListCheckRuns,
 		},
-		{
-			Tool: mcp.NewTool("get_check_run",
-				mcp.WithDescription("Get a CodeUp check run by ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("checkRunId", mcp.Required(), mcp.Description("Check run ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetCheckRun,
-		},
 	}
 }

@@ -60,16 +60,6 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 			Handler: handleListProtectedBranches,
 		},
 		{
-			Tool: mcp.NewTool("get_protected_branch",
-				mcp.WithDescription("Get a protected branch rule in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("protectedBranchRuleId", mcp.Required(), mcp.Description("Protected branch rule ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetProtectedBranch,
-		},
-		{
 			Tool: mcp.NewTool("list_push_rules",
 				mcp.WithDescription("List push rules in a CodeUp repository."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
@@ -77,16 +67,6 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListPushRules,
-		},
-		{
-			Tool: mcp.NewTool("get_push_rule",
-				mcp.WithDescription("Get a push rule in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("pushRuleId", mcp.Required(), mcp.Description("Push rule ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetPushRule,
 		},
 	}
 }

@@ -51,16 +51,6 @@ func appstackEnvironmentTools() []toolset.ServerTool {
 			),
 			Handler: handleListEnvironments,
 		},
-		{
-			Tool: mcp.NewTool("get_environment",
-				mcp.WithDescription("Get an AppStack environment by application and environment name."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
-				mcp.WithString("envName", mcp.Required(), mcp.Description("Environment name.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetEnvironment,
-		},
 	}
 }
 

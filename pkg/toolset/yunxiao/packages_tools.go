@@ -35,16 +35,5 @@ func packageTools() []toolset.ServerTool {
 			),
 			Handler: handleListArtifacts,
 		},
-		{
-			Tool: mcp.NewTool("get_artifact",
-				mcp.WithDescription("Get one artifact from a Packages repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repoId", mcp.Required(), mcp.Description("Packages repository ID.")),
-				mcp.WithNumber("artifactId", mcp.Required(), mcp.Description("Artifact ID.")),
-				mcp.WithString("repoType", mcp.Required(), mcp.Description("Repository type: GENERIC, DOCKER, MAVEN, NPM, NUGET, or PYPI.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetArtifact,
-		},
 	}
 }

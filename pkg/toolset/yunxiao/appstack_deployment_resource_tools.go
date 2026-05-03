@@ -7,39 +7,7 @@ import (
 )
 
 func appstackDeploymentResourceTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 4)
-	tools = append(tools, appstackDeploymentLogTools()...)
-	tools = append(tools, appstackResourcePoolTools()...)
-	return tools
-}
-
-func appstackDeploymentLogTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
-		{
-			Tool: mcp.NewTool("get_machine_deploy_log",
-				mcp.WithDescription("Get an AppStack machine deployment log."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithNumber("tunnelId", mcp.Required(), mcp.Description("Deployment tunnel ID.")),
-				mcp.WithString("machineSn", mcp.Required(), mcp.Description("Machine serial number.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetMachineDeployLog,
-		},
-	}
-}
-
-func appstackResourcePoolTools() []toolset.ServerTool {
-	return []toolset.ServerTool{
-		{
-			Tool: mcp.NewTool("get_deploy_group",
-				mcp.WithDescription("Get an AppStack deploy group by pool and group name."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("poolName", mcp.Required(), mcp.Description("Resource pool name.")),
-				mcp.WithString("deployGroupName", mcp.Required(), mcp.Description("Deploy group name.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetDeployGroup,
-		},
 		{
 			Tool: mcp.NewTool("list_resource_instances",
 				mcp.WithDescription("List AppStack resource instances in a resource pool."),
@@ -54,16 +22,6 @@ func appstackResourcePoolTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListResourceInstances,
-		},
-		{
-			Tool: mcp.NewTool("get_resource_instance",
-				mcp.WithDescription("Get an AppStack resource instance by pool and instance name."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("poolName", mcp.Required(), mcp.Description("Resource pool name.")),
-				mcp.WithString("instanceName", mcp.Required(), mcp.Description("Resource instance name.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetResourceInstance,
 		},
 	}
 }

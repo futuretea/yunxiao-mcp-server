@@ -1,6 +1,6 @@
 # Projex Tools
 
-This document describes the 46 read-only MCP tools in the projex domain.
+This document describes the 36 read-only MCP tools in the projex domain.
 
 ## Enhanced Tools
 
@@ -45,34 +45,24 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_milestones` | List milestones in a Projex project. |
 | `list_testcase_repositories` | List Projex testcase repositories in a Yunxiao organization. |
 | `list_directories` | List testcase directories in a Projex testcase repository. |
-| `get_testcase_field_config` | Get testcase field configuration in a Projex testcase repository. |
-| `get_testcase` | Get a Projex testcase by ID. |
 | `search_testcases` | Search Projex testcases in one testcase repository. |
 | `list_test_plans` | List Projex test plans in a Yunxiao organization. |
 | `get_test_result_list` | Get testcase result summaries in a Projex test plan directory. |
 | `list_project_members` | List members in a Projex project. |
 | `list_project_templates` | List Projex project templates in a Yunxiao organization. |
-| `get_project_template_field_config` | Get field configuration for a Projex project template. |
 | `list_project_program` | List Projex projects bound to a project program. |
 | `list_project_roles` | List roles in a Projex project. |
 | `list_all_project_roles` | List all Projex project roles in a Yunxiao organization. |
 | `search_projects` | Search Projex projects in a Yunxiao organization. |
-| `get_project` | Get a Projex project by ID. |
-| `get_sprint` | Get a Projex sprint by ID. |
 | `list_sprints` | List Projex sprints in a project. |
 | `search_workitems` | Search work items in one Projex project space. |
-| `get_workitem` | Get a Projex work item by ID. |
 | `list_work_item_comments` | List comments for a Projex work item. |
 | `list_all_work_item_types` | List all work item types in a Yunxiao organization. |
 | `list_work_item_types` | List work item types in one Projex project. |
-| `get_work_item_type` | Get a Projex work item type by ID. |
 | `list_work_item_relation_work_item_types` | List work item types that can be related to a Projex work item type. |
-| `get_work_item_type_field_config` | Get field configuration for a Projex work item type. |
-| `get_work_item_workflow` | Get workflow information for a Projex work item type. |
 | `list_versions` | List versions in a Projex project. |
 | `list_workitem_activities` | List activity events for a Projex work item. |
 | `list_workitem_attachments` | List attachments for a Projex work item. |
-| `get_workitem_file` | Get file metadata for a Projex work item file. |
 | `list_workitem_relation_records` | List relation records for a Projex work item. |
 | `list_labels` | List labels in a Projex project. |
 
@@ -366,29 +356,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `testRepoId` | string | Yes | Testcase repository ID. |
 
-### get_testcase_field_config
-
-**Description**: Get testcase field configuration in a Projex testcase repository.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `testRepoId` | string | Yes | Testcase repository ID. |
-
-### get_testcase
-
-**Description**: Get a Projex testcase by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `testRepoId` | string | Yes | Testcase repository ID. |
-| `testcaseId` | string | Yes | Testcase ID. |
-
 ### search_testcases
 
 **Description**: Search Projex testcases in one testcase repository.
@@ -454,17 +421,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 |------|------|----------|-------------|
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 
-### get_project_template_field_config
-
-**Description**: Get field configuration for a Projex project template.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectTemplateId` | string | Yes | Project template ID. |
-
 ### list_project_program
 
 **Description**: List Projex projects bound to a project program.
@@ -517,29 +473,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `sort` | string | No | Sort direction: asc or desc. |
 | `page` | number | No | Page number. |
 | `perPage` | number | No | Page size. |
-
-### get_project
-
-**Description**: Get a Projex project by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-
-### get_sprint
-
-**Description**: Get a Projex sprint by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `sprintId` | string | Yes | Sprint ID. |
 
 ### list_sprints
 
@@ -595,17 +528,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `page` | number | No | Page number. |
 | `perPage` | number | No | Page size. |
 
-### get_workitem
-
-**Description**: Get a Projex work item by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
-
 ### list_work_item_comments
 
 **Description**: List comments for a Projex work item.
@@ -644,17 +566,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `projectId` | string | Yes | Project ID. |
 | `category` | string | Yes | Work item category, such as Req, Bug, or Task. |
 
-### get_work_item_type
-
-**Description**: Get a Projex work item type by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workItemTypeId` | string | Yes | Work item type ID. |
-
 ### list_work_item_relation_work_item_types
 
 **Description**: List work item types that can be related to a Projex work item type.
@@ -666,30 +577,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `workItemTypeId` | string | Yes | Work item type ID. |
 | `relationType` | string | No | Relation type: PARENT, SUB, ASSOCIATED, DEPEND_ON, or DEPENDED_BY. |
-
-### get_work_item_type_field_config
-
-**Description**: Get field configuration for a Projex work item type.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `workItemTypeId` | string | Yes | Work item type ID. |
-
-### get_work_item_workflow
-
-**Description**: Get workflow information for a Projex work item type.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `workItemTypeId` | string | Yes | Work item type ID. |
 
 ### list_versions
 
@@ -729,18 +616,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 |------|------|----------|-------------|
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `workitemId` | string | Yes | Work item ID. |
-
-### get_workitem_file
-
-**Description**: Get file metadata for a Projex work item file.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
-| `fileId` | string | Yes | File ID. |
 
 ### list_workitem_relation_records
 

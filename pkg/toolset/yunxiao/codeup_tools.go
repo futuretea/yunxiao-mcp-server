@@ -7,7 +7,7 @@ import (
 )
 
 func codeupTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 40)
+	tools := make([]toolset.ServerTool, 0, 32)
 	tools = append(tools, codeupRepositoryTools()...)
 	tools = append(tools, codeupRepositoryMetadataTools()...)
 	tools = append(tools, codeupNamespaceTools()...)
@@ -40,20 +40,6 @@ func codeupRepositoryTools() []toolset.ServerTool {
 			Handler: handleListRepositories,
 		},
 		{
-			Tool: mcp.NewTool("get_repository",
-				mcp.WithDescription("Get a CodeUp repository by numeric ID or full path."),
-				mcp.WithString("organizationId",
-					mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted."),
-				),
-				mcp.WithString("repositoryId",
-					mcp.Required(),
-					mcp.Description("Repository numeric ID or full path such as org/repo."),
-				),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetRepository,
-		},
-		{
 			Tool: mcp.NewTool("list_branches",
 				mcp.WithDescription("List branches in a CodeUp repository."),
 				mcp.WithString("organizationId",
@@ -70,16 +56,6 @@ func codeupRepositoryTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListBranches,
-		},
-		{
-			Tool: mcp.NewTool("get_branch",
-				mcp.WithDescription("Get CodeUp branch details."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("branchName", mcp.Required(), mcp.Description("Branch name, such as main or feature/demo.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetBranch,
 		},
 	}
 }
@@ -99,17 +75,6 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 			Handler: handleListFiles,
 		},
 		{
-			Tool: mcp.NewTool("get_file_blobs",
-				mcp.WithDescription("Get CodeUp file content."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("filePath", mcp.Required(), mcp.Description("File path, such as src/main.go.")),
-				mcp.WithString("ref", mcp.Required(), mcp.Description("Branch, tag, or commit SHA.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetFileBlobs,
-		},
-		{
 			Tool: mcp.NewTool("list_commits",
 				mcp.WithDescription("List commits in a CodeUp repository."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
@@ -126,30 +91,6 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListCommits,
-		},
-		{
-			Tool: mcp.NewTool("get_commit",
-				mcp.WithDescription("Get CodeUp commit details."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("sha", mcp.Required(), mcp.Description("Commit SHA.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetCommit,
-		},
-		{
-			Tool: mcp.NewTool("compare",
-				mcp.WithDescription("Compare two CodeUp refs or commits."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("from", mcp.Required(), mcp.Description("Source commit SHA, branch, or tag.")),
-				mcp.WithString("to", mcp.Required(), mcp.Description("Target commit SHA, branch, or tag.")),
-				mcp.WithString("sourceType", mcp.Description("Source ref type: branch or tag.")),
-				mcp.WithString("targetType", mcp.Description("Target ref type: branch or tag.")),
-				mcp.WithString("straight", mcp.Description("Whether to compare directly without merge-base: true or false.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleCompare,
 		},
 	}
 }
@@ -183,16 +124,6 @@ func codeupChangeRequestCoreTools() []toolset.ServerTool {
 			),
 			Handler: handleListChangeRequests,
 		},
-		{
-			Tool: mcp.NewTool("get_change_request",
-				mcp.WithDescription("Get CodeUp merge request details."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetChangeRequest,
-		},
 	}
 }
 
@@ -207,18 +138,6 @@ func codeupChangeRequestDiffTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListChangeRequestPatchSets,
-		},
-		{
-			Tool: mcp.NewTool("get_change_request_tree",
-				mcp.WithDescription("Get CodeUp merge request changed file tree."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
-				mcp.WithString("fromPatchSetId", mcp.Required(), mcp.Description("Target-side patch set ID.")),
-				mcp.WithString("toPatchSetId", mcp.Required(), mcp.Description("Source-side patch set ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetChangeRequestTree,
 		},
 	}
 }
@@ -239,17 +158,6 @@ func codeupChangeRequestCommentTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListChangeRequestComments,
-		},
-		{
-			Tool: mcp.NewTool("get_change_request_comment",
-				mcp.WithDescription("Get CodeUp merge request comment details."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
-				mcp.WithString("commentBizId", mcp.Required(), mcp.Description("Comment business ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetChangeRequestComment,
 		},
 	}
 }

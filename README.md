@@ -9,7 +9,7 @@ Go 语言版本的 Yunxiao MCP Server。当前实现提供可构建的 stdio MCP
 - HTTP health endpoint：`/healthz`
 - Cobra CLI 与 YAML/env/flag 配置加载
 - Yunxiao OpenAPI token 认证：启动时默认 token，HTTP/SSE 请求级 `x-yunxiao-token` 或 `yunxiao_access_token` 覆盖
-- **191 个只读 MCP 工具**，覆盖 7 个领域：
+- **124 个只读 MCP 工具**，覆盖 7 个领域：
   - **Projex**（项目管理）：项目、迭代、工作项、里程碑、测试用例等
   - **Codeup**（代码托管）：仓库、分支、提交、合并请求、代码评审等
   - **Flow**（CI/CD）：流水线、运行记录、构建任务等

@@ -25,16 +25,6 @@ func appstackSystemReleaseOverviewTools() []toolset.ServerTool {
 			Handler: handleListSystemReleaseWorkflows,
 		},
 		{
-			Tool: mcp.NewTool("get_release",
-				mcp.WithDescription("Get an AppStack system release by serial number."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("systemName", mcp.Required(), mcp.Description("System name.")),
-				mcp.WithString("sn", mcp.Required(), mcp.Description("Release serial number.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetRelease,
-		},
-		{
 			Tool: mcp.NewTool("list_release_members",
 				mcp.WithDescription("List members of an AppStack system release."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),

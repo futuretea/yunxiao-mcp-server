@@ -1,6 +1,6 @@
 # Platform Tools
 
-This document describes the 26 read-only MCP tools in the platform domain.
+This document describes the 18 read-only MCP tools in the platform domain.
 
 ## Enhanced Tools
 
@@ -30,9 +30,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | **`get_organization_department_overview`** | Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call. |
 | **`get_organization_group_overview`** | Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call. |
 | `list_enterprise_departments` | List enterprise departments visible to the current Yunxiao user. |
-| `get_enterprise_department` | Get an enterprise department by ID. |
 | `list_organization_groups` | List groups in a Yunxiao organization. |
-| `get_organization_group` | Get a Yunxiao organization group by ID. |
 | `list_organization_group_members` | List members in a Yunxiao organization group. |
 | `get_user` | Get a Yunxiao user by ID or username. |
 | `list_app_extension_features` | List app extension feature implementations for a Yunxiao organization. |
@@ -40,16 +38,10 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `get_current_organization_info` | Get current user context, including the last organization returned by Yunxiao. |
 | `get_user_organizations` | Get Yunxiao organizations visible to the current user. |
 | `list_organizations` | List Yunxiao organizations visible to the current user. |
-| `get_organization` | Get a Yunxiao organization by ID. |
 | `list_organization_departments` | List departments in a Yunxiao organization. |
-| `get_organization_department_info` | Get Yunxiao organization department details. |
-| `get_organization_department_ancestors` | List ancestor departments for a Yunxiao organization department. |
 | `list_organization_members` | List members in a Yunxiao organization. |
-| `get_organization_member_info` | Get Yunxiao organization member details by member ID. |
-| `get_organization_member_info_by_user_id` | Get Yunxiao organization member details by user ID. |
 | `search_organization_members` | Search members in a Yunxiao organization. |
 | `list_organization_roles` | List roles in a Yunxiao organization. |
-| `get_organization_role` | Get a Yunxiao organization role by ID. |
 | `list_users` | List Yunxiao users. |
 
 ### list_audit_logs
@@ -132,16 +124,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `page` | number | No | Page number. |
 | `perPage` | number | No | Page size from 1 to 100. |
 
-### get_enterprise_department
-
-**Description**: Get an enterprise department by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `departmentId` | string | Yes | Enterprise department ID. |
-
 ### list_organization_groups
 
 **Description**: List groups in a Yunxiao organization.
@@ -155,17 +137,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `page` | number | No | Page number. |
 | `perPage` | number | No | Page size from 1 to 100. |
-
-### get_organization_group
-
-**Description**: Get a Yunxiao organization group by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `groupId` | string | Yes | Group ID. |
 
 ### list_organization_group_members
 
@@ -241,16 +212,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `page` | number | No | Page number. Defaults to 1 when omitted by Yunxiao. |
 | `perPage` | number | No | Page size from 1 to 100. Defaults to 100 when omitted by Yunxiao. |
 
-### get_organization
-
-**Description**: Get a Yunxiao organization by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Organization ID. Defaults to the user's sole organization when omitted. |
-
 ### list_organization_departments
 
 **Description**: List departments in a Yunxiao organization.
@@ -266,28 +227,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `page` | number | No | Page number. |
 | `perPage` | number | No | Page size from 1 to 100. |
 
-### get_organization_department_info
-
-**Description**: Get Yunxiao organization department details.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `departmentId` | string | Yes | Department ID. |
-
-### get_organization_department_ancestors
-
-**Description**: List ancestor departments for a Yunxiao organization department.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `departmentId` | string | Yes | Department ID. |
-
 ### list_organization_members
 
 **Description**: List members in a Yunxiao organization.
@@ -301,28 +240,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `page` | number | No | Page number. |
 | `perPage` | number | No | Page size from 1 to 100. |
-
-### get_organization_member_info
-
-**Description**: Get Yunxiao organization member details by member ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `memberId` | string | Yes | Organization member ID. |
-
-### get_organization_member_info_by_user_id
-
-**Description**: Get Yunxiao organization member details by user ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `userId` | string | Yes | Yunxiao user ID. |
 
 ### search_organization_members
 
@@ -353,17 +270,6 @@ Tools marked in **bold** are enhanced aggregation tools.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-
-### get_organization_role
-
-**Description**: Get a Yunxiao organization role by ID.
-
-**Parameters**:
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `roleId` | string | Yes | Organization role ID. |
 
 ### list_users
 

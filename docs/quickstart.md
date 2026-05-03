@@ -219,7 +219,6 @@ This guide provides common MCP conversation patterns for AI assistants using the
 
 **Recommended flow**:
 1. `get_pipeline_overview` — pipeline info, latest run, and recent run history in one call.
-2. If specific job logs are needed: `get_pipeline_job_run_log` with the job run ID from the latest run.
 
 **Example**:
 ```json
@@ -277,7 +276,6 @@ This guide provides common MCP conversation patterns for AI assistants using the
 
 **Recommended flow**:
 1. `get_organization_overview` — organization info, departments, members, groups, and roles in one call.
-2. If specific member details are needed: `get_organization_member_info` with the member ID.
 
 **Example**:
 ```json
@@ -341,7 +339,6 @@ This guide provides common MCP conversation patterns for AI assistants using the
 
 **Recommended flow**:
 1. `list_change_order_versions` with the application name, sorted by creation time descending.
-2. `get_change_order` for the specific change order serial number if needed.
 
 **Tip**: Appstack change orders represent deployment records. Use `current` and `pageSize` for pagination on this endpoint.
 
@@ -351,7 +348,6 @@ This guide provides common MCP conversation patterns for AI assistants using the
 
 **Recommended flow**:
 1. `search_testcases` with `testRepoId` and optional `subject` filter.
-2. `get_testcase` with `testcaseId` for detailed test case content.
 
 **Example step 1**:
 ```json
@@ -377,7 +373,6 @@ This guide provides common MCP conversation patterns for AI assistants using the
 
 **Recommended flow**:
 1. `list_artifacts` with the package repository ID.
-2. `get_artifact` for detailed artifact metadata if needed.
 
 **Example step 1**:
 ```json

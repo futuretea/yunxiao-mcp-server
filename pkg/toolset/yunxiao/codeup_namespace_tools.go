@@ -7,10 +7,9 @@ import (
 )
 
 func codeupNamespaceTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 4)
+	tools := make([]toolset.ServerTool, 0, 2)
 	tools = append(tools, codeupTemplateRepositoryTools()...)
 	tools = append(tools, codeupNamespaceListTools()...)
-	tools = append(tools, codeupNamespaceLookupTools()...)
 	return tools
 }
 
@@ -45,28 +44,6 @@ func codeupNamespaceListTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListNamespaces,
-		},
-	}
-}
-
-func codeupNamespaceLookupTools() []toolset.ServerTool {
-	return []toolset.ServerTool{
-		{
-			Tool: mcp.NewTool("get_namespace",
-				mcp.WithDescription("Get a CodeUp namespace or group by ID or full path."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("namespaceId", mcp.Required(), mcp.Description("Namespace ID or full path such as group/subgroup.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetNamespace,
-		},
-		{
-			Tool: mcp.NewTool("get_org_namespace",
-				mcp.WithDescription("Get the organization-level CodeUp namespace."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetOrgNamespace,
 		},
 	}
 }

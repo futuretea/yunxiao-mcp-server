@@ -7,7 +7,7 @@ import (
 )
 
 func flowTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 16)
+	tools := make([]toolset.ServerTool, 0, 8)
 	tools = append(tools, flowPipelineTools()...)
 	tools = append(tools, flowPipelineRunTools()...)
 	tools = append(tools, flowPipelineJobTools()...)
@@ -37,20 +37,6 @@ func flowPipelineTools() []toolset.ServerTool {
 			),
 			Handler: handleListPipelines,
 		},
-		{
-			Tool: mcp.NewTool("get_pipeline",
-				mcp.WithDescription("Get Flow pipeline details."),
-				mcp.WithString("organizationId",
-					mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted."),
-				),
-				mcp.WithString("pipelineId",
-					mcp.Required(),
-					mcp.Description("Pipeline ID."),
-				),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetPipeline,
-		},
 	}
 }
 
@@ -75,38 +61,6 @@ func flowPipelineRunTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListPipelineRuns,
-		},
-		{
-			Tool: mcp.NewTool("get_pipeline_run",
-				mcp.WithDescription("Get a Flow pipeline run by ID."),
-				mcp.WithString("organizationId",
-					mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted."),
-				),
-				mcp.WithString("pipelineId",
-					mcp.Required(),
-					mcp.Description("Pipeline ID."),
-				),
-				mcp.WithString("pipelineRunId",
-					mcp.Required(),
-					mcp.Description("Pipeline run ID."),
-				),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetPipelineRun,
-		},
-		{
-			Tool: mcp.NewTool("get_latest_pipeline_run",
-				mcp.WithDescription("Get the latest Flow pipeline run."),
-				mcp.WithString("organizationId",
-					mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted."),
-				),
-				mcp.WithString("pipelineId",
-					mcp.Required(),
-					mcp.Description("Pipeline ID."),
-				),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetLatestPipelineRun,
 		},
 	}
 }
@@ -135,17 +89,6 @@ func flowPipelineJobTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListPipelineJobHistorys,
-		},
-		{
-			Tool: mcp.NewTool("get_pipeline_job_run_log",
-				mcp.WithDescription("Get a Flow pipeline job run log."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID.")),
-				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID.")),
-				mcp.WithString("jobId", mcp.Required(), mcp.Description("Pipeline job ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetPipelineJobRunLog,
 		},
 	}
 }

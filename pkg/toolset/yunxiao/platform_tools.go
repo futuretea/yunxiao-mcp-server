@@ -62,16 +62,6 @@ func platformBasicTools() []toolset.ServerTool {
 			),
 			Handler: handleListOrganizations,
 		},
-		{
-			Tool: mcp.NewTool("get_organization",
-				mcp.WithDescription("Get a Yunxiao organization by ID."),
-				mcp.WithString("organizationId",
-					mcp.Description("Organization ID. Defaults to the user's sole organization when omitted."),
-				),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetOrganization,
-		},
 	}
 }
 
@@ -88,24 +78,6 @@ func platformDepartmentTools() []toolset.ServerTool {
 			),
 			Handler: handleListOrganizationDepartments,
 		},
-		{
-			Tool: mcp.NewTool("get_organization_department_info",
-				mcp.WithDescription("Get Yunxiao organization department details."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("departmentId", mcp.Required(), mcp.Description("Department ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetOrganizationDepartmentInfo,
-		},
-		{
-			Tool: mcp.NewTool("get_organization_department_ancestors",
-				mcp.WithDescription("List ancestor departments for a Yunxiao organization department."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("departmentId", mcp.Required(), mcp.Description("Department ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetOrganizationDepartmentAncestors,
-		},
 	}
 }
 
@@ -120,24 +92,6 @@ func platformMemberTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListOrganizationMembers,
-		},
-		{
-			Tool: mcp.NewTool("get_organization_member_info",
-				mcp.WithDescription("Get Yunxiao organization member details by member ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("memberId", mcp.Required(), mcp.Description("Organization member ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetOrganizationMemberInfo,
-		},
-		{
-			Tool: mcp.NewTool("get_organization_member_info_by_user_id",
-				mcp.WithDescription("Get Yunxiao organization member details by user ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("userId", mcp.Required(), mcp.Description("Yunxiao user ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetOrganizationMemberInfoByUserID,
 		},
 		{
 			Tool: mcp.NewTool("search_organization_members",
@@ -167,15 +121,6 @@ func platformRoleAndUserTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListOrganizationRoles,
-		},
-		{
-			Tool: mcp.NewTool("get_organization_role",
-				mcp.WithDescription("Get a Yunxiao organization role by ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("roleId", mcp.Required(), mcp.Description("Organization role ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetOrganizationRole,
 		},
 		{
 			Tool: mcp.NewTool("list_users",

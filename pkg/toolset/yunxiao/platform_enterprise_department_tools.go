@@ -18,13 +18,5 @@ func platformEnterpriseDepartmentTools() []toolset.ServerTool {
 			),
 			Handler: handleListEnterpriseDepartments,
 		},
-		{
-			Tool: mcp.NewTool("get_enterprise_department",
-				mcp.WithDescription("Get an enterprise department by ID."),
-				mcp.WithString("departmentId", mcp.Required(), mcp.Description("Enterprise department ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetEnterpriseDepartment,
-		},
 	}
 }
