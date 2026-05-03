@@ -15,7 +15,6 @@ var minimalToolNames = map[string]struct{}{
 
 	// Projex — Workitem queries
 	"search_workitems":             {},
-	"get_workitem":                 {},
 	"get_project_workitem_summary": {},
 	"get_project_workitem_detail":  {},
 	"get_my_project_workitems":     {},

@@ -7,7 +7,7 @@ import (
 )
 
 func projexTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 41)
+	tools := make([]toolset.ServerTool, 0, 37)
 	tools = append(tools, projexProjectTools()...)
 	tools = append(tools, projexEnhancedTools()...)
 	tools = append(tools, projexProjectMetadataTools()...)
@@ -40,30 +40,11 @@ func projexProjectTools() []toolset.ServerTool {
 			),
 			Handler: handleSearchProjects,
 		},
-		{
-			Tool: mcp.NewTool("get_project",
-				mcp.WithDescription("Get a Projex project by ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetProject,
-		},
 	}
 }
 
 func projexSprintTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
-		{
-			Tool: mcp.NewTool("get_sprint",
-				mcp.WithDescription("Get a Projex sprint by ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
-				mcp.WithString("sprintId", mcp.Required(), mcp.Description("Sprint ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetSprint,
-		},
 		{
 			Tool: mcp.NewTool("list_sprints",
 				mcp.WithDescription("List Projex sprints in a project."),
@@ -116,15 +97,6 @@ func projexWorkitemTools() []toolset.ServerTool {
 			Handler: handleSearchWorkitems,
 		},
 		{
-			Tool: mcp.NewTool("get_workitem",
-				mcp.WithDescription("Get a Projex work item by ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetWorkitem,
-		},
-		{
 			Tool: mcp.NewTool("list_work_item_comments",
 				mcp.WithDescription("List comments for a Projex work item."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
@@ -166,15 +138,6 @@ func projexWorkitemTypeListTools() []toolset.ServerTool {
 			),
 			Handler: handleListWorkItemTypes,
 		},
-		{
-			Tool: mcp.NewTool("get_work_item_type",
-				mcp.WithDescription("Get a Projex work item type by ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetWorkItemType,
-		},
 	}
 }
 
@@ -189,26 +152,6 @@ func projexWorkitemTypeMetadataTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListWorkItemRelationWorkItemTypes,
-		},
-		{
-			Tool: mcp.NewTool("get_work_item_type_field_config",
-				mcp.WithDescription("Get field configuration for a Projex work item type."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
-				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetWorkItemTypeFieldConfig,
-		},
-		{
-			Tool: mcp.NewTool("get_work_item_workflow",
-				mcp.WithDescription("Get workflow information for a Projex work item type."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
-				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetWorkItemWorkflow,
 		},
 	}
 }

@@ -18,16 +18,6 @@ func projexWorkitemMetadataTools() []toolset.ServerTool {
 			Handler: handleListWorkitemAttachments,
 		},
 		{
-			Tool: mcp.NewTool("get_workitem_file",
-				mcp.WithDescription("Get file metadata for a Projex work item file."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID.")),
-				mcp.WithString("fileId", mcp.Required(), mcp.Description("File ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetWorkitemFile,
-		},
-		{
 			Tool: mcp.NewTool("list_workitem_relation_records",
 				mcp.WithDescription("List relation records for a Projex work item."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),

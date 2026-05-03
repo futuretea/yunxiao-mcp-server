@@ -7,7 +7,7 @@ import (
 )
 
 func projexMilestoneTestcaseTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 8)
+	tools := make([]toolset.ServerTool, 0, 6)
 	tools = append(tools, projexMilestoneTools()...)
 	tools = append(tools, projexTestcaseReadTools()...)
 	tools = append(tools, projexTestPlanReadTools()...)
@@ -51,25 +51,6 @@ func projexTestcaseReadTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListDirectories,
-		},
-		{
-			Tool: mcp.NewTool("get_testcase_field_config",
-				mcp.WithDescription("Get testcase field configuration in a Projex testcase repository."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("testRepoId", mcp.Required(), mcp.Description("Testcase repository ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetTestcaseFieldConfig,
-		},
-		{
-			Tool: mcp.NewTool("get_testcase",
-				mcp.WithDescription("Get a Projex testcase by ID."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("testRepoId", mcp.Required(), mcp.Description("Testcase repository ID.")),
-				mcp.WithString("testcaseId", mcp.Required(), mcp.Description("Testcase ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetTestcase,
 		},
 		{
 			Tool: mcp.NewTool("search_testcases",

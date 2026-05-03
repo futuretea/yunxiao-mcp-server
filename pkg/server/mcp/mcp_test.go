@@ -307,15 +307,15 @@ func TestNewServerEnableDomainsOverridesProjectFocused(t *testing.T) {
 		t.Fatalf("enabled_domains should override project_focused, expected codeup tools, got %v", enabled)
 	}
 
-	// Should include superseded raw tools because enabled_domains does not hide them
-	hasGetProject := false
+	// Should include list/search tools because enabled_domains does not hide them
+	hasSearchProjects := false
 	for _, name := range enabled {
-		if name == "get_project" {
-			hasGetProject = true
+		if name == "search_projects" {
+			hasSearchProjects = true
 		}
 	}
-	if !hasGetProject {
-		t.Fatalf("enabled_domains should include all projex tools including get_project, got %v", enabled)
+	if !hasSearchProjects {
+		t.Fatalf("enabled_domains should include all projex tools including search_projects, got %v", enabled)
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 func projexProjectMetadataTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 6)
+	tools := make([]toolset.ServerTool, 0, 5)
 	tools = append(tools, projexProjectMemberTools()...)
 	tools = append(tools, projexProjectTemplateTools()...)
 	tools = append(tools, projexProjectProgramTools()...)
@@ -40,15 +40,6 @@ func projexProjectTemplateTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListProjectTemplates,
-		},
-		{
-			Tool: mcp.NewTool("get_project_template_field_config",
-				mcp.WithDescription("Get field configuration for a Projex project template."),
-				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
-				mcp.WithString("projectTemplateId", mcp.Required(), mcp.Description("Project template ID.")),
-				mcp.WithReadOnlyHintAnnotation(true),
-			),
-			Handler: handleGetProjectTemplateFieldConfig,
 		},
 	}
 }
