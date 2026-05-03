@@ -101,9 +101,13 @@ This guide provides common MCP conversation patterns for AI assistants using the
 **User asks**: "What repositories are in namespace Y?"
 
 **Recommended flow**:
-1. `list_codeup_repositories` with the namespace ID.
-2. `get_repository` for details on a specific repo.
-3. `list_merge_requests` or `list_commits` for recent activity.
+1. `list_repositories` with the namespace ID.
+
+**User asks**: "Tell me about repository Z."
+
+**Recommended flow**:
+1. `get_repository_overview` — repository info, branches, recent commits, and open merge requests in one call.
+2. If deeper commit history is needed: `list_commits` with a larger `perPage`.
 
 ## Pattern: Check Recent Deployments
 

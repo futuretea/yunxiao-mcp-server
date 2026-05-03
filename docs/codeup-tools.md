@@ -1,6 +1,6 @@
 # Codeup Tools
 
-This document describes the 37 read-only MCP tools in the codeup domain.
+This document describes the 38 read-only MCP tools in the codeup domain.
 
 ## Pagination
 
@@ -20,6 +20,7 @@ Tools in this domain use the following pagination scheme(s):
 | `list_commit_statuses` | List CodeUp commit statuses for a repository commit. |
 | `list_check_runs` | List CodeUp check runs for a repository ref. |
 | `get_check_run` | Get a CodeUp check run by ID. |
+| `get_repository_overview` | Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. |
 | `list_group_members` | List CodeUp group members. |
 | `get_member_https_clone_username` | Get a CodeUp user's HTTPS clone username. |
 | `list_merge_requests` | List legacy CodeUp merge requests in a Yunxiao organization. |
@@ -164,6 +165,25 @@ Tools in this domain use the following pagination scheme(s):
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
 | `checkRunId` | string | Yes | Check run ID. |
+
+### get_repository_overview
+
+**Description**: Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `includeBranches` | boolean | No | Whether to include branch list. Defaults to true. |
+| `includeCommits` | boolean | No | Whether to include recent commits. Defaults to true. |
+| `includeMergeRequests` | boolean | No | Whether to include merge requests. Defaults to true. |
+| `refName` | string | No | Branch, tag, or commit SHA for commit listing. Defaults to the repository default branch when omitted. |
+| `branchLimit` | number | No | Max branches returned. Defaults to 5. |
+| `commitLimit` | number | No | Max commits returned. Defaults to 5. |
+| `mrLimit` | number | No | Max merge requests returned. Defaults to 5. |
+| `mrState` | string | No | Merge request state filter: opened, merged, or closed. Defaults to opened. |
 
 ### list_group_members
 

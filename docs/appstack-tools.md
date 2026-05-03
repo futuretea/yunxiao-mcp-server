@@ -6,9 +6,9 @@ This document describes the 50 read-only MCP tools in the appstack domain.
 
 Tools in this domain use the following pagination scheme(s):
 
-- Keyset (nextToken)
 - Offset (current/pageSize)
 - Offset (page/perPage)
+- Keyset (nextToken)
 
 ## Tool Inventory
 
