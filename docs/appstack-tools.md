@@ -8,17 +8,17 @@ These tools combine multiple Yunxiao OpenAPI calls into single, user-centric ope
 
 | Tool | Description |
 |------|-------------|
-| `get_application_overview` | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
-| `get_environment_overview` | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. |
-| `get_release_overview` | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. |
+| `get_application_overview` | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. Use this after discovering applications via list_applications or list_attached_apps. |
+| `get_environment_overview` | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. Use this after identifying an application and environment via get_application_overview. |
+| `get_release_overview` | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows. |
 
 ## Pagination
 
 Tools in this domain use the following pagination scheme(s):
 
-- Offset (page/perPage)
 - Keyset (nextToken)
 - Offset (current/pageSize)
+- Offset (page/perPage)
 
 ## Tool Inventory
 
@@ -26,41 +26,41 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Tool | Description |
 |------|-------------|
-| `search_app_templates` | Search AppStack application templates. |
-| `list_environments` | List AppStack environments for an application. |
-| `list_application_members` | List members of an AppStack application. |
-| `list_application_sources` | List source repositories attached to an AppStack application. |
-| `list_resource_instances` | List AppStack resource instances in a resource pool. |
-| **`get_application_overview`** | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. |
-| **`get_environment_overview`** | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. |
-| **`get_release_overview`** | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. |
-| `list_global_vars` | Search AppStack global variable groups. |
-| `search_releases` | Search AppStack releases in a Yunxiao organization. |
-| `list_system_release_workflows` | List AppStack release workflows for a system. |
-| `list_release_members` | List members of an AppStack system release. |
-| `list_release_products` | List products attached to an AppStack system release. |
-| `list_attached_change_requests` | List change requests attached to an AppStack system release. |
-| `list_release_executions` | List execution records for an AppStack system release. |
-| `list_systems` | List AppStack systems in a Yunxiao organization. |
-| `list_attached_apps` | List applications attached to an AppStack system. |
-| `list_system_members` | List members of an AppStack system. |
-| `list_applications` | List AppStack applications in a Yunxiao organization. |
-| `list_app_orchestration` | List AppStack orchestrations for an application. |
-| `list_app_release_workflows` | List AppStack release workflows for an application. |
-| `list_app_release_workflow_briefs` | List AppStack release workflow briefs for an application. |
-| `list_app_release_stage_briefs` | List AppStack release stage briefs for an application release workflow. |
-| `list_app_release_stage_runs` | List AppStack release stage execution records. |
-| `list_app_release_stage_exec_metadata` | List integrated change metadata for an AppStack release stage execution. |
-| `list_appstack_change_request_executions` | List execution records for an AppStack change request. |
-| `list_appstack_change_request_work_items` | List work items for an AppStack change request. |
-| `list_change_order_versions` | List AppStack change order versions. |
-| `list_change_orders_by_origin` | List AppStack change orders by creation origin. |
-| `list_change_order_job_logs` | List logs for an AppStack change order job. |
-| `find_task_operation_log` | Get an AppStack deployment task operation log. |
+| `search_app_templates` | Search AppStack application templates. Use this to discover templates before creating or deploying applications. |
+| `list_environments` | List AppStack environments for an application. Use list_applications to discover valid application names. |
+| `list_application_members` | List members of an AppStack application. Use list_applications to discover valid application names. |
+| `list_application_sources` | List source repositories attached to an AppStack application. Use list_applications to discover valid application names. |
+| `list_resource_instances` | List AppStack resource instances in a resource pool. Use list_resource_pools to discover valid pool names. |
+| **`get_application_overview`** | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. Use this after discovering applications via list_applications or list_attached_apps. |
+| **`get_environment_overview`** | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. Use this after identifying an application and environment via get_application_overview. |
+| **`get_release_overview`** | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_global_vars` | Search AppStack global variable groups. Use this to discover variable group IDs before reading or updating specific groups. |
+| `search_releases` | Search AppStack releases in a Yunxiao organization. Use this to discover releases before calling get_release_overview or other release-specific tools. |
+| `list_system_release_workflows` | List AppStack release workflows for a system. Use this after discovering a system via list_systems to find releases and their workflows. |
+| `list_release_members` | List members of an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_release_products` | List products attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_attached_change_requests` | List change requests attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_release_executions` | List execution records for an AppStack system release. Use this after discovering release workflow and stage details via list_system_release_workflows or get_release_overview. |
+| `list_systems` | List AppStack systems in a Yunxiao organization. Use this as the entry point to discover systems before calling other system-specific tools. |
+| `list_attached_apps` | List applications attached to an AppStack system. Use this to discover applications within a system before calling get_application_overview. |
+| `list_system_members` | List members of an AppStack system. Use this after discovering a system via list_systems. |
+| `list_applications` | List AppStack applications in a Yunxiao organization. AppStack manages deployment environments and release pipelines. |
+| `list_app_orchestration` | List AppStack orchestrations for an application. Orchestrations define deployment workflows and environment configurations. |
+| `list_app_release_workflows` | List AppStack release workflows for an application. Release workflows model multi-stage deployment pipelines. |
+| `list_app_release_workflow_briefs` | List AppStack release workflow briefs for an application. Briefs provide a condensed view of workflow definitions. |
+| `list_app_release_stage_briefs` | List AppStack release stage briefs for an application release workflow. Stages represent individual deployment phases within a workflow. |
+| `list_app_release_stage_runs` | List AppStack release stage execution records. Each record represents a single run of a deployment stage. |
+| `list_app_release_stage_exec_metadata` | List integrated change metadata for an AppStack release stage execution. Metadata includes linked work items and commits. |
+| `list_appstack_change_request_executions` | List execution records for an AppStack change request. Change requests track planned deployments. |
+| `list_appstack_change_request_work_items` | List work items for an AppStack change request. Work items represent linked Projex tasks or requirements. |
+| `list_change_order_versions` | List AppStack change order versions. Change orders track actual deployments and their versions. |
+| `list_change_orders_by_origin` | List AppStack change orders by creation origin. Use this to trace deployments back to their source (e.g., a Flow pipeline). |
+| `list_change_order_job_logs` | List logs for an AppStack change order job. Job logs capture deployment script output. |
+| `find_task_operation_log` | Get an AppStack deployment task operation log. Operation logs record manual or automated actions taken during deployment. |
 
 ### search_app_templates
 
-**Description**: Search AppStack application templates.
+**Description**: Search AppStack application templates. Use this to discover templates before creating or deploying applications.
 
 **Pagination**: Keyset (nextToken)
 
@@ -68,18 +68,18 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `pagination` | string | No | Pagination mode. Yunxiao currently supports keyset. |
-| `perPage` | number | No | Page size, up to 100. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `pagination` | string | No | Pagination mode. Valid value: keyset. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 | `nextToken` | string | No | Keyset pagination token from the previous response. |
-| `displayNameKeyword` | string | No | Template display name keyword. |
-| `page` | number | No | Page number when using page pagination. |
+| `displayNameKeyword` | string | No | Template display name keyword for filtering results. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
 
 ### list_environments
 
-**Description**: List AppStack environments for an application.
+**Description**: List AppStack environments for an application. Use list_applications to discover valid application names.
 
 **Pagination**: Keyset (nextToken)
 
@@ -87,18 +87,18 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `pagination` | string | No | Pagination mode. Yunxiao currently supports keyset. |
-| `perPage` | number | No | Page size, up to 100. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid names. |
+| `pagination` | string | No | Pagination mode. Valid value: keyset. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 | `nextToken` | string | No | Keyset pagination token from the previous response. |
-| `page` | number | No | Page number when using page pagination. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
 
 ### list_application_members
 
-**Description**: List members of an AppStack application.
+**Description**: List members of an AppStack application. Use list_applications to discover valid application names.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -106,14 +106,14 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `current` | number | No | Current page number. Defaults to 1. |
-| `pageSize` | number | No | Page size. Defaults to 10. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid names. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_application_sources
 
-**Description**: List source repositories attached to an AppStack application.
+**Description**: List source repositories attached to an AppStack application. Use list_applications to discover valid application names.
 
 **Pagination**: Keyset (nextToken)
 
@@ -121,18 +121,18 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `pagination` | string | No | Pagination mode. Use keyset for keyset pagination. |
-| `perPage` | number | No | Page size, up to 100. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid names. |
+| `pagination` | string | No | Pagination mode. Valid value: keyset. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 | `nextToken` | string | No | Keyset pagination token from the previous response. |
-| `page` | number | No | Page number when using page pagination. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
 
 ### list_resource_instances
 
-**Description**: List AppStack resource instances in a resource pool.
+**Description**: List AppStack resource instances in a resource pool. Use list_resource_pools to discover valid pool names.
 
 **Pagination**: Keyset (nextToken)
 
@@ -140,18 +140,18 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `poolName` | string | Yes | Resource pool name. |
-| `pagination` | string | No | Pagination mode. Yunxiao currently supports keyset. |
-| `perPage` | number | No | Page size, up to 100. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `poolName` | string | Yes | Resource pool name. Use list_resource_pools to discover valid names. |
+| `pagination` | string | No | Pagination mode. Valid value: keyset. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 | `nextToken` | string | No | Keyset pagination token from the previous response. |
-| `page` | number | No | Page number when using page pagination. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
 
 ### get_application_overview
 
-**Description**: Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call.
+**Description**: Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. Use this after discovering applications via list_applications or list_attached_apps.
 
 **Type**: Enhanced aggregation tool
 
@@ -159,8 +159,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application unique name. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application unique name. Use list_applications or list_attached_apps to discover valid names. |
 | `includeEnvironments` | boolean | No | Whether to include environment list. Defaults to true. |
 | `includeOrchestrations` | boolean | No | Whether to include recent orchestrations. Defaults to true. |
 | `envLimit` | number | No | Max environments returned. Defaults to 5. |
@@ -168,7 +168,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_environment_overview
 
-**Description**: Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call.
+**Description**: Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. Use this after identifying an application and environment via get_application_overview.
 
 **Type**: Enhanced aggregation tool
 
@@ -176,15 +176,15 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application unique name. |
-| `envName` | string | Yes | Environment name. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application unique name. Use list_applications or list_attached_apps to discover valid names. |
+| `envName` | string | Yes | Environment name. Use get_application_overview to discover valid environment names. |
 | `includeVariableGroups` | boolean | No | Whether to include environment variable groups. Defaults to true. |
 | `includeLatestOrchestration` | boolean | No | Whether to include the latest available orchestration. Defaults to true. |
 
 ### get_release_overview
 
-**Description**: Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call.
+**Description**: Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows.
 
 **Type**: Enhanced aggregation tool
 
@@ -192,9 +192,9 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
-| `sn` | string | Yes | Release serial number. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
+| `sn` | string | Yes | Release serial number. Use search_releases or list_system_release_workflows to discover valid serial numbers. |
 | `includeMembers` | boolean | No | Whether to include release members. Defaults to true. |
 | `includeProducts` | boolean | No | Whether to include release products. Defaults to true. |
 | `includeChangeRequests` | boolean | No | Whether to include attached change requests. Defaults to true. |
@@ -202,7 +202,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### list_global_vars
 
-**Description**: Search AppStack global variable groups.
+**Description**: Search AppStack global variable groups. Use this to discover variable group IDs before reading or updating specific groups.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -210,14 +210,14 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `current` | number | No | Current page number. Defaults to 1. |
-| `pageSize` | number | No | Page size. Defaults to 10. |
-| `search` | string | No | Optional search keyword. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `search` | string | No | Optional search keyword for filtering variable groups by name. |
 
 ### search_releases
 
-**Description**: Search AppStack releases in a Yunxiao organization.
+**Description**: Search AppStack releases in a Yunxiao organization. Use this to discover releases before calling get_release_overview or other release-specific tools.
 
 **Pagination**: Keyset (nextToken)
 
@@ -225,54 +225,54 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `pagination` | string | No | Pagination mode. Yunxiao currently supports keyset. |
-| `perPage` | number | No | Page size, up to 100. |
-| `orderBy` | string | No | Sort field: id or gmt_create. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `pagination` | string | No | Pagination mode. Valid value: keyset. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmt_create. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 | `nextToken` | string | No | Keyset pagination token from the previous response. |
 | `nameKeyword` | string | No | Release display-name search keyword. |
-| `systemName` | string | No | System unique name. |
-| `states` | array | No | Release states such as DEVELOPING, RELEASING, CLOSED, or RELEASED. |
+| `systemName` | string | No | System unique name. Use list_systems to discover valid names. |
+| `states` | array | No | Release states filter. Valid values: DEVELOPING, RELEASING, CLOSED, RELEASED. |
 
 ### list_system_release_workflows
 
-**Description**: List AppStack release workflows for a system.
+**Description**: List AppStack release workflows for a system. Use this after discovering a system via list_systems to find releases and their workflows.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
 
 ### list_release_members
 
-**Description**: List members of an AppStack system release.
+**Description**: List members of an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
-| `sn` | string | Yes | Release serial number. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
+| `sn` | string | Yes | Release serial number. Use search_releases or list_system_release_workflows to discover valid serial numbers. |
 
 ### list_release_products
 
-**Description**: List products attached to an AppStack system release.
+**Description**: List products attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
-| `sn` | string | Yes | Release serial number. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
+| `sn` | string | Yes | Release serial number. Use search_releases or list_system_release_workflows to discover valid serial numbers. |
 
 ### list_attached_change_requests
 
-**Description**: List change requests attached to an AppStack system release.
+**Description**: List change requests attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -280,15 +280,15 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
-| `releaseSn` | string | Yes | Release serial number. |
-| `current` | number | No | Current page number. Defaults to 1. |
-| `pageSize` | number | No | Page size. Defaults to 10. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
+| `releaseSn` | string | Yes | Release serial number. Use search_releases or list_system_release_workflows to discover valid serial numbers. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_release_executions
 
-**Description**: List execution records for an AppStack system release.
+**Description**: List execution records for an AppStack system release. Use this after discovering release workflow and stage details via list_system_release_workflows or get_release_overview.
 
 **Pagination**: Offset (page/perPage)
 
@@ -296,19 +296,19 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
-| `sn` | string | Yes | Release serial number. |
-| `releaseWorkflowSn` | string | Yes | Release workflow serial number. |
-| `releaseStageSn` | string | Yes | Release stage serial number. |
-| `perPage` | number | No | Page size, up to 100. |
-| `page` | number | No | Page number. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
+| `sn` | string | Yes | Release serial number. Use search_releases or list_system_release_workflows to discover valid serial numbers. |
+| `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_system_release_workflows to discover valid serial numbers. |
+| `releaseStageSn` | string | Yes | Release stage serial number. Use list_system_release_workflows to discover valid serial numbers. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 
 ### list_systems
 
-**Description**: List AppStack systems in a Yunxiao organization.
+**Description**: List AppStack systems in a Yunxiao organization. Use this as the entry point to discover systems before calling other system-specific tools.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -316,13 +316,13 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `current` | number | No | Current page number. Defaults to 1. |
-| `pageSize` | number | No | Page size. Defaults to 10. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_attached_apps
 
-**Description**: List applications attached to an AppStack system.
+**Description**: List applications attached to an AppStack system. Use this to discover applications within a system before calling get_application_overview.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -330,14 +330,14 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
-| `current` | number | No | Current page number. Defaults to 1. |
-| `pageSize` | number | No | Page size. Defaults to 10. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_system_members
 
-**Description**: List members of an AppStack system.
+**Description**: List members of an AppStack system. Use this after discovering a system via list_systems.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -345,14 +345,14 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `systemName` | string | Yes | System name. |
-| `current` | number | No | Current page number. Defaults to 1. |
-| `pageSize` | number | No | Page size. Defaults to 10. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_applications
 
-**Description**: List AppStack applications in a Yunxiao organization.
+**Description**: List AppStack applications in a Yunxiao organization. AppStack manages deployment environments and release pipelines.
 
 **Pagination**: Keyset (nextToken)
 
@@ -360,62 +360,62 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `pagination` | string | No | Pagination mode. Yunxiao currently supports keyset. |
-| `perPage` | number | No | Page size, up to 100. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `pagination` | string | No | Pagination mode. Valid value: keyset. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 | `nextToken` | string | No | Keyset pagination token from the previous response. |
-| `page` | number | No | Page number when using page pagination. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
 
 ### list_app_orchestration
 
-**Description**: List AppStack orchestrations for an application.
+**Description**: List AppStack orchestrations for an application. Orchestrations define deployment workflows and environment configurations.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
 
 ### list_app_release_workflows
 
-**Description**: List AppStack release workflows for an application.
+**Description**: List AppStack release workflows for an application. Release workflows model multi-stage deployment pipelines.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
 
 ### list_app_release_workflow_briefs
 
-**Description**: List AppStack release workflow briefs for an application.
+**Description**: List AppStack release workflow briefs for an application. Briefs provide a condensed view of workflow definitions.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
 
 ### list_app_release_stage_briefs
 
-**Description**: List AppStack release stage briefs for an application release workflow.
+**Description**: List AppStack release stage briefs for an application release workflow. Stages represent individual deployment phases within a workflow.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `releaseWorkflowSn` | string | Yes | Release workflow serial number. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_app_release_workflows to discover valid values. |
 
 ### list_app_release_stage_runs
 
-**Description**: List AppStack release stage execution records.
+**Description**: List AppStack release stage execution records. Each record represents a single run of a deployment stage.
 
 **Pagination**: Keyset (nextToken)
 
@@ -423,34 +423,34 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `releaseWorkflowSn` | string | Yes | Release workflow serial number. |
-| `releaseStageSn` | string | Yes | Release stage serial number. |
-| `pagination` | string | No | Pagination mode. Use keyset for keyset pagination. |
-| `perPage` | number | No | Page size, up to 100. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_app_release_workflows to discover valid values. |
+| `releaseStageSn` | string | Yes | Release stage serial number. Use list_app_release_stage_briefs to discover valid values. |
+| `pagination` | string | No | Pagination mode. Valid value: keyset. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 | `nextToken` | string | No | Keyset pagination token from the previous response. |
-| `page` | number | No | Page number when using page pagination. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
 
 ### list_app_release_stage_exec_metadata
 
-**Description**: List integrated change metadata for an AppStack release stage execution.
+**Description**: List integrated change metadata for an AppStack release stage execution. Metadata includes linked work items and commits.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `releaseWorkflowSn` | string | Yes | Release workflow serial number. |
-| `releaseStageSn` | string | Yes | Release stage serial number. |
-| `executionNumber` | string | Yes | Release stage execution number. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_app_release_workflows to discover valid values. |
+| `releaseStageSn` | string | Yes | Release stage serial number. Use list_app_release_stage_briefs to discover valid values. |
+| `executionNumber` | string | Yes | Release stage execution number. Use list_app_release_stage_runs to discover valid values. |
 
 ### list_appstack_change_request_executions
 
-**Description**: List execution records for an AppStack change request.
+**Description**: List execution records for an AppStack change request. Change requests track planned deployments.
 
 **Pagination**: Offset (page/perPage)
 
@@ -458,31 +458,31 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `sn` | string | Yes | Change request serial number. |
-| `releaseWorkflowSn` | string | Yes | Release workflow serial number. |
-| `releaseStageSn` | string | Yes | Release stage serial number. |
-| `perPage` | number | No | Page size, up to 100. |
-| `page` | number | No | Page number. |
-| `orderBy` | string | No | Sort field: id or gmtCreate. |
-| `sort` | string | No | Sort direction: asc or desc. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `sn` | string | Yes | Change request serial number. Typically discovered via list_attached_change_requests. |
+| `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_app_release_workflows to discover valid values. |
+| `releaseStageSn` | string | Yes | Release stage serial number. Use list_app_release_stage_briefs to discover valid values. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
+| `sort` | string | No | Sort direction. Valid values: asc, desc. |
 
 ### list_appstack_change_request_work_items
 
-**Description**: List work items for an AppStack change request.
+**Description**: List work items for an AppStack change request. Work items represent linked Projex tasks or requirements.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `sn` | string | Yes | Change request serial number. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `sn` | string | Yes | Change request serial number. Typically discovered via list_attached_change_requests. |
 
 ### list_change_order_versions
 
-**Description**: List AppStack change order versions.
+**Description**: List AppStack change order versions. Change orders track actual deployments and their versions.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -490,30 +490,30 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `envNames` | string | No | Comma-separated environment names. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `envNames` | string | No | Comma-separated environment names. Use list_environments to discover valid environment names for an application. |
 | `creators` | string | No | Comma-separated creator account IDs. |
-| `current` | number | No | Current page number. |
-| `pageSize` | number | No | Page size. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_change_orders_by_origin
 
-**Description**: List AppStack change orders by creation origin.
+**Description**: List AppStack change orders by creation origin. Use this to trace deployments back to their source (e.g., a Flow pipeline).
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `originType` | string | Yes | Origin type, such as FLOW. |
-| `originId` | string | Yes | Origin identifier. |
-| `appName` | string | No | Application name filter. |
-| `envName` | string | No | Environment name filter. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `originType` | string | Yes | Origin type indicating the source system. Valid value: FLOW (Flow pipeline). |
+| `originId` | string | Yes | Origin identifier from the source system. For FLOW origin, use a pipeline run ID or pipeline ID. |
+| `appName` | string | No | Application name filter. Use list_applications to discover valid app names. |
+| `envName` | string | No | Environment name filter. Use list_environments to discover valid environment names for an application. |
 
 ### list_change_order_job_logs
 
-**Description**: List logs for an AppStack change order job.
+**Description**: List logs for an AppStack change order job. Job logs capture deployment script output.
 
 **Pagination**: Offset (current/pageSize)
 
@@ -521,25 +521,25 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `changeOrderSn` | string | Yes | Change order serial number. |
-| `jobSn` | string | Yes | Change order job serial number. |
-| `current` | number | No | Current page number. |
-| `pageSize` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `changeOrderSn` | string | Yes | Change order serial number. Use list_change_order_versions to discover valid values. |
+| `jobSn` | string | Yes | Change order job serial number. Typically returned in change order details. |
+| `current` | number | No | Page number for pagination. Starts at 1. |
+| `pageSize` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### find_task_operation_log
 
-**Description**: Get an AppStack deployment task operation log.
+**Description**: Get an AppStack deployment task operation log. Operation logs record manual or automated actions taken during deployment.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `appName` | string | Yes | Application name. |
-| `changeOrderSn` | string | Yes | Change order serial number. |
-| `jobSn` | string | Yes | Change order job serial number. |
-| `stageSn` | string | Yes | Deployment stage serial number. |
-| `taskSn` | string | Yes | Deployment task serial number. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `changeOrderSn` | string | Yes | Change order serial number. Use list_change_order_versions to discover valid values. |
+| `jobSn` | string | Yes | Change order job serial number. Typically returned in change order details. |
+| `stageSn` | string | Yes | Deployment stage serial number. Typically returned in change order job details. |
+| `taskSn` | string | Yes | Deployment task serial number. Typically returned in change order stage details. |
 

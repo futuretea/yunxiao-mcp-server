@@ -25,28 +25,28 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Tool | Description |
 |------|-------------|
-| `list_audit_logs` | List audit logs in a Yunxiao organization. |
+| `list_audit_logs` | List audit logs in a Yunxiao organization. Use this to track user actions, resource changes, and security events within a time range. |
 | **`get_organization_overview`** | Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call. |
 | **`get_organization_department_overview`** | Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call. |
 | **`get_organization_group_overview`** | Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call. |
 | `list_enterprise_departments` | List enterprise departments visible to the current Yunxiao user. |
-| `list_organization_groups` | List groups in a Yunxiao organization. |
-| `list_organization_group_members` | List members in a Yunxiao organization group. |
+| `list_organization_groups` | List groups in a Yunxiao organization. Groups are permission-bound collections of users and resources. Use list_organization_members to discover users who can be added to groups. |
+| `list_organization_group_members` | List members in a Yunxiao organization group. Use this to check who belongs to a specific group and their roles. |
 | `get_user` | Get a Yunxiao user by ID or username. |
 | `list_app_extension_features` | List app extension feature implementations for a Yunxiao organization. |
-| `get_current_user` | Get the current Yunxiao user for the configured access token. |
-| `get_current_organization_info` | Get current user context, including the last organization returned by Yunxiao. |
-| `get_user_organizations` | Get Yunxiao organizations visible to the current user. |
-| `list_organizations` | List Yunxiao organizations visible to the current user. |
-| `list_organization_departments` | List departments in a Yunxiao organization. |
-| `list_organization_members` | List members in a Yunxiao organization. |
-| `search_organization_members` | Search members in a Yunxiao organization. |
-| `list_organization_roles` | List roles in a Yunxiao organization. |
-| `list_users` | List Yunxiao users. |
+| `get_current_user` | Get the current Yunxiao user profile for the configured access token. Use this to verify authentication and discover the user's identity, account ID, and default organization. |
+| `get_current_organization_info` | Get the current user's default Yunxiao organization context, including organization ID and name. Use this to discover the default organizationId before calling organization-scoped tools. |
+| `get_user_organizations` | Get Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one. |
+| `list_organizations` | List Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one. |
+| `list_organization_departments` | List departments in a Yunxiao organization. Use this to discover department IDs for filtering members or assigning work items. |
+| `list_organization_members` | List members in a Yunxiao organization. Use this to discover user IDs, names, and roles for assigning work items or mentioning in comments. |
+| `search_organization_members` | Search members in a Yunxiao organization with filters. Use this to find specific users by name, department, or role for assignment or review purposes. |
+| `list_organization_roles` | List roles defined in a Yunxiao organization. Use this to discover role IDs for filtering members or checking permissions. |
+| `list_users` | List Yunxiao users across organizations. Use this to discover user IDs and account information for mentions, assignments, or cross-org collaboration. |
 
 ### list_audit_logs
 
-**Description**: List audit logs in a Yunxiao organization.
+**Description**: List audit logs in a Yunxiao organization. Use this to track user actions, resource changes, and security events within a time range.
 
 **Pagination**: Keyset (nextToken)
 
@@ -54,12 +54,12 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `actionTimeStart` | string | Yes | Inclusive RFC3339 action-time lower bound. |
-| `actionTimeEnd` | string | No | RFC3339 action-time upper bound. Defaults to current time when omitted by Yunxiao. |
-| `userIds` | string | No | Comma-separated user IDs. |
-| `apps` | string | No | Comma-separated application identities. |
-| `perPage` | number | No | Page size from 1 to 100. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `actionTimeStart` | string | Yes | Inclusive action-time lower bound. Format: RFC3339 timestamp (e.g., 2024-01-01T00:00:00+08:00). |
+| `actionTimeEnd` | string | No | Action-time upper bound. Format: RFC3339 timestamp (e.g., 2024-01-31T23:59:59+08:00). Defaults to current time when omitted. |
+| `userIds` | string | No | Filter by user IDs. Format: comma-separated numeric user IDs. Use list_users or list_organization_members to discover valid IDs. |
+| `apps` | string | No | Filter by application identities. Format: comma-separated application names or identifiers. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 | `nextToken` | string | No | Pagination token from the previous response x-next-token header. |
 
 ### get_organization_overview
@@ -72,14 +72,14 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 | `includeDepartments` | boolean | No | Whether to include departments list. Defaults to true. |
 | `includeMembers` | boolean | No | Whether to include members list. Defaults to true. |
 | `includeGroups` | boolean | No | Whether to include groups list. Defaults to true. |
 | `includeRoles` | boolean | No | Whether to include roles list. Defaults to true. |
-| `departmentLimit` | number | No | Max departments returned. Defaults to 5. |
-| `memberLimit` | number | No | Max members returned. Defaults to 5. |
-| `groupLimit` | number | No | Max groups returned. Defaults to 5. |
+| `departmentLimit` | number | No | Maximum departments to include in the overview. Defaults to 5. Set to 0 to exclude. |
+| `memberLimit` | number | No | Maximum members to include in the overview. Defaults to 5. Set to 0 to exclude. |
+| `groupLimit` | number | No | Maximum groups to include in the overview. Defaults to 5. Set to 0 to exclude. |
 
 ### get_organization_department_overview
 
@@ -91,8 +91,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `departmentId` | string | Yes | Department ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `departmentId` | string | Yes | Department ID. Use list_organization_departments or list_enterprise_departments to discover valid IDs. |
 | `includeAncestors` | boolean | No | Whether to include the ancestor chain. Defaults to true. |
 
 ### get_organization_group_overview
@@ -105,10 +105,10 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `groupId` | string | Yes | Group ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `groupId` | string | Yes | Group ID. Use list_organization_groups to discover valid group IDs. |
 | `includeMembers` | boolean | No | Whether to include group members. Defaults to true. |
-| `memberLimit` | number | No | Max members returned. Defaults to 5. |
+| `memberLimit` | number | No | Maximum members to include in the overview. Defaults to 5. Set to 0 to exclude. |
 
 ### list_enterprise_departments
 
@@ -120,13 +120,13 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `parentId` | string | No | Parent department ID. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size from 1 to 100. |
+| `parentId` | string | No | Parent department ID. Use list_organization_departments with an empty parentId to discover top-level departments, then drill down by setting this to a discovered department ID. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_organization_groups
 
-**Description**: List groups in a Yunxiao organization.
+**Description**: List groups in a Yunxiao organization. Groups are permission-bound collections of users and resources. Use list_organization_members to discover users who can be added to groups.
 
 **Pagination**: Offset (page/perPage)
 
@@ -134,13 +134,13 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size from 1 to 100. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_organization_group_members
 
-**Description**: List members in a Yunxiao organization group.
+**Description**: List members in a Yunxiao organization group. Use this to check who belongs to a specific group and their roles.
 
 **Pagination**: Offset (page/perPage)
 
@@ -148,10 +148,10 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `groupId` | string | Yes | Group ID. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. Default is 100. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `groupId` | string | Yes | Group ID. Use list_organization_groups to discover valid IDs. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### get_user
 
@@ -161,7 +161,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `idOrUsername` | string | Yes | User ID or login username. |
+| `idOrUsername` | string | Yes | User ID (numeric) or login username. Use list_users to discover valid values. |
 
 ### list_app_extension_features
 
@@ -171,24 +171,24 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `type` | string | Yes | App extension type. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `type` | string | Yes | App extension type identifier. Contact your organization admin for valid type values. |
 
 ### get_current_user
 
-**Description**: Get the current Yunxiao user for the configured access token.
+**Description**: Get the current Yunxiao user profile for the configured access token. Use this to verify authentication and discover the user's identity, account ID, and default organization.
 
 **Parameters**: None
 
 ### get_current_organization_info
 
-**Description**: Get current user context, including the last organization returned by Yunxiao.
+**Description**: Get the current user's default Yunxiao organization context, including organization ID and name. Use this to discover the default organizationId before calling organization-scoped tools.
 
 **Parameters**: None
 
 ### get_user_organizations
 
-**Description**: Get Yunxiao organizations visible to the current user.
+**Description**: Get Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one.
 
 **Pagination**: Offset (page/perPage)
 
@@ -201,7 +201,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### list_organizations
 
-**Description**: List Yunxiao organizations visible to the current user.
+**Description**: List Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one.
 
 **Pagination**: Offset (page/perPage)
 
@@ -214,7 +214,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### list_organization_departments
 
-**Description**: List departments in a Yunxiao organization.
+**Description**: List departments in a Yunxiao organization. Use this to discover department IDs for filtering members or assigning work items.
 
 **Pagination**: Offset (page/perPage)
 
@@ -222,14 +222,14 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `parentId` | string | No | Parent department ID. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size from 1 to 100. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `parentId` | string | No | Parent department ID. Use list_organization_departments with an empty parentId to discover top-level departments, then drill down by setting this to a discovered department ID. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. |
 
 ### list_organization_members
 
-**Description**: List members in a Yunxiao organization.
+**Description**: List members in a Yunxiao organization. Use this to discover user IDs, names, and roles for assigning work items or mentioning in comments.
 
 **Pagination**: Offset (page/perPage)
 
@@ -237,13 +237,13 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size from 1 to 100. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. |
 
 ### search_organization_members
 
-**Description**: Search members in a Yunxiao organization.
+**Description**: Search members in a Yunxiao organization with filters. Use this to find specific users by name, department, or role for assignment or review purposes.
 
 **Pagination**: Keyset (nextToken)
 
@@ -251,29 +251,29 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `deptIds` | array | No | Department IDs. |
-| `query` | string | No | Member search query. |
-| `includeChildren` | boolean | No | Whether to include child departments. |
-| `nextToken` | string | No | Pagination next token. |
-| `roleIds` | array | No | Role IDs. |
-| `statuses` | array | No | Member statuses. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size from 1 to 100. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `deptIds` | array | No | Department IDs to filter by. Use list_organization_departments to discover valid department IDs. |
+| `query` | string | No | Member search query. Matches username, display name, or email. |
+| `includeChildren` | boolean | No | Whether to include members from child departments. Set to true for broader searches across the org tree. |
+| `nextToken` | string | No | Pagination next token from a previous response. |
+| `roleIds` | array | No | Role IDs to filter by. Use list_organization_roles to discover valid role IDs. |
+| `statuses` | array | No | Member statuses to filter by. Common values: enabled, disabled. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. |
 
 ### list_organization_roles
 
-**Description**: List roles in a Yunxiao organization.
+**Description**: List roles defined in a Yunxiao organization. Use this to discover role IDs for filtering members or checking permissions.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 
 ### list_users
 
-**Description**: List Yunxiao users.
+**Description**: List Yunxiao users across organizations. Use this to discover user IDs and account information for mentions, assignments, or cross-org collaboration.
 
 **Pagination**: Offset (page/perPage)
 
@@ -282,8 +282,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `filter` | string | No | Fuzzy filter for username, login, email, or phone. |
-| `status` | string | No | User status: enabled or deleted. |
-| `deptId` | string | No | Department ID. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `status` | string | No | User status filter. Common values: enabled, deleted. |
+| `deptId` | string | No | Department ID. Use list_organization_departments to discover valid IDs. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 

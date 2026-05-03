@@ -1,6 +1,6 @@
 # Projex Tools
 
-This document describes the 36 read-only MCP tools in the projex domain.
+This document describes the 40 read-only MCP tools in the projex domain.
 
 ## Enhanced Tools
 
@@ -8,14 +8,14 @@ These tools combine multiple Yunxiao OpenAPI calls into single, user-centric ope
 
 | Tool | Description |
 |------|-------------|
-| `get_project_overview` | Get a compact Projex project overview with common project-management lists in one read-only call. |
-| `get_project_workitem_summary` | Summarize Projex work items by category for one project with samples and pagination totals. |
-| `get_project_workitem_context` | Get project work item metadata context: types, labels, members, and optional fields/workflow for one type. |
-| `get_sprint_overview` | Get a sprint overview with work item samples and totals by category for one project sprint. |
-| `get_my_project_workitems` | Get work items assigned to or created by a specific user for one project, grouped by category. |
-| `get_project_workitem_board` | Get a Kanban-style board view of work items grouped by status for one project. |
-| `get_project_workitem_detail` | Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. |
-| `get_work_item_type_overview` | Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. |
+| `get_project_overview` | Get a compact Projex project overview with members, sprints, milestones, versions, and labels in one read-only call. This is the best starting point when exploring a new project. |
+| `get_project_workitem_summary` | Summarize Projex work items by category for one project with samples and pagination totals. This is ideal for dashboards and overviews. For detailed searching with complex filters, use search_workitems instead. |
+| `get_project_workitem_context` | Get project work item metadata context: types, labels, members, and optional field/workflow configuration for one type. Use this before creating or updating work items to discover valid IDs for status, priority, labels, and members. |
+| `get_sprint_overview` | Get a sprint overview with work item samples and totals by category for one project sprint. Combines sprint metadata with categorized work item summaries in a single call. |
+| `get_my_project_workitems` | Get work items assigned to or created by a specific user for one project, grouped by category. Useful for workload review and stand-up summaries. |
+| `get_project_workitem_board` | Get a Kanban-style board view of work items grouped by status for one project. Returns work items organized by their current status columns. For flat search results, use search_workitems instead. |
+| `get_project_workitem_detail` | Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. Use this when you need the full picture of one specific work item. |
+| `get_work_item_type_overview` | Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. Use this to understand the schema and lifecycle of a specific work item type. |
 
 ## Pagination
 
@@ -29,80 +29,84 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Tool | Description |
 |------|-------------|
-| `list_current_user_effort_records` | List actual effort records for the current user. |
-| `list_effort_records` | List actual effort records for a Projex work item. |
-| `list_estimated_efforts` | List estimated effort records for a Projex work item. |
-| **`get_project_overview`** | Get a compact Projex project overview with common project-management lists in one read-only call. |
-| **`get_project_workitem_summary`** | Summarize Projex work items by category for one project with samples and pagination totals. |
-| **`get_project_workitem_context`** | Get project work item metadata context: types, labels, members, and optional fields/workflow for one type. |
-| **`get_sprint_overview`** | Get a sprint overview with work item samples and totals by category for one project sprint. |
-| **`get_my_project_workitems`** | Get work items assigned to or created by a specific user for one project, grouped by category. |
-| **`get_project_workitem_board`** | Get a Kanban-style board view of work items grouped by status for one project. |
-| **`get_project_workitem_detail`** | Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. |
-| **`get_work_item_type_overview`** | Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. |
-| `get_project_risk_dashboard` | Get a read-only project risk dashboard with category samples, overdue work items, and optional high-priority/stale sections. |
-| `get_project_member_task_status` | Get per-member task status for one project with assigned, overdue, and optional status-group sections. |
-| `list_milestones` | List milestones in a Projex project. |
-| `list_testcase_repositories` | List Projex testcase repositories in a Yunxiao organization. |
-| `list_directories` | List testcase directories in a Projex testcase repository. |
-| `search_testcases` | Search Projex testcases in one testcase repository. |
-| `list_test_plans` | List Projex test plans in a Yunxiao organization. |
-| `get_test_result_list` | Get testcase result summaries in a Projex test plan directory. |
-| `list_project_members` | List members in a Projex project. |
-| `list_project_templates` | List Projex project templates in a Yunxiao organization. |
-| `list_project_program` | List Projex projects bound to a project program. |
-| `list_project_roles` | List roles in a Projex project. |
-| `list_all_project_roles` | List all Projex project roles in a Yunxiao organization. |
-| `search_projects` | Search Projex projects in a Yunxiao organization. |
-| `list_sprints` | List Projex sprints in a project. |
-| `search_workitems` | Search work items in one Projex project space. |
-| `list_work_item_comments` | List comments for a Projex work item. |
-| `list_all_work_item_types` | List all work item types in a Yunxiao organization. |
-| `list_work_item_types` | List work item types in one Projex project. |
-| `list_work_item_relation_work_item_types` | List work item types that can be related to a Projex work item type. |
-| `list_versions` | List versions in a Projex project. |
-| `list_workitem_activities` | List activity events for a Projex work item. |
-| `list_workitem_attachments` | List attachments for a Projex work item. |
-| `list_workitem_relation_records` | List relation records for a Projex work item. |
-| `list_labels` | List labels in a Projex project. |
+| `list_current_user_effort_records` | List actual effort (time tracking) records for the current user within a date range. |
+| `list_effort_records` | List actual effort (time tracking) records logged against a specific work item. |
+| `list_estimated_efforts` | List estimated effort records for a specific work item. |
+| **`get_project_overview`** | Get a compact Projex project overview with members, sprints, milestones, versions, and labels in one read-only call. This is the best starting point when exploring a new project. |
+| **`get_project_workitem_summary`** | Summarize Projex work items by category for one project with samples and pagination totals. This is ideal for dashboards and overviews. For detailed searching with complex filters, use search_workitems instead. |
+| **`get_project_workitem_context`** | Get project work item metadata context: types, labels, members, and optional field/workflow configuration for one type. Use this before creating or updating work items to discover valid IDs for status, priority, labels, and members. |
+| **`get_sprint_overview`** | Get a sprint overview with work item samples and totals by category for one project sprint. Combines sprint metadata with categorized work item summaries in a single call. |
+| **`get_my_project_workitems`** | Get work items assigned to or created by a specific user for one project, grouped by category. Useful for workload review and stand-up summaries. |
+| **`get_project_workitem_board`** | Get a Kanban-style board view of work items grouped by status for one project. Returns work items organized by their current status columns. For flat search results, use search_workitems instead. |
+| **`get_project_workitem_detail`** | Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. Use this when you need the full picture of one specific work item. |
+| **`get_work_item_type_overview`** | Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. Use this to understand the schema and lifecycle of a specific work item type. |
+| `get_project_risk_dashboard` | Get a read-only project risk dashboard with category samples, overdue work items, and optional high-priority/stale sections. Best used for project health checks and sprint retrospectives. |
+| `get_project_member_task_status` | Get per-member task status for one project with assigned, overdue, and optional status-group sections. Useful for workload balancing and identifying blocked team members. |
+| `list_milestones` | List milestones (planning checkpoints) in a Projex project. Milestones track progress against goals, distinct from sprints (time-boxed iterations) and versions (releases). |
+| `list_testcase_repositories` | List Projex testcase repositories in a Yunxiao organization. A testcase repository is a container for organizing test cases. |
+| `list_directories` | List directories (folders) within a Projex testcase repository. |
+| `search_testcases` | Search test cases within a single Projex testcase repository. |
+| `list_test_plans` | List test plans in a Yunxiao organization. A test plan groups test cases for execution tracking. |
+| `get_test_result_list` | Get test execution result summaries for a specific directory within a test plan. |
+| `list_project_members` | List members in a Projex project. Use this to discover user IDs for filtering work items or assigning tasks. |
+| `list_project_templates` | List Projex project templates in a Yunxiao organization. Useful when setting up new projects. |
+| `list_project_program` | List Projex projects bound to a project program (project group). |
+| `list_project_roles` | List roles defined in a specific Projex project. |
+| `list_all_project_roles` | List all Projex project roles across a Yunxiao organization. |
+| `search_projects` | Search Projex projects in a Yunxiao organization. Use this to discover available projects and obtain their project IDs before calling other project-scoped tools. |
+| `list_sprints` | List sprints (iterations) in a Projex project. Sprints are time-boxed development cycles. Use this when you need iteration-level planning data. For a broader view that also includes milestones and versions, use get_project_overview instead. |
+| `search_workitems` | Search work items in a single Projex project with flexible filtering and pagination. This is the primary tool for finding work items when you know the project. For a high-level summary across categories without detailed filtering, use get_project_workitem_summary. For a Kanban board view grouped by status, use get_project_workitem_board. |
+| `list_work_item_comments` | List comments for a single Projex work item. For a comprehensive view that includes comments along with activities, attachments, and relations, use get_project_workitem_detail instead. |
+| `list_all_work_item_types` | List all work item types across a Yunxiao organization. This returns organization-level type definitions. For project-scoped types (including custom fields), use list_work_item_types instead. |
+| `list_work_item_types` | List work item types available in a specific Projex project. Use this before creating a work item to discover valid workitemTypeId values and categories for the target project. |
+| `list_work_item_relation_work_item_types` | List work item types that can be related to a given work item type. Use this when setting up work item relationships to discover which types are valid for the chosen relationType. |
+| `list_versions` | List versions (releases) in a Projex project. Versions represent release milestones, distinct from sprints (iterations) and milestones (planning checkpoints). |
+| `list_workitem_activities` | List activity events (history log) for a single Projex work item. For a comprehensive view including comments and attachments, use get_project_workitem_detail instead. |
+| `list_workitem_attachments` | List file attachments for a Projex work item. Use search_workitems to discover work item IDs. |
+| `list_workitem_relation_records` | List relation records (parent, subtask, dependency links) for a Projex work item. Use search_workitems to discover work item IDs. |
+| `list_labels` | List labels in a Projex project. Labels are used to categorize and filter work items. Use search_projects to discover project IDs. |
+| `create_workitem` | Create a new work item in a Projex project. Before calling this, use list_work_item_types to discover the correct category and workitemTypeId for the target project. |
+| `update_workitem` | Update an existing work item's fields. Only provided fields will be changed; omitted fields retain their current values. Use search_workitems to find the workitemId if unknown. |
+| `update_workitem_status` | Change the status of a work item. Use get_project_workitem_context to discover valid statusId values for the work item type before updating. |
+| `add_workitem_comment` | Add a comment to a work item. Use search_workitems to find the workitemId if unknown. |
 
 ### list_current_user_effort_records
 
-**Description**: List actual effort records for the current user.
+**Description**: List actual effort (time tracking) records for the current user within a date range.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `startDate` | string | Yes | Start date in yyyy-MM-dd format. |
-| `endDate` | string | Yes | End date in yyyy-MM-dd format. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `startDate` | string | Yes | Start date in YYYY-MM-DD format (e.g., 2024-01-01). |
+| `endDate` | string | Yes | End date in YYYY-MM-DD format (e.g., 2024-01-31). |
 
 ### list_effort_records
 
-**Description**: List actual effort records for a Projex work item.
+**Description**: List actual effort (time tracking) records logged against a specific work item.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID (numeric string). Find it via search_workitems. |
 
 ### list_estimated_efforts
 
-**Description**: List estimated effort records for a Projex work item.
+**Description**: List estimated effort records for a specific work item.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID (numeric string). Find it via search_workitems. |
 
 ### get_project_overview
 
-**Description**: Get a compact Projex project overview with common project-management lists in one read-only call.
+**Description**: Get a compact Projex project overview with members, sprints, milestones, versions, and labels in one read-only call. This is the best starting point when exploring a new project.
 
 **Type**: Enhanced aggregation tool
 
@@ -112,8 +116,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
 | `includeMembers` | boolean | No | Whether to include project members. Defaults to true. |
 | `includeSprints` | boolean | No | Whether to include sprints. Defaults to true. |
 | `includeMilestones` | boolean | No | Whether to include milestones. Defaults to true. |
@@ -126,7 +130,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_project_workitem_summary
 
-**Description**: Summarize Projex work items by category for one project with samples and pagination totals.
+**Description**: Summarize Projex work items by category for one project with samples and pagination totals. This is ideal for dashboards and overviews. For detailed searching with complex filters, use search_workitems instead.
 
 **Type**: Enhanced aggregation tool
 
@@ -134,8 +138,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
 | `categories` | string | No | Comma-separated work item categories. Defaults to Req,Task,Bug,Risk. |
 | `subject` | string | No | Subject contains filter applied to every category. |
 | `status` | string | No | Comma-separated status IDs applied to every category. |
@@ -149,7 +153,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_project_workitem_context
 
-**Description**: Get project work item metadata context: types, labels, members, and optional fields/workflow for one type.
+**Description**: Get project work item metadata context: types, labels, members, and optional field/workflow configuration for one type. Use this before creating or updating work items to discover valid IDs for status, priority, labels, and members.
 
 **Type**: Enhanced aggregation tool
 
@@ -159,10 +163,10 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
 | `category` | string | Yes | Work item category, such as Req, Task, Bug, or Risk. |
-| `workItemTypeId` | string | No | Optional work item type ID for field and workflow metadata. |
+| `workItemTypeId` | string | No | Optional work item type ID (numeric string) for field and workflow metadata. Use list_work_item_types to find available types. |
 | `includeMembers` | boolean | No | Whether to include project members. Defaults to true. |
 | `includeLabels` | boolean | No | Whether to include project labels. Defaults to true. |
 | `includeFields` | boolean | No | Whether to include field configuration when workItemTypeId is set. Defaults to true. |
@@ -172,7 +176,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_sprint_overview
 
-**Description**: Get a sprint overview with work item samples and totals by category for one project sprint.
+**Description**: Get a sprint overview with work item samples and totals by category for one project sprint. Combines sprint metadata with categorized work item summaries in a single call.
 
 **Type**: Enhanced aggregation tool
 
@@ -180,9 +184,9 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `sprintId` | string | Yes | Sprint ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
+| `sprintId` | string | Yes | Sprint ID (string). Use list_sprints to discover sprint IDs in the project. |
 | `categories` | string | No | Comma-separated work item categories. Defaults to Task,Bug. |
 | `subject` | string | No | Subject contains filter applied to every category. |
 | `status` | string | No | Comma-separated status IDs applied to every category. |
@@ -192,7 +196,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_my_project_workitems
 
-**Description**: Get work items assigned to or created by a specific user for one project, grouped by category.
+**Description**: Get work items assigned to or created by a specific user for one project, grouped by category. Useful for workload review and stand-up summaries.
 
 **Type**: Enhanced aggregation tool
 
@@ -200,9 +204,9 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `userId` | string | Yes | User ID to filter work items by. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
+| `userId` | string | Yes | User ID (string) to filter work items by. Use list_project_members to find user IDs in the project. |
 | `relation` | string | No | Filter relation: assigned or created. Defaults to assigned. |
 | `categories` | string | No | Comma-separated work item categories. Defaults to Task,Bug. |
 | `status` | string | No | Comma-separated status IDs applied to every category. |
@@ -210,7 +214,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_project_workitem_board
 
-**Description**: Get a Kanban-style board view of work items grouped by status for one project.
+**Description**: Get a Kanban-style board view of work items grouped by status for one project. Returns work items organized by their current status columns. For flat search results, use search_workitems instead.
 
 **Type**: Enhanced aggregation tool
 
@@ -218,8 +222,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
 | `category` | string | Yes | Work item category, such as Task or Bug. |
 | `sprint` | string | No | Optional sprint ID to filter work items. |
 | `subject` | string | No | Subject contains filter applied to the search. |
@@ -230,7 +234,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_project_workitem_detail
 
-**Description**: Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call.
+**Description**: Get comprehensive details for a single work item including basic info, activities, attachments, comments, and relation records in one read-only call. Use this when you need the full picture of one specific work item.
 
 **Type**: Enhanced aggregation tool
 
@@ -240,8 +244,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID (numeric string). Find it via search_workitems or get_project_workitem_summary. |
 | `includeActivities` | boolean | No | Whether to include activity history. Defaults to true. |
 | `includeRelations` | boolean | No | Whether to include relation records. Defaults to true. |
 | `relationTypes` | string | No | Comma-separated relation types for relation records. Defaults to ASSOCIATED,SUB. |
@@ -252,7 +256,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_work_item_type_overview
 
-**Description**: Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call.
+**Description**: Get a comprehensive overview of a Projex work item type including basic info, field configuration, and workflow in one read-only call. Use this to understand the schema and lifecycle of a specific work item type.
 
 **Type**: Enhanced aggregation tool
 
@@ -260,22 +264,22 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `workItemTypeId` | string | Yes | Work item type ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
+| `workItemTypeId` | string | Yes | Work item type ID (numeric string). Use list_work_item_types to find available types. |
 | `includeFieldConfig` | boolean | No | Whether to include field configuration. Defaults to true. |
 | `includeWorkflow` | boolean | No | Whether to include workflow metadata. Defaults to true. |
 
 ### get_project_risk_dashboard
 
-**Description**: Get a read-only project risk dashboard with category samples, overdue work items, and optional high-priority/stale sections.
+**Description**: Get a read-only project risk dashboard with category samples, overdue work items, and optional high-priority/stale sections. Best used for project health checks and sprint retrospectives.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
 | `categories` | string | No | Comma-separated categories for category totals. Defaults to Risk,Bug,Task. |
 | `subject` | string | No | Subject contains filter applied to every section. |
 | `status` | string | No | Comma-separated active status IDs applied to every section. |
@@ -292,14 +296,14 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### get_project_member_task_status
 
-**Description**: Get per-member task status for one project with assigned, overdue, and optional status-group sections.
+**Description**: Get per-member task status for one project with assigned, overdue, and optional status-group sections. Useful for workload balancing and identifying blocked team members.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
 | `assigneeIds` | string | No | Comma-separated assignee user IDs. Defaults to project members up to memberLimit. |
 | `categories` | string | No | Comma-separated work item categories. Defaults to Task,Bug. |
 | `subject` | string | No | Subject contains filter applied to every section. |
@@ -317,7 +321,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### list_milestones
 
-**Description**: List milestones in a Projex project.
+**Description**: List milestones (planning checkpoints) in a Projex project. Milestones track progress against goals, distinct from sprints (time-boxed iterations) and versions (releases).
 
 **Pagination**: Offset (page/perPage)
 
@@ -325,15 +329,15 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `status` | string | No | Comma-separated milestone statuses. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
+| `status` | string | No | Comma-separated milestone status IDs. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_testcase_repositories
 
-**Description**: List Projex testcase repositories in a Yunxiao organization.
+**Description**: List Projex testcase repositories in a Yunxiao organization. A testcase repository is a container for organizing test cases.
 
 **Pagination**: Offset (page/perPage)
 
@@ -341,24 +345,24 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_directories
 
-**Description**: List testcase directories in a Projex testcase repository.
+**Description**: List directories (folders) within a Projex testcase repository.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `testRepoId` | string | Yes | Testcase repository ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `testRepoId` | string | Yes | Testcase repository ID (string). Use list_testcase_repositories to discover available repositories. |
 
 ### search_testcases
 
-**Description**: Search Projex testcases in one testcase repository.
+**Description**: Search test cases within a single Projex testcase repository.
 
 **Pagination**: Offset (page/perPage)
 
@@ -366,96 +370,96 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `testRepoId` | string | Yes | Testcase repository ID. |
-| `directoryId` | string | No | Directory ID filter. |
-| `subject` | string | No | Testcase subject contains filter. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `testRepoId` | string | Yes | Testcase repository ID (string). Use list_testcase_repositories to discover available repositories. |
+| `directoryId` | string | No | Directory ID (string) to filter by. Use list_directories to discover directory IDs. |
+| `subject` | string | No | Filter by testcase subject/title (contains match). |
 | `conditions` | string | No | Advanced conditions JSON string. Overrides simple filters. |
 | `orderBy` | string | No | Sort field: gmtCreate or name. |
 | `sort` | string | No | Sort direction: asc or desc. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_test_plans
 
-**Description**: List Projex test plans in a Yunxiao organization.
+**Description**: List test plans in a Yunxiao organization. A test plan groups test cases for execution tracking.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 
 ### get_test_result_list
 
-**Description**: Get testcase result summaries in a Projex test plan directory.
+**Description**: Get test execution result summaries for a specific directory within a test plan.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 | `testPlanIdentifier` | string | Yes | Test plan ID. |
 | `directoryIdentifier` | string | Yes | Test plan directory ID. |
 
 ### list_project_members
 
-**Description**: List members in a Projex project.
+**Description**: List members in a Projex project. Use this to discover user IDs for filtering work items or assigning tasks.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `name` | string | No | Member name filter. |
-| `roleId` | string | No | Project role ID filter, such as project.admin. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
+| `name` | string | No | Filter by member name (contains match). |
+| `roleId` | string | No | Filter by project role ID, such as project.admin. Use list_project_roles to discover available roles. |
 
 ### list_project_templates
 
-**Description**: List Projex project templates in a Yunxiao organization.
+**Description**: List Projex project templates in a Yunxiao organization. Useful when setting up new projects.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 
 ### list_project_program
 
-**Description**: List Projex projects bound to a project program.
+**Description**: List Projex projects bound to a project program (project group).
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `programIdentifier` | string | Yes | Project program identifier. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `programIdentifier` | string | Yes | Project program identifier (string). |
 
 ### list_project_roles
 
-**Description**: List roles in a Projex project.
+**Description**: List roles defined in a specific Projex project.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
 
 ### list_all_project_roles
 
-**Description**: List all Projex project roles in a Yunxiao organization.
+**Description**: List all Projex project roles across a Yunxiao organization.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 
 ### search_projects
 
-**Description**: Search Projex projects in a Yunxiao organization.
+**Description**: Search Projex projects in a Yunxiao organization. Use this to discover available projects and obtain their project IDs before calling other project-scoped tools.
 
 **Pagination**: Offset (page/perPage)
 
@@ -463,20 +467,20 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `name` | string | No | Project name contains filter. |
-| `status` | string | No | Comma-separated project status IDs. |
-| `creator` | string | No | Comma-separated creator user IDs. |
-| `conditions` | string | No | Advanced conditions JSON string. Overrides simple filters. |
-| `extraConditions` | string | No | Extra conditions JSON string. |
-| `orderBy` | string | No | Sort field, such as gmtCreate or name. |
-| `sort` | string | No | Sort direction: asc or desc. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `name` | string | No | Filter by project name (contains match). |
+| `status` | string | No | Comma-separated project status IDs. Use without filters to list all projects and inspect their statuses. |
+| `creator` | string | No | Comma-separated creator user IDs. Use list_project_members to find user IDs in the project. |
+| `conditions` | string | No | Advanced filter conditions as a JSON string. Overrides simple filters when provided. |
+| `extraConditions` | string | No | Extra filter conditions as a JSON string, combined with conditions. |
+| `orderBy` | string | No | Sort field, such as gmtCreate (creation time) or name. |
+| `sort` | string | No | Sort direction: asc (ascending) or desc (descending). |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Most endpoints default to 20. |
 
 ### list_sprints
 
-**Description**: List Projex sprints in a project.
+**Description**: List sprints (iterations) in a Projex project. Sprints are time-boxed development cycles. Use this when you need iteration-level planning data. For a broader view that also includes milestones and versions, use get_project_overview instead.
 
 **Pagination**: Offset (page/perPage)
 
@@ -484,16 +488,16 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `status` | string | No | Comma-separated sprint statuses: TODO, DOING, ARCHIVED. |
-| `name` | string | No | Sprint name filter. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID (string). Use search_projects if you do not know the project ID. |
+| `status` | string | No | Comma-separated sprint statuses. Common values: TODO (not started), DOING (active), ARCHIVED (closed). |
+| `name` | string | No | Filter by sprint name (contains match). |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Most endpoints default to 20. |
 
 ### search_workitems
 
-**Description**: Search work items in one Projex project space.
+**Description**: Search work items in a single Projex project with flexible filtering and pagination. This is the primary tool for finding work items when you know the project. For a high-level summary across categories without detailed filtering, use get_project_workitem_summary. For a Kanban board view grouped by status, use get_project_workitem_board.
 
 **Pagination**: Offset (page/perPage)
 
@@ -501,36 +505,36 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `category` | string | Yes | Work item category, such as Req, Task, Bug, or Risk. |
-| `projectId` | string | Yes | Project ID. This API searches one project at a time. |
-| `subject` | string | No | Subject contains filter. |
-| `status` | string | No | Comma-separated status IDs. |
-| `assignedTo` | string | No | Comma-separated assignee user IDs. |
-| `creator` | string | No | Comma-separated creator user IDs. |
-| `tag` | string | No | Comma-separated tag IDs. |
-| `sprint` | string | No | Comma-separated sprint IDs. |
-| `workitemType` | string | No | Comma-separated work item type IDs. |
-| `statusStage` | string | No | Comma-separated status stage IDs. |
-| `priority` | string | No | Comma-separated priority IDs. |
-| `subjectDescription` | string | No | Subject or description contains filter. |
-| `createdAfter` | string | No | Created date lower bound, YYYY-MM-DD or datetime. |
-| `createdBefore` | string | No | Created date upper bound, YYYY-MM-DD or datetime. |
-| `updatedAfter` | string | No | Updated date lower bound, YYYY-MM-DD or datetime. |
-| `updatedBefore` | string | No | Updated date upper bound, YYYY-MM-DD or datetime. |
-| `finishTimeAfter` | string | No | Planned finish date lower bound, YYYY-MM-DD or datetime. |
-| `finishTimeBefore` | string | No | Planned finish date upper bound, YYYY-MM-DD or datetime. |
-| `updateStatusAtAfter` | string | No | Status update date lower bound, YYYY-MM-DD or datetime. |
-| `updateStatusAtBefore` | string | No | Status update date upper bound, YYYY-MM-DD or datetime. |
-| `conditions` | string | No | Advanced conditions JSON string. Overrides simple filters. |
-| `orderBy` | string | No | Sort field. Defaults are controlled by Yunxiao. |
-| `sort` | string | No | Sort direction: asc or desc. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `category` | string | Yes | Work item category. Common values: Req (需求/Requirement), Task (任务), Bug (缺陷), Risk (风险). Use list_work_item_types to discover available categories for a project. |
+| `projectId` | string | Yes | Project ID (string). This API searches one project at a time. Use search_projects to find the project ID. |
+| `subject` | string | No | Filter by work item subject/title (contains match). |
+| `status` | string | No | Comma-separated status IDs. Use get_project_workitem_context to discover valid status IDs for the target category. |
+| `assignedTo` | string | No | Comma-separated assignee user IDs. Use list_project_members to find user IDs in the project. |
+| `creator` | string | No | Comma-separated creator user IDs. Use list_project_members to find user IDs in the project. |
+| `tag` | string | No | Comma-separated tag IDs. Use get_project_workitem_context to discover available tags. |
+| `sprint` | string | No | Comma-separated sprint IDs. Use list_sprints to discover sprint IDs in the project. |
+| `workitemType` | string | No | Comma-separated work item type IDs. Use list_work_item_types to discover available types. |
+| `statusStage` | string | No | Comma-separated status stage IDs (higher-level status grouping). Use get_project_workitem_context to discover valid stages. |
+| `priority` | string | No | Comma-separated priority IDs. Use get_project_workitem_context to discover available priorities. |
+| `subjectDescription` | string | No | Filter by subject or description content (contains match). |
+| `createdAfter` | string | No | Created date lower bound. Accepts YYYY-MM-DD (e.g., 2024-01-01) or ISO datetime. |
+| `createdBefore` | string | No | Created date upper bound. Accepts YYYY-MM-DD or ISO datetime. |
+| `updatedAfter` | string | No | Updated date lower bound. Accepts YYYY-MM-DD or ISO datetime. |
+| `updatedBefore` | string | No | Updated date upper bound. Accepts YYYY-MM-DD or ISO datetime. |
+| `finishTimeAfter` | string | No | Planned finish date lower bound. Accepts YYYY-MM-DD or ISO datetime. |
+| `finishTimeBefore` | string | No | Planned finish date upper bound. Accepts YYYY-MM-DD or ISO datetime. |
+| `updateStatusAtAfter` | string | No | Status update date lower bound. Accepts YYYY-MM-DD or ISO datetime. |
+| `updateStatusAtBefore` | string | No | Status update date upper bound. Accepts YYYY-MM-DD or ISO datetime. |
+| `conditions` | string | No | Advanced filter conditions as a JSON string. Overrides simple filters when provided. |
+| `orderBy` | string | No | Sort field. Defaults are controlled by Yunxiao. Common values: gmtCreate, gmtModified, priority, serialNumber. |
+| `sort` | string | No | Sort direction: asc (ascending) or desc (descending). |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Most endpoints default to 20. |
 
 ### list_work_item_comments
 
-**Description**: List comments for a Projex work item.
+**Description**: List comments for a single Projex work item. For a comprehensive view that includes comments along with activities, attachments, and relations, use get_project_workitem_detail instead.
 
 **Pagination**: Offset (page/perPage)
 
@@ -538,49 +542,49 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workItemId` | string | Yes | Work item ID. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID (numeric string). Find it via search_workitems or get_project_workitem_summary. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Most endpoints default to 20. |
 
 ### list_all_work_item_types
 
-**Description**: List all work item types in a Yunxiao organization.
+**Description**: List all work item types across a Yunxiao organization. This returns organization-level type definitions. For project-scoped types (including custom fields), use list_work_item_types instead.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `categories` | string | No | Optional work item type categories, such as Req, Bug, or Task. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `categories` | string | No | Comma-separated work item type categories to filter by. Common values: Req, Bug, Task, Risk. |
 
 ### list_work_item_types
 
-**Description**: List work item types in one Projex project.
+**Description**: List work item types available in a specific Projex project. Use this before creating a work item to discover valid workitemTypeId values and categories for the target project.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `category` | string | Yes | Work item category, such as Req, Bug, or Task. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID (string). Use search_projects if you do not know the project ID. |
+| `category` | string | Yes | Work item category to filter by. Common values: Req, Bug, Task, Risk. Use list_all_work_item_types to see available categories. |
 
 ### list_work_item_relation_work_item_types
 
-**Description**: List work item types that can be related to a Projex work item type.
+**Description**: List work item types that can be related to a given work item type. Use this when setting up work item relationships to discover which types are valid for the chosen relationType.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workItemTypeId` | string | Yes | Work item type ID. |
-| `relationType` | string | No | Relation type: PARENT, SUB, ASSOCIATED, DEPEND_ON, or DEPENDED_BY. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workItemTypeId` | string | Yes | Work item type ID (numeric string). Use list_work_item_types to find available types. |
+| `relationType` | string | No | Relation type filter. Valid values: PARENT, SUB, ASSOCIATED, DEPEND_ON, DEPENDED_BY. Omit to list all compatible types. |
 
 ### list_versions
 
-**Description**: List versions in a Projex project.
+**Description**: List versions (releases) in a Projex project. Versions represent release milestones, distinct from sprints (iterations) and milestones (planning checkpoints).
 
 **Pagination**: Offset (page/perPage)
 
@@ -588,50 +592,50 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `status` | string | No | Comma-separated version statuses: TODO, DOING, ARCHIVED. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
+| `status` | string | No | Comma-separated version statuses. Common values: TODO, DOING, ARCHIVED. |
 | `name` | string | No | Version name filter. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 
 ### list_workitem_activities
 
-**Description**: List activity events for a Projex work item.
+**Description**: List activity events (history log) for a single Projex work item. For a comprehensive view including comments and attachments, use get_project_workitem_detail instead.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID. Use search_workitems to discover valid IDs. |
 
 ### list_workitem_attachments
 
-**Description**: List attachments for a Projex work item.
+**Description**: List file attachments for a Projex work item. Use search_workitems to discover work item IDs.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID. Use search_workitems to discover valid IDs. |
 
 ### list_workitem_relation_records
 
-**Description**: List relation records for a Projex work item.
+**Description**: List relation records (parent, subtask, dependency links) for a Projex work item. Use search_workitems to discover work item IDs.
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `workitemId` | string | Yes | Work item ID. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID. Use search_workitems to discover valid IDs. |
 | `relationType` | string | Yes | Relation type: PARENT, SUB, ASSOCIATED, DEPEND_ON, or DEPENDED_BY. |
 
 ### list_labels
 
-**Description**: List labels in a Projex project.
+**Description**: List labels in a Projex project. Labels are used to categorize and filter work items. Use search_projects to discover project IDs.
 
 **Pagination**: Offset (page/perPage)
 
@@ -639,8 +643,70 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
-| `projectId` | string | Yes | Project ID. |
-| `page` | number | No | Page number. |
-| `perPage` | number | No | Page size. |
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID. Use search_projects to discover valid IDs. |
+| `page` | number | No | Page number for pagination. Starts at 1. |
+| `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+
+### create_workitem
+
+**Description**: Create a new work item in a Projex project. Before calling this, use list_work_item_types to discover the correct category and workitemTypeId for the target project.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `projectId` | string | Yes | Project ID where the work item will be created. |
+| `category` | string | Yes | Work item category. Common values: Req, Task, Bug, Risk. Use list_work_item_types to discover valid categories for the project. |
+| `workitemTypeId` | string | Yes | Work item type ID (numeric string). Use list_work_item_types to find available types for the project. |
+| `subject` | string | Yes | Work item title/subject. |
+| `description` | string | No | Work item description. |
+| `assignedTo` | string | No | Assignee user ID (string). Use list_project_members or get_project_workitem_context to discover valid user IDs. |
+| `priority` | string | No | Priority ID (string). Use get_project_workitem_context to discover available priorities for the work item type. |
+| `parentId` | string | No | Parent work item ID (numeric string) for creating sub-items. Use search_workitems to find the parent ID. |
+| `sprint` | string | No | Sprint ID (string) to associate the work item with. Use list_sprints to discover active sprints. |
+| `labels` | array | No | Label IDs to attach to the work item. |
+
+### update_workitem
+
+**Description**: Update an existing work item's fields. Only provided fields will be changed; omitted fields retain their current values. Use search_workitems to find the workitemId if unknown.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID to update. |
+| `subject` | string | No | New title/subject. |
+| `description` | string | No | New description. |
+| `assignedTo` | string | No | New assignee user ID. |
+| `priority` | string | No | New priority ID. |
+| `sprint` | string | No | New sprint ID. |
+| `labels` | array | No | New label IDs (replaces existing labels). |
+
+### update_workitem_status
+
+**Description**: Change the status of a work item. Use get_project_workitem_context to discover valid statusId values for the work item type before updating.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID (numeric string). Find it via search_workitems or get_project_workitem_summary. |
+| `statusId` | string | Yes | Target status ID (string). Use get_project_workitem_context to discover valid status IDs for the work item type. |
+| `comment` | string | No | Optional comment explaining the status change. |
+
+### add_workitem_comment
+
+**Description**: Add a comment to a work item. Use search_workitems to find the workitemId if unknown.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `workitemId` | string | Yes | Work item ID (numeric string). Find it via search_workitems or get_project_workitem_summary. |
+| `content` | string | Yes | Comment content (plain text or rich text format supported by Yunxiao). |
 
