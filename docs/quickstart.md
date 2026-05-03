@@ -109,6 +109,22 @@ This guide provides common MCP conversation patterns for AI assistants using the
 1. `get_repository_overview` — repository info, branches, recent commits, and open merge requests in one call.
 2. If deeper commit history is needed: `list_commits` with a larger `perPage`.
 
+## Pattern: Check Pipeline Status
+
+**User asks**: "How is pipeline X doing?"
+
+**Recommended flow**:
+1. `get_pipeline_overview` — pipeline info, latest run, and recent run history in one call.
+2. If specific job logs are needed: `get_pipeline_job_run_log` with the job run ID from the latest run.
+
+**Example**:
+```json
+{
+  "pipelineId": "pipeline-1",
+  "runLimit": 5
+}
+```
+
 ## Pattern: Check Recent Deployments
 
 **User asks**: "What was the last deployment for application Z?"

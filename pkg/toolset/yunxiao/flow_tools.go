@@ -7,12 +7,13 @@ import (
 )
 
 func flowTools() []toolset.ServerTool {
-	tools := make([]toolset.ServerTool, 0, 14)
+	tools := make([]toolset.ServerTool, 0, 15)
 	tools = append(tools, flowPipelineTools()...)
 	tools = append(tools, flowPipelineRunTools()...)
 	tools = append(tools, flowPipelineJobTools()...)
 	tools = append(tools, flowArtifactRelationTools()...)
 	tools = append(tools, flowResourceMemberTools()...)
+	tools = append(tools, flowEnhancedTools()...)
 	return tools
 }
 

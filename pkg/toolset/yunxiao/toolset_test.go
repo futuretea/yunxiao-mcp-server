@@ -126,6 +126,7 @@ func expectedFlowToolNames() []string {
 		"list_pipeline_relations",
 		"get_last_instance",
 		"list_resource_members",
+		"get_pipeline_overview",
 	}
 }
 

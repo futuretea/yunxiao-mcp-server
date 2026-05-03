@@ -1,6 +1,6 @@
 # Flow Tools
 
-This document describes the 14 read-only MCP tools in the flow domain.
+This document describes the 15 read-only MCP tools in the flow domain.
 
 ## Pagination
 
@@ -17,6 +17,7 @@ Tools in this domain use the following pagination scheme(s):
 | `get_pipeline_emas_artifact_url` | Get a temporary download URL for a Flow EMAS artifact. |
 | `list_pipeline_relations` | List Flow pipeline related objects. |
 | `get_last_instance` | Get the latest Flow pipeline run instance detail. |
+| `get_pipeline_overview` | Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call. |
 | `list_resource_members` | List members for a Flow resource such as a pipeline or host group. |
 | `list_pipelines` | List Flow pipelines in a Yunxiao organization. |
 | `get_pipeline` | Get Flow pipeline details. |
@@ -87,6 +88,19 @@ Tools in this domain use the following pagination scheme(s):
 |------|------|----------|-------------|
 | `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
 | `pipelineId` | string | Yes | Pipeline ID. |
+
+### get_pipeline_overview
+
+**Description**: Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call.
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. Defaults to the user's sole organization when omitted. |
+| `pipelineId` | string | Yes | Pipeline ID. |
+| `includeRuns` | boolean | No | Whether to include recent run history. Defaults to true. |
+| `runLimit` | number | No | Max recent runs returned. Defaults to 5. |
 
 ### list_resource_members
 
