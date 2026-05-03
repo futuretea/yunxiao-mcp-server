@@ -7,6 +7,8 @@ This document describes the enhanced aggregation tools in the Codeup (source cod
 | Tool | Purpose | API Calls |
 |------|---------|-----------|
 | `get_repository_overview` | Repository dashboard with branches, recent commits, and merge requests | 1 + up to 3 |
+| `get_change_request_overview` | Change request snapshot with patch sets and comments | 1 + up to 2 |
+| `get_commit_overview` | Commit snapshot with details, commit statuses, and check runs | 1 + up to 2 |
 
 ## Common Behaviors
 
@@ -67,3 +69,28 @@ When `refName` is omitted and `includeCommits` is true, the tool attempts to rea
 ```
 
 **Note**: Comments are fetched via POST with `comment_type` set to `GLOBAL_COMMENT`. Merge requests are filtered to the specified repository using the `repositoryIds` query parameter.
+
+### get_commit_overview
+
+**When to use**: You want a quick snapshot of a commit — its details plus CI statuses and check runs.
+
+**Parameters**:
+- `organizationId`, `repositoryId`, `sha`: required
+- `includeStatuses`: toggle commit statuses list, default true
+- `includeCheckRuns`: toggle check runs list, default true
+- `statusLimit`: max commit statuses returned, default 5
+- `checkRunLimit`: max check runs returned, default 5
+
+**Example**:
+```json
+{
+  "repositoryId": "org/repo",
+  "sha": "abc123def456",
+  "includeStatuses": true,
+  "includeCheckRuns": true,
+  "statusLimit": 5,
+  "checkRunLimit": 5
+}
+```
+
+**Note**: Check runs are fetched using the commit SHA as the `ref` query parameter.

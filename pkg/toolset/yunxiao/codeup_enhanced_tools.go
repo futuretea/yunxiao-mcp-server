@@ -39,5 +39,19 @@ func codeupEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetChangeRequestOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_commit_overview",
+				mcp.WithDescription("Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("sha", mcp.Required(), mcp.Description("Commit SHA.")),
+				mcp.WithBoolean("includeStatuses", mcp.Description("Whether to include commit statuses. Defaults to true.")),
+				mcp.WithBoolean("includeCheckRuns", mcp.Description("Whether to include check runs. Defaults to true.")),
+				mcp.WithNumber("statusLimit", mcp.Description("Max commit statuses returned. Defaults to 5.")),
+				mcp.WithNumber("checkRunLimit", mcp.Description("Max check runs returned. Defaults to 5.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetCommitOverview,
+		},
 	}
 }

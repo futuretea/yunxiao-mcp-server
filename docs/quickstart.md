@@ -133,6 +133,25 @@ This guide provides common MCP conversation patterns for AI assistants using the
 }
 ```
 
+## Pattern: Check Commit Status
+
+**User asks**: "What is the CI status of commit abc123?"
+
+**Recommended flow**:
+1. `get_commit_overview` — commit details, commit statuses, and check runs in one call.
+
+**Example**:
+```json
+{
+  "repositoryId": "org/repo",
+  "sha": "abc123def456",
+  "includeStatuses": true,
+  "includeCheckRuns": true,
+  "statusLimit": 5,
+  "checkRunLimit": 5
+}
+```
+
 ## Pattern: Check Pipeline Status
 
 **User asks**: "How is pipeline X doing?"

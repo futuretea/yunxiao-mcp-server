@@ -143,3 +143,61 @@ func changeRequestOverviewFilters(params map[string]any) map[string]any {
 		"commentResolved":  optionalBoolDefault(params, "commentResolved", false),
 	}
 }
+
+func handleGetCommitOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, repositoryID, err := requiredOrganizationAndRepository(params)
+	if err != nil {
+		return "", err
+	}
+	sha, err := requiredString(params, "sha")
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	repoPath := codeupRepositoryPath(organizationID, repositoryID)
+	commitPath := repoPath + "/commits/" + url.PathEscape(sha)
+
+	commit, err := getProjectOverviewSection(ctx, c, "commit", commitPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"commit":  commit,
+		"filters": commitOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeStatuses", true) {
+		statusQuery := repositoryLimitQuery(params, "statusLimit", 5)
+		statuses, err := getProjectOverviewSection(ctx, c, "statuses", commitPath+"/statuses", statusQuery)
+		if err != nil {
+			return "", err
+		}
+		overview["statuses"] = statuses
+	}
+
+	if optionalBoolDefault(params, "includeCheckRuns", true) {
+		checkRunQuery := repositoryLimitQuery(params, "checkRunLimit", 5)
+		checkRunQuery.Set("ref", sha)
+		checkRuns, err := getProjectOverviewSection(ctx, c, "checkRuns", repoPath+"/checkRuns", checkRunQuery)
+		if err != nil {
+			return "", err
+		}
+		overview["checkRuns"] = checkRuns
+	}
+
+	return marshalPretty(overview)
+}
+
+func commitOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeStatuses":  optionalBoolDefault(params, "includeStatuses", true),
+		"includeCheckRuns": optionalBoolDefault(params, "includeCheckRuns", true),
+		"statusLimit":      optionalIntDefault(params, "statusLimit", 5),
+		"checkRunLimit":    optionalIntDefault(params, "checkRunLimit", 5),
+	}
+}
