@@ -25,10 +25,10 @@ func handleGetEnterpriseDepartment(ctx context.Context, client any, params map[s
 		return "", err
 	}
 
-	id, err := requiredString(params, "id")
+	departmentID, err := requiredString(params, "departmentId")
 	if err != nil {
 		return "", err
 	}
 
-	return c.GetJSON(ctx, "/platform/departments/"+encodePathValue(id), nil)
+	return c.GetJSON(ctx, "/platform/departments/"+encodePathValue(departmentID), nil)
 }

@@ -95,7 +95,7 @@ func TestHandleGetArtifactBuildsPathAndQuery(t *testing.T) {
 	if _, err := handleGetArtifact(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 		"repoId":         "repo-1",
-		"id":             float64(123),
+		"artifactId":     float64(123),
 		"repoType":       "MAVEN",
 	}); err != nil {
 		t.Fatalf("handleGetArtifact() error = %v", err)
@@ -163,10 +163,10 @@ func TestPackagesHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetArtifact(context.Background(), client, map[string]any{"organizationId": "org-1", "repoId": "repo-1"}); err == nil {
 		t.Fatal("expected missing id error")
 	}
-	if _, err := handleGetArtifact(context.Background(), client, map[string]any{"organizationId": "org-1", "repoId": "repo-1", "id": float64(1)}); err == nil {
+	if _, err := handleGetArtifact(context.Background(), client, map[string]any{"organizationId": "org-1", "repoId": "repo-1", "artifactId": float64(1)}); err == nil {
 		t.Fatal("expected missing repoType error")
 	}
-	if _, err := handleGetArtifact(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repoId": "repo-1", "id": float64(1), "repoType": "MAVEN"}); err == nil {
+	if _, err := handleGetArtifact(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repoId": "repo-1", "artifactId": float64(1), "repoType": "MAVEN"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 }

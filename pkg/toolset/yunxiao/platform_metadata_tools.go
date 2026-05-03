@@ -19,7 +19,7 @@ func platformMetadataTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_app_extension_features",
 				mcp.WithDescription("List app extension feature implementations for a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("type", mcp.Required(), mcp.Description("App extension type.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),

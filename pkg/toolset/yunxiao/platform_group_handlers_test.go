@@ -51,7 +51,7 @@ func TestHandleGetOrganizationGroupBuildsEscapedPath(t *testing.T) {
 
 	if _, err := handleGetOrganizationGroup(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "group/1",
+		"groupId":        "group/1",
 	}); err != nil {
 		t.Fatalf("handleGetOrganizationGroup() error = %v", err)
 	}
@@ -71,7 +71,7 @@ func TestHandleListOrganizationGroupMembersPreservesEncodedID(t *testing.T) {
 
 	result, err := handleListOrganizationGroupMembers(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "group%2F1",
+		"groupId":        "group%2F1",
 		"page":           float64(1),
 		"perPage":        float64(20),
 	})
@@ -103,7 +103,7 @@ func TestPlatformGroupHandlersRequireParams(t *testing.T) {
 	if err == nil {
 		t.Fatal("handleGetOrganizationGroup() expected missing id error")
 	}
-	if _, err := handleGetOrganizationGroup(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "g-1"}); err == nil {
+	if _, err := handleGetOrganizationGroup(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "groupId": "g-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListOrganizationGroupMembers(context.Background(), client, map[string]any{}); err == nil {
@@ -112,7 +112,7 @@ func TestPlatformGroupHandlersRequireParams(t *testing.T) {
 	if _, err := handleListOrganizationGroupMembers(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
 		t.Fatal("expected missing id error")
 	}
-	if _, err := handleListOrganizationGroupMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "g-1"}); err == nil {
+	if _, err := handleListOrganizationGroupMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "groupId": "g-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 }

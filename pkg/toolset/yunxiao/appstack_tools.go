@@ -29,7 +29,7 @@ func appstackApplicationTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_applications",
 				mcp.WithDescription("List AppStack applications in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("pagination", mcp.Description("Pagination mode. Yunxiao currently supports keyset.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size, up to 100.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field: id or gmtCreate.")),
@@ -43,7 +43,7 @@ func appstackApplicationTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_application",
 				mcp.WithDescription("Get an AppStack application by name."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -57,7 +57,7 @@ func appstackVariableGroupTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_env_variable_groups",
 				mcp.WithDescription("Get AppStack variable groups bound to an environment."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("envName", mcp.Required(), mcp.Description("Environment name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -67,7 +67,7 @@ func appstackVariableGroupTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_variable_group",
 				mcp.WithDescription("Get an AppStack application variable group by name."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("variableGroupName", mcp.Required(), mcp.Description("Variable group name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -77,7 +77,7 @@ func appstackVariableGroupTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_app_variable_groups",
 				mcp.WithDescription("Get AppStack variable groups for an application."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -86,7 +86,7 @@ func appstackVariableGroupTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_app_variable_groups_revision",
 				mcp.WithDescription("Get the revision of AppStack variable groups for an application."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -100,7 +100,7 @@ func appstackOrchestrationTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_latest_orchestration",
 				mcp.WithDescription("Get the latest AppStack orchestration available for an environment."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("envName", mcp.Required(), mcp.Description("Environment name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -110,7 +110,7 @@ func appstackOrchestrationTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_app_orchestration",
 				mcp.WithDescription("List AppStack orchestrations for an application."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -119,7 +119,7 @@ func appstackOrchestrationTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_app_orchestration",
 				mcp.WithDescription("Get an AppStack application orchestration by serial number."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("sn", mcp.Required(), mcp.Description("Orchestration serial number.")),
 				mcp.WithString("tagName", mcp.Description("Optional orchestration tag.")),
@@ -143,7 +143,7 @@ func appstackAppReleaseWorkflowOverviewTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_app_release_workflows",
 				mcp.WithDescription("List AppStack release workflows for an application."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -152,7 +152,7 @@ func appstackAppReleaseWorkflowOverviewTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_app_release_workflow_briefs",
 				mcp.WithDescription("List AppStack release workflow briefs for an application."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -161,7 +161,7 @@ func appstackAppReleaseWorkflowOverviewTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_app_release_workflow_stage",
 				mcp.WithDescription("Get an AppStack application release workflow stage."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
 				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
@@ -172,7 +172,7 @@ func appstackAppReleaseWorkflowOverviewTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_app_release_stage_briefs",
 				mcp.WithDescription("List AppStack release stage briefs for an application release workflow."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -187,7 +187,7 @@ func appstackAppReleaseStageExecutionTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_app_release_stage_runs",
 				mcp.WithDescription("List AppStack release stage execution records."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
 				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
@@ -204,7 +204,7 @@ func appstackAppReleaseStageExecutionTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_app_release_stage_exec_metadata",
 				mcp.WithDescription("List integrated change metadata for an AppStack release stage execution."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
 				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
@@ -216,7 +216,7 @@ func appstackAppReleaseStageExecutionTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_app_release_stage_pipeline_run",
 				mcp.WithDescription("Get the pipeline run for an AppStack release stage execution."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
 				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
@@ -228,7 +228,7 @@ func appstackAppReleaseStageExecutionTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_app_release_stage_pipeline_job_log",
 				mcp.WithDescription("Get a pipeline job log for an AppStack release stage execution."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
 				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number.")),
@@ -246,7 +246,7 @@ func appstackChangeRequestTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_appstack_change_request_audit_items",
 				mcp.WithDescription("Get audit items for an AppStack change request."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("sn", mcp.Required(), mcp.Description("Change request serial number.")),
 				mcp.WithString("refType", mcp.Required(), mcp.Description("Reference type, such as CR.")),
@@ -257,7 +257,7 @@ func appstackChangeRequestTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_appstack_change_request_executions",
 				mcp.WithDescription("List execution records for an AppStack change request."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("sn", mcp.Required(), mcp.Description("Change request serial number.")),
 				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number.")),
@@ -273,7 +273,7 @@ func appstackChangeRequestTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_appstack_change_request_work_items",
 				mcp.WithDescription("List work items for an AppStack change request."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("sn", mcp.Required(), mcp.Description("Change request serial number.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -295,7 +295,7 @@ func appstackChangeOrderSummaryTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_change_order_versions",
 				mcp.WithDescription("List AppStack change order versions."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("envNames", mcp.Description("Comma-separated environment names.")),
 				mcp.WithString("creators", mcp.Description("Comma-separated creator account IDs.")),
@@ -308,7 +308,7 @@ func appstackChangeOrderSummaryTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_change_order",
 				mcp.WithDescription("Get an AppStack change order by serial number."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("changeOrderSn", mcp.Required(), mcp.Description("Change order serial number.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -318,7 +318,7 @@ func appstackChangeOrderSummaryTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_change_orders_by_origin",
 				mcp.WithDescription("List AppStack change orders by creation origin."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("originType", mcp.Required(), mcp.Description("Origin type, such as FLOW.")),
 				mcp.WithString("originId", mcp.Required(), mcp.Description("Origin identifier.")),
 				mcp.WithString("appName", mcp.Description("Application name filter.")),
@@ -335,7 +335,7 @@ func appstackChangeOrderLogTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_change_order_job_logs",
 				mcp.WithDescription("List logs for an AppStack change order job."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("changeOrderSn", mcp.Required(), mcp.Description("Change order serial number.")),
 				mcp.WithString("jobSn", mcp.Required(), mcp.Description("Change order job serial number.")),
@@ -348,7 +348,7 @@ func appstackChangeOrderLogTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("find_task_operation_log",
 				mcp.WithDescription("Get an AppStack deployment task operation log."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name.")),
 				mcp.WithString("changeOrderSn", mcp.Required(), mcp.Description("Change order serial number.")),
 				mcp.WithString("jobSn", mcp.Required(), mcp.Description("Change order job serial number.")),

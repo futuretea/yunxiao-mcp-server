@@ -51,12 +51,12 @@ func handleGetWorkItemType(ctx context.Context, client any, params map[string]an
 		return "", err
 	}
 
-	organizationID, id, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, workItemTypeID, err := requiredOrganizationAndNamedID(params, "workItemTypeId")
 	if err != nil {
 		return "", err
 	}
 
-	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitemTypes/" + url.PathEscape(id)
+	path := "/projex/organizations/" + url.PathEscape(organizationID) + "/workitemTypes/" + url.PathEscape(workItemTypeID)
 	return c.GetJSON(ctx, path, nil)
 }
 

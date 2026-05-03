@@ -27,7 +27,7 @@ func TestHandleListVersionsBuildsPathAndQuery(t *testing.T) {
 
 	result, err := handleListVersions(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"status":         "TODO,DOING",
 		"name":           "release",
 		"page":           float64(2),
@@ -54,7 +54,7 @@ func TestHandleListWorkitemActivitiesBuildsPath(t *testing.T) {
 
 	if _, err := handleListWorkitemActivities(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "workitem-1",
+		"workitemId":     "workitem-1",
 	}); err != nil {
 		t.Fatalf("handleListWorkitemActivities() error = %v", err)
 	}
@@ -79,10 +79,10 @@ func TestHandleListWorkitemActivitiesRequiresOrganizationId(t *testing.T) {
 }
 
 func TestProjexVersionActivityHandlersRequireParams(t *testing.T) {
-	if _, err := handleListVersions(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "project-1"}); err == nil {
+	if _, err := handleListVersions(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleListWorkitemActivities(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+	if _, err := handleListWorkitemActivities(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 }

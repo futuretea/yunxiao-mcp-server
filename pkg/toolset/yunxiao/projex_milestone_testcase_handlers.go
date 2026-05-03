@@ -7,7 +7,7 @@ import (
 )
 
 func handleListMilestones(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -25,7 +25,7 @@ func handleListMilestones(ctx context.Context, client any, params map[string]any
 }
 
 func handleListDirectories(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, testRepoID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, testRepoID, err := requiredOrganizationAndNamedID(params, "testRepoId")
 	if err != nil {
 		return "", err
 	}
@@ -59,7 +59,7 @@ func handleListTestcaseRepositories(ctx context.Context, client any, params map[
 }
 
 func handleGetTestcaseFieldConfig(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, testRepoID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, testRepoID, err := requiredOrganizationAndNamedID(params, "testRepoId")
 	if err != nil {
 		return "", err
 	}
@@ -159,7 +159,7 @@ func requiredOrganizationTestRepoAndTestcase(params map[string]any) (string, str
 	if err != nil {
 		return "", "", "", err
 	}
-	testcaseID, err := requiredString(params, "id")
+	testcaseID, err := requiredString(params, "testcaseId")
 	if err != nil {
 		return "", "", "", err
 	}

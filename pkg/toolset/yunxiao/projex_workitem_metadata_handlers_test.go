@@ -20,7 +20,7 @@ func TestHandleListWorkitemAttachmentsBuildsPath(t *testing.T) {
 
 	if _, err := handleListWorkitemAttachments(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "workitem-1",
+		"workitemId":     "workitem-1",
 	}); err != nil {
 		t.Fatalf("handleListWorkitemAttachments() error = %v", err)
 	}
@@ -40,7 +40,7 @@ func TestHandleGetWorkitemFileBuildsPath(t *testing.T) {
 	if _, err := handleGetWorkitemFile(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 		"workitemId":     "workitem-1",
-		"id":             "file-1",
+		"fileId":         "file-1",
 	}); err != nil {
 		t.Fatalf("handleGetWorkitemFile() error = %v", err)
 	}
@@ -62,7 +62,7 @@ func TestHandleListWorkitemRelationRecordsBuildsPathAndQuery(t *testing.T) {
 
 	if _, err := handleListWorkitemRelationRecords(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "workitem-1",
+		"workitemId":     "workitem-1",
 		"relationType":   "ASSOCIATED",
 	}); err != nil {
 		t.Fatalf("handleListWorkitemRelationRecords() error = %v", err)
@@ -76,7 +76,7 @@ func TestHandleListWorkitemRelationRecordsRequiresRelationType(t *testing.T) {
 
 	_, err := handleListWorkitemRelationRecords(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "workitem-1",
+		"workitemId":     "workitem-1",
 	})
 	if err == nil || !strings.Contains(err.Error(), "relationType is required") {
 		t.Fatalf("error = %v", err)
@@ -101,7 +101,7 @@ func TestHandleListLabelsBuildsPathAndQuery(t *testing.T) {
 
 	result, err := handleListLabels(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"page":           float64(2),
 		"perPage":        float64(20),
 	})
@@ -128,7 +128,7 @@ func TestHandleGetWorkitemFileRequiresWorkitemId(t *testing.T) {
 	})
 	if _, err := handleGetWorkitemFile(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "file-1",
+		"fileId":         "file-1",
 	}); err == nil {
 		t.Fatal("expected missing workitemId error")
 	}
@@ -163,16 +163,16 @@ func TestRequiredOrganizationWorkitemAndFileRequiresFileId(t *testing.T) {
 }
 
 func TestProjexWorkitemMetadataHandlersRequireParams(t *testing.T) {
-	if _, err := handleListWorkitemAttachments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+	if _, err := handleListWorkitemAttachments(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleGetWorkitemFile(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1", "id": "file-1"}); err == nil {
+	if _, err := handleGetWorkitemFile(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1", "fileId": "file-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleListWorkitemRelationRecords(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1", "relationType": "ASSOCIATED"}); err == nil {
+	if _, err := handleListWorkitemRelationRecords(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1", "relationType": "ASSOCIATED"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleListLabels(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "project-1"}); err == nil {
+	if _, err := handleListLabels(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 }

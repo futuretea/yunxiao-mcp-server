@@ -11,8 +11,8 @@ func projexVersionActivityTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_versions",
 				mcp.WithDescription("List versions in a Projex project."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("status", mcp.Description("Comma-separated version statuses: TODO, DOING, ARCHIVED.")),
 				mcp.WithString("name", mcp.Description("Version name filter.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
@@ -24,8 +24,8 @@ func projexVersionActivityTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_workitem_activities",
 				mcp.WithDescription("List activity events for a Projex work item."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Work item ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListWorkitemActivities,

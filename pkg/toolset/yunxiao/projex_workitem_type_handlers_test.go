@@ -64,7 +64,7 @@ func TestHandleGetWorkItemTypeBuildsPath(t *testing.T) {
 
 	if _, err := handleGetWorkItemType(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "type-1",
+		"workItemTypeId": "type-1",
 	}); err != nil {
 		t.Fatalf("handleGetWorkItemType() error = %v", err)
 	}
@@ -257,7 +257,7 @@ func TestProjexWorkitemTypeHandlersRequireParams(t *testing.T) {
 	if _, err := handleListWorkItemTypes(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1", "category": "Task"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleGetWorkItemType(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "type-1"}); err == nil {
+	if _, err := handleGetWorkItemType(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workItemTypeId": "type-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListWorkItemRelationWorkItemTypes(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workItemTypeId": "type-1"}); err == nil {

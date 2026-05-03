@@ -26,7 +26,7 @@ func projexProjectTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("search_projects",
 				mcp.WithDescription("Search Projex projects in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("name", mcp.Description("Project name contains filter.")),
 				mcp.WithString("status", mcp.Description("Comma-separated project status IDs.")),
 				mcp.WithString("creator", mcp.Description("Comma-separated creator user IDs.")),
@@ -43,8 +43,8 @@ func projexProjectTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_project",
 				mcp.WithDescription("Get a Projex project by ID."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetProject,
@@ -57,9 +57,9 @@ func projexSprintTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_sprint",
 				mcp.WithDescription("Get a Projex sprint by ID."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Sprint ID.")),
+				mcp.WithString("sprintId", mcp.Required(), mcp.Description("Sprint ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetSprint,
@@ -67,8 +67,8 @@ func projexSprintTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_sprints",
 				mcp.WithDescription("List Projex sprints in a project."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Project ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("status", mcp.Description("Comma-separated sprint statuses: TODO, DOING, ARCHIVED.")),
 				mcp.WithString("name", mcp.Description("Sprint name filter.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
@@ -85,7 +85,7 @@ func projexWorkitemTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("search_workitems",
 				mcp.WithDescription("Search work items in one Projex project space."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Req, Task, Bug, or Risk.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID. This API searches one project at a time.")),
 				mcp.WithString("subject", mcp.Description("Subject contains filter.")),
@@ -118,8 +118,8 @@ func projexWorkitemTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_workitem",
 				mcp.WithDescription("Get a Projex work item by ID."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Work item ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("workitemId", mcp.Required(), mcp.Description("Work item ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetWorkitem,
@@ -127,7 +127,7 @@ func projexWorkitemTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_work_item_comments",
 				mcp.WithDescription("List comments for a Projex work item."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("workItemId", mcp.Required(), mcp.Description("Work item ID.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size.")),
@@ -150,7 +150,7 @@ func projexWorkitemTypeListTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_all_work_item_types",
 				mcp.WithDescription("List all work item types in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("categories", mcp.Description("Optional work item type categories, such as Req, Bug, or Task.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -159,7 +159,7 @@ func projexWorkitemTypeListTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_work_item_types",
 				mcp.WithDescription("List work item types in one Projex project."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("category", mcp.Required(), mcp.Description("Work item category, such as Req, Bug, or Task.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -169,8 +169,8 @@ func projexWorkitemTypeListTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_work_item_type",
 				mcp.WithDescription("Get a Projex work item type by ID."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Work item type ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetWorkItemType,
@@ -183,7 +183,7 @@ func projexWorkitemTypeMetadataTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_work_item_relation_work_item_types",
 				mcp.WithDescription("List work item types that can be related to a Projex work item type."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
 				mcp.WithString("relationType", mcp.Description("Relation type: PARENT, SUB, ASSOCIATED, DEPEND_ON, or DEPENDED_BY.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -193,7 +193,7 @@ func projexWorkitemTypeMetadataTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_work_item_type_field_config",
 				mcp.WithDescription("Get field configuration for a Projex work item type."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -203,7 +203,7 @@ func projexWorkitemTypeMetadataTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_work_item_workflow",
 				mcp.WithDescription("Get workflow information for a Projex work item type."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID.")),
 				mcp.WithString("workItemTypeId", mcp.Required(), mcp.Description("Work item type ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),

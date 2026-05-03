@@ -26,8 +26,7 @@ func codeupRepositoryTools() []toolset.ServerTool {
 			Tool: mcp.NewTool("list_repositories",
 				mcp.WithDescription("List CodeUp repositories in a Yunxiao organization."),
 				mcp.WithString("organizationId",
-					mcp.Required(),
-					mcp.Description("Yunxiao organization ID."),
+					mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted."),
 				),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size from 1 to 100.")),
@@ -43,8 +42,7 @@ func codeupRepositoryTools() []toolset.ServerTool {
 			Tool: mcp.NewTool("get_repository",
 				mcp.WithDescription("Get a CodeUp repository by numeric ID or full path."),
 				mcp.WithString("organizationId",
-					mcp.Required(),
-					mcp.Description("Yunxiao organization ID."),
+					mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted."),
 				),
 				mcp.WithString("repositoryId",
 					mcp.Required(),
@@ -58,8 +56,7 @@ func codeupRepositoryTools() []toolset.ServerTool {
 			Tool: mcp.NewTool("list_branches",
 				mcp.WithDescription("List branches in a CodeUp repository."),
 				mcp.WithString("organizationId",
-					mcp.Required(),
-					mcp.Description("Yunxiao organization ID."),
+					mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted."),
 				),
 				mcp.WithString("repositoryId",
 					mcp.Required(),
@@ -76,7 +73,7 @@ func codeupRepositoryTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_branch",
 				mcp.WithDescription("Get CodeUp branch details."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("branchName", mcp.Required(), mcp.Description("Branch name, such as main or feature/demo.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -91,7 +88,7 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_files",
 				mcp.WithDescription("List files in a CodeUp repository tree."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("path", mcp.Description("Directory path to query.")),
 				mcp.WithString("ref", mcp.Description("Branch, tag, or commit SHA. Defaults to the repository default branch when omitted.")),
@@ -103,7 +100,7 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_file_blobs",
 				mcp.WithDescription("Get CodeUp file content."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("filePath", mcp.Required(), mcp.Description("File path, such as src/main.go.")),
 				mcp.WithString("ref", mcp.Required(), mcp.Description("Branch, tag, or commit SHA.")),
@@ -114,7 +111,7 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_commits",
 				mcp.WithDescription("List commits in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("refName", mcp.Required(), mcp.Description("Branch, tag, or commit SHA.")),
 				mcp.WithString("since", mcp.Description("Start time in ISO 8601 format.")),
@@ -132,7 +129,7 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_commit",
 				mcp.WithDescription("Get CodeUp commit details."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("sha", mcp.Required(), mcp.Description("Commit SHA.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -142,7 +139,7 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("compare",
 				mcp.WithDescription("Compare two CodeUp refs or commits."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("from", mcp.Required(), mcp.Description("Source commit SHA, branch, or tag.")),
 				mcp.WithString("to", mcp.Required(), mcp.Description("Target commit SHA, branch, or tag.")),
@@ -169,7 +166,7 @@ func codeupChangeRequestCoreTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_change_requests",
 				mcp.WithDescription("List CodeUp merge requests in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size.")),
 				mcp.WithString("projectIds", mcp.Description("Comma-separated repository IDs or full paths.")),
@@ -188,7 +185,7 @@ func codeupChangeRequestCoreTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_change_request",
 				mcp.WithDescription("Get CodeUp merge request details."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -203,7 +200,7 @@ func codeupChangeRequestDiffTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_change_request_patch_sets",
 				mcp.WithDescription("List CodeUp merge request patch sets."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -213,7 +210,7 @@ func codeupChangeRequestDiffTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_change_request_tree",
 				mcp.WithDescription("Get CodeUp merge request changed file tree."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
 				mcp.WithString("fromPatchSetId", mcp.Required(), mcp.Description("Target-side patch set ID.")),
@@ -230,7 +227,7 @@ func codeupChangeRequestCommentTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_change_request_comments",
 				mcp.WithDescription("List CodeUp merge request comments."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
 				mcp.WithString("patchSetBizIds", mcp.Description("Comma-separated patch set IDs.")),
@@ -245,7 +242,7 @@ func codeupChangeRequestCommentTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_change_request_comment",
 				mcp.WithDescription("Get CodeUp merge request comment details."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("localId", mcp.Required(), mcp.Description("Merge request local ID within the repository.")),
 				mcp.WithString("commentBizId", mcp.Required(), mcp.Description("Comment business ID.")),

@@ -18,7 +18,7 @@ func appstackDeploymentLogTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_machine_deploy_log",
 				mcp.WithDescription("Get an AppStack machine deployment log."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithNumber("tunnelId", mcp.Required(), mcp.Description("Deployment tunnel ID.")),
 				mcp.WithString("machineSn", mcp.Required(), mcp.Description("Machine serial number.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -33,7 +33,7 @@ func appstackResourcePoolTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_deploy_group",
 				mcp.WithDescription("Get an AppStack deploy group by pool and group name."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("poolName", mcp.Required(), mcp.Description("Resource pool name.")),
 				mcp.WithString("deployGroupName", mcp.Required(), mcp.Description("Deploy group name.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -43,7 +43,7 @@ func appstackResourcePoolTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_resource_instances",
 				mcp.WithDescription("List AppStack resource instances in a resource pool."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("poolName", mcp.Required(), mcp.Description("Resource pool name.")),
 				mcp.WithString("pagination", mcp.Description("Pagination mode. Yunxiao currently supports keyset.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size, up to 100.")),
@@ -58,7 +58,7 @@ func appstackResourcePoolTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_resource_instance",
 				mcp.WithDescription("Get an AppStack resource instance by pool and instance name."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("poolName", mcp.Required(), mcp.Description("Resource pool name.")),
 				mcp.WithString("instanceName", mcp.Required(), mcp.Description("Resource instance name.")),
 				mcp.WithReadOnlyHintAnnotation(true),

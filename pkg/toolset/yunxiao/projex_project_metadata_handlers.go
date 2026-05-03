@@ -6,7 +6,7 @@ import (
 )
 
 func handleListProjectMembers(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +36,7 @@ func handleListProjectTemplates(ctx context.Context, client any, params map[stri
 }
 
 func handleGetProjectTemplateFieldConfig(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, templateID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, templateID, err := requiredOrganizationAndNamedID(params, "projectTemplateId")
 	if err != nil {
 		return "", err
 	}
@@ -64,7 +64,7 @@ func handleListProjectProgram(ctx context.Context, client any, params map[string
 }
 
 func handleListProjectRoles(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}

@@ -97,9 +97,9 @@ func TestHandleGetProtectedBranchBuildsPath(t *testing.T) {
 	})
 
 	if _, err := handleGetProtectedBranch(context.Background(), client, map[string]any{
-		"organizationId": "org-1",
-		"repositoryId":   "group/repo",
-		"id":             float64(12),
+		"organizationId":        "org-1",
+		"repositoryId":          "group/repo",
+		"protectedBranchRuleId": float64(12),
 	}); err != nil {
 		t.Fatalf("handleGetProtectedBranch() error = %v", err)
 	}
@@ -162,7 +162,7 @@ func TestCodeupRepositoryMetadataHandlersRequireParams(t *testing.T) {
 	if _, err := handleListProtectedBranches(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleGetProtectedBranch(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo", "id": float64(1)}); err == nil {
+	if _, err := handleGetProtectedBranch(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo", "protectedBranchRuleId": float64(1)}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListPushRules(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "repositoryId": "group/repo"}); err == nil {
@@ -193,7 +193,7 @@ func TestCodeupRepositoryMetadataHandlersReturnAPIError(t *testing.T) {
 		t.Fatal("expected API error")
 	}
 	if _, err := handleGetProtectedBranch(context.Background(), client, map[string]any{
-		"organizationId": "org-1", "repositoryId": "group/repo", "id": float64(1),
+		"organizationId": "org-1", "repositoryId": "group/repo", "protectedBranchRuleId": float64(1),
 	}); err == nil {
 		t.Fatal("expected API error")
 	}

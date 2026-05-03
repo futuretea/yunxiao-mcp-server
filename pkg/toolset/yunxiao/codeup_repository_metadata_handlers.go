@@ -59,7 +59,7 @@ func handleGetProtectedBranch(ctx context.Context, client any, params map[string
 	if err != nil {
 		return "", err
 	}
-	id, err := requiredNumberPathString(params, "id")
+	protectedBranchRuleID, err := requiredNumberPathString(params, "protectedBranchRuleId")
 	if err != nil {
 		return "", err
 	}
@@ -68,7 +68,7 @@ func handleGetProtectedBranch(ctx context.Context, client any, params map[string
 		return "", err
 	}
 
-	path := codeupRepositoryPath(organizationID, repositoryID) + "/protectedBranches/" + url.PathEscape(id)
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/protectedBranches/" + url.PathEscape(protectedBranchRuleID)
 	return c.GetJSON(ctx, path, nil)
 }
 

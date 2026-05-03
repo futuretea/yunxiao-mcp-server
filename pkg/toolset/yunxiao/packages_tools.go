@@ -11,7 +11,7 @@ func packageTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_package_repositories",
 				mcp.WithDescription("List Packages repositories in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repoTypes", mcp.Description("Comma-separated repository types: GENERIC, DOCKER, MAVEN, NPM, or NUGET.")),
 				mcp.WithString("repoCategories", mcp.Description("Comma-separated repository modes: Hybrid, Local, Proxy, ProxyCache, or Group.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
@@ -23,7 +23,7 @@ func packageTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_artifacts",
 				mcp.WithDescription("List artifacts in a Packages repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repoId", mcp.Required(), mcp.Description("Packages repository ID.")),
 				mcp.WithString("repoType", mcp.Required(), mcp.Description("Repository type: GENERIC, DOCKER, MAVEN, NPM, NUGET, or PYPI.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
@@ -38,9 +38,9 @@ func packageTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_artifact",
 				mcp.WithDescription("Get one artifact from a Packages repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repoId", mcp.Required(), mcp.Description("Packages repository ID.")),
-				mcp.WithNumber("id", mcp.Required(), mcp.Description("Artifact ID.")),
+				mcp.WithNumber("artifactId", mcp.Required(), mcp.Description("Artifact ID.")),
 				mcp.WithString("repoType", mcp.Required(), mcp.Description("Repository type: GENERIC, DOCKER, MAVEN, NPM, NUGET, or PYPI.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),

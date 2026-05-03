@@ -11,7 +11,7 @@ func lingmaKnowledgeBaseTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_knowledge_bases",
 				mcp.WithDescription("List Tongyi Lingma knowledge bases."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("query", mcp.Description("Knowledge base name fuzzy query.")),
 				mcp.WithString("sceneType", mcp.Description("Scene type, such as chat or completion.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field.")),
@@ -26,7 +26,7 @@ func lingmaKnowledgeBaseTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_kb_files",
 				mcp.WithDescription("List Tongyi Lingma knowledge base files."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("kbId", mcp.Required(), mcp.Description("Knowledge base ID.")),
 				mcp.WithString("query", mcp.Description("File name fuzzy query.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field.")),
@@ -40,7 +40,7 @@ func lingmaKnowledgeBaseTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_kb_members",
 				mcp.WithDescription("List Tongyi Lingma knowledge base members."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("kbId", mcp.Required(), mcp.Description("Knowledge base ID.")),
 				mcp.WithString("query", mcp.Description("Member name fuzzy query.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field.")),

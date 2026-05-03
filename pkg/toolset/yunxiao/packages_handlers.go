@@ -65,7 +65,7 @@ func handleGetArtifact(ctx context.Context, client any, params map[string]any) (
 	if err != nil {
 		return "", err
 	}
-	id, err := requiredNumberPathString(params, "id")
+	artifactID, err := requiredNumberPathString(params, "artifactId")
 	if err != nil {
 		return "", err
 	}
@@ -77,7 +77,7 @@ func handleGetArtifact(ctx context.Context, client any, params map[string]any) (
 	query := url.Values{}
 	query.Set("repoType", repoType)
 
-	path := "/packages/organizations/" + url.PathEscape(organizationID) + "/repositories/" + url.PathEscape(repoID) + "/artifacts/" + url.PathEscape(id)
+	path := "/packages/organizations/" + url.PathEscape(organizationID) + "/repositories/" + url.PathEscape(repoID) + "/artifacts/" + url.PathEscape(artifactID)
 	return c.GetJSON(ctx, path, query)
 }
 

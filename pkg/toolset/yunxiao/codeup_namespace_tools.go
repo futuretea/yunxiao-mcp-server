@@ -19,7 +19,7 @@ func codeupTemplateRepositoryTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_template_repositories",
 				mcp.WithDescription("List CodeUp template repositories in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithNumber("templateType", mcp.Required(), mcp.Description("Template type: 1 for custom templates, 2 for built-in templates.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size from 1 to 100.")),
@@ -35,7 +35,7 @@ func codeupNamespaceListTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_namespaces",
 				mcp.WithDescription("List CodeUp namespaces or groups in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithNumber("parentId", mcp.Description("Parent namespace ID. Omit to list namespaces available to the current user.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size from 1 to 100.")),
@@ -54,7 +54,7 @@ func codeupNamespaceLookupTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_namespace",
 				mcp.WithDescription("Get a CodeUp namespace or group by ID or full path."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("namespaceId", mcp.Required(), mcp.Description("Namespace ID or full path such as group/subgroup.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -63,7 +63,7 @@ func codeupNamespaceLookupTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_org_namespace",
 				mcp.WithDescription("Get the organization-level CodeUp namespace."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetOrgNamespace,

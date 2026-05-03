@@ -23,7 +23,7 @@ func TestHandleListProjectMembersBuildsPathAndQuery(t *testing.T) {
 
 	if _, err := handleListProjectMembers(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"name":           "demo",
 		"roleId":         "project.admin",
 	}); err != nil {
@@ -61,8 +61,8 @@ func TestHandleGetProjectTemplateFieldConfigBuildsPath(t *testing.T) {
 	})
 
 	if _, err := handleGetProjectTemplateFieldConfig(context.Background(), client, map[string]any{
-		"organizationId": "org-1",
-		"id":             "template-1",
+		"organizationId":    "org-1",
+		"projectTemplateId": "template-1",
 	}); err != nil {
 		t.Fatalf("handleGetProjectTemplateFieldConfig() error = %v", err)
 	}
@@ -100,7 +100,7 @@ func TestHandleListProjectRolesBuildsPath(t *testing.T) {
 
 	if _, err := handleListProjectRoles(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 	}); err != nil {
 		t.Fatalf("handleListProjectRoles() error = %v", err)
 	}
@@ -179,19 +179,19 @@ func TestHandleListAllProjectRolesRequiresOrganizationId(t *testing.T) {
 }
 
 func TestProjexProjectMetadataHandlersRequireParams(t *testing.T) {
-	if _, err := handleListProjectMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "project-1"}); err == nil {
+	if _, err := handleListProjectMembers(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListProjectTemplates(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleGetProjectTemplateFieldConfig(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "template-1"}); err == nil {
+	if _, err := handleGetProjectTemplateFieldConfig(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectTemplateId": "template-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListProjectProgram(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "programIdentifier": "prog-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleListProjectRoles(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "project-1"}); err == nil {
+	if _, err := handleListProjectRoles(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "project-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListAllProjectRoles(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1"}); err == nil {

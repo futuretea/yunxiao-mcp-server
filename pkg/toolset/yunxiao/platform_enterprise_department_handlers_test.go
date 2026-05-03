@@ -52,7 +52,7 @@ func TestHandleGetEnterpriseDepartmentPreservesEncodedID(t *testing.T) {
 	})
 
 	if _, err := handleGetEnterpriseDepartment(context.Background(), client, map[string]any{
-		"id": "dept%2F1",
+		"departmentId": "dept%2F1",
 	}); err != nil {
 		t.Fatalf("handleGetEnterpriseDepartment() error = %v", err)
 	}
@@ -72,7 +72,7 @@ func TestPlatformEnterpriseDepartmentHandlersRequireParams(t *testing.T) {
 	if _, err := handleListEnterpriseDepartments(context.Background(), "invalid-client", map[string]any{}); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleGetEnterpriseDepartment(context.Background(), "invalid-client", map[string]any{"id": "dept-1"}); err == nil {
+	if _, err := handleGetEnterpriseDepartment(context.Background(), "invalid-client", map[string]any{"departmentId": "dept-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 }

@@ -31,7 +31,7 @@ func handleListCurrentUserEffortRecords(ctx context.Context, client any, params 
 }
 
 func handleListEffortRecords(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "workitemId")
 	if err != nil {
 		return "", err
 	}
@@ -45,7 +45,7 @@ func handleListEffortRecords(ctx context.Context, client any, params map[string]
 }
 
 func handleListEstimatedEfforts(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "workitemId")
 	if err != nil {
 		return "", err
 	}

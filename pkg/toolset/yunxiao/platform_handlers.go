@@ -39,11 +39,11 @@ func handleGetOrganization(ctx context.Context, client any, params map[string]an
 		return "", err
 	}
 
-	id, err := requiredString(params, "id")
+	organizationID, err := requiredString(params, "organizationId")
 	if err != nil {
 		return "", err
 	}
-	return c.GetJSON(ctx, "/platform/organizations/"+url.PathEscape(id), nil)
+	return c.GetJSON(ctx, "/platform/organizations/"+url.PathEscape(organizationID), nil)
 }
 
 func handleListOrganizationDepartments(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -80,12 +80,12 @@ func getOrganizationDepartment(ctx context.Context, client any, params map[strin
 		return "", err
 	}
 
-	organizationID, id, err := requiredOrganizationAndID(params)
+	organizationID, departmentID, err := requiredOrganizationAndNamedID(params, "departmentId")
 	if err != nil {
 		return "", err
 	}
 
-	path := organizationPath(organizationID) + "/departments/" + url.PathEscape(id) + suffix
+	path := organizationPath(organizationID) + "/departments/" + url.PathEscape(departmentID) + suffix
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -114,17 +114,12 @@ func handleGetOrganizationMemberInfo(ctx context.Context, client any, params map
 		return "", err
 	}
 
-	organizationID, id, err := requiredOrganizationAndID(params)
+	organizationID, memberID, err := requiredOrganizationAndNamedID(params, "memberId")
 	if err != nil {
-		var memberID string
-		organizationID, memberID, err = requiredOrganizationAndNamedID(params, "memberId")
-		if err != nil {
-			return "", err
-		}
-		id = memberID
+		return "", err
 	}
 
-	path := organizationPath(organizationID) + "/members/" + url.PathEscape(id)
+	path := organizationPath(organizationID) + "/members/" + url.PathEscape(memberID)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -196,17 +191,12 @@ func handleGetOrganizationRole(ctx context.Context, client any, params map[strin
 		return "", err
 	}
 
-	organizationID, id, err := requiredOrganizationAndID(params)
+	organizationID, roleID, err := requiredOrganizationAndNamedID(params, "roleId")
 	if err != nil {
-		var roleID string
-		organizationID, roleID, err = requiredOrganizationAndNamedID(params, "roleId")
-		if err != nil {
-			return "", err
-		}
-		id = roleID
+		return "", err
 	}
 
-	path := organizationPath(organizationID) + "/roles/" + url.PathEscape(id)
+	path := organizationPath(organizationID) + "/roles/" + url.PathEscape(roleID)
 	return c.GetJSON(ctx, path, nil)
 }
 

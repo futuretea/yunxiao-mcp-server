@@ -30,10 +30,6 @@ func requiredOrganizationAndRepository(params map[string]any) (string, string, e
 	return organizationID, repositoryID, nil
 }
 
-func requiredOrganizationAndID(params map[string]any) (string, string, error) {
-	return requiredOrganizationAndNamedID(params, "id")
-}
-
 func requiredOrganizationAndNamedID(params map[string]any, key string) (string, string, error) {
 	organizationID, err := requiredString(params, "organizationId")
 	if err != nil {

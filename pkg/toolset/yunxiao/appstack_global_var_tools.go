@@ -11,7 +11,7 @@ func appstackGlobalVarTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_global_var",
 				mcp.WithDescription("Get an AppStack global variable group."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("name", mcp.Required(), mcp.Description("Global variable group name.")),
 				mcp.WithString("revisionSha", mcp.Description("Optional global variable group revision SHA.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -21,7 +21,7 @@ func appstackGlobalVarTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_global_vars",
 				mcp.WithDescription("Search AppStack global variable groups."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithNumber("current", mcp.Description("Current page number. Defaults to 1.")),
 				mcp.WithNumber("pageSize", mcp.Description("Page size. Defaults to 10.")),
 				mcp.WithString("search", mcp.Description("Optional search keyword.")),

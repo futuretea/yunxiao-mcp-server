@@ -29,12 +29,12 @@ func handleGetOrganizationGroup(ctx context.Context, client any, params map[stri
 		return "", err
 	}
 
-	organizationID, id, err := requiredOrganizationAndID(params)
+	organizationID, groupID, err := requiredOrganizationAndNamedID(params, "groupId")
 	if err != nil {
 		return "", err
 	}
 
-	path := organizationPath(organizationID) + "/groups/" + encodePathValue(id)
+	path := organizationPath(organizationID) + "/groups/" + encodePathValue(groupID)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -44,7 +44,7 @@ func handleListOrganizationGroupMembers(ctx context.Context, client any, params 
 		return "", err
 	}
 
-	organizationID, id, err := requiredOrganizationAndID(params)
+	organizationID, groupID, err := requiredOrganizationAndNamedID(params, "groupId")
 	if err != nil {
 		return "", err
 	}
@@ -53,6 +53,6 @@ func handleListOrganizationGroupMembers(ctx context.Context, client any, params 
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 
-	path := organizationPath(organizationID) + "/groups/" + encodePathValue(id) + "/members"
+	path := organizationPath(organizationID) + "/groups/" + encodePathValue(groupID) + "/members"
 	return c.GetJSONWithMetadata(ctx, path, query)
 }

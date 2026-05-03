@@ -6,7 +6,7 @@ import (
 )
 
 func handleListVersions(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -25,7 +25,7 @@ func handleListVersions(ctx context.Context, client any, params map[string]any) 
 }
 
 func handleListWorkitemActivities(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "workitemId")
 	if err != nil {
 		return "", err
 	}

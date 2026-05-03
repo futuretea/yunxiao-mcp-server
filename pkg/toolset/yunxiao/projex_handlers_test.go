@@ -77,7 +77,7 @@ func TestHandleGetProjectBuildsPath(t *testing.T) {
 
 	if _, err := handleGetProject(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 	}); err != nil {
 		t.Fatalf("handleGetProject() error = %v", err)
 	}
@@ -103,7 +103,7 @@ func TestHandleListSprintsBuildsPathAndQuery(t *testing.T) {
 
 	result, err := handleListSprints(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "project-1",
+		"projectId":      "project-1",
 		"status":         "TODO,DOING",
 		"name":           "release",
 		"page":           float64(2),
@@ -131,7 +131,7 @@ func TestHandleGetSprintBuildsPath(t *testing.T) {
 	if _, err := handleGetSprint(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 		"projectId":      "project-1",
-		"id":             "sprint-1",
+		"sprintId":       "sprint-1",
 	}); err != nil {
 		t.Fatalf("handleGetSprint() error = %v", err)
 	}
@@ -208,7 +208,7 @@ func TestHandleGetWorkitemBuildsPath(t *testing.T) {
 
 	if _, err := handleGetWorkitem(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
-		"id":             "workitem-1",
+		"workitemId":     "workitem-1",
 	}); err != nil {
 		t.Fatalf("handleGetWorkitem() error = %v", err)
 	}
@@ -279,13 +279,13 @@ func TestProjexHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetProject(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
 		t.Fatal("expected missing id error")
 	}
-	if _, err := handleGetProject(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "p-1"}); err == nil {
+	if _, err := handleGetProject(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "p-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListSprints(context.Background(), client, map[string]any{}); err == nil {
 		t.Fatal("expected missing organizationId error")
 	}
-	if _, err := handleListSprints(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "p-1"}); err == nil {
+	if _, err := handleListSprints(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "p-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleGetSprint(context.Background(), client, map[string]any{}); err == nil {
@@ -297,7 +297,7 @@ func TestProjexHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetSprint(context.Background(), client, map[string]any{"organizationId": "org-1", "projectId": "p-1"}); err == nil {
 		t.Fatal("expected missing id error")
 	}
-	if _, err := handleGetSprint(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "p-1", "id": "s-1"}); err == nil {
+	if _, err := handleGetSprint(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "projectId": "p-1", "sprintId": "s-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleSearchWorkitems(context.Background(), client, map[string]any{}); err == nil {
@@ -312,7 +312,7 @@ func TestProjexHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetWorkitem(context.Background(), client, map[string]any{"organizationId": "org-1"}); err == nil {
 		t.Fatal("expected missing id error")
 	}
-	if _, err := handleGetWorkitem(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "id": "wi-1"}); err == nil {
+	if _, err := handleGetWorkitem(context.Background(), "invalid-client", map[string]any{"organizationId": "org-1", "workitemId": "wi-1"}); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListWorkItemComments(context.Background(), client, map[string]any{}); err == nil {

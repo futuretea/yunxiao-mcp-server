@@ -11,7 +11,7 @@ func appstackReleaseSearchTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("search_releases",
 				mcp.WithDescription("Search AppStack releases in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("pagination", mcp.Description("Pagination mode. Yunxiao currently supports keyset.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size, up to 100.")),
 				mcp.WithString("orderBy", mcp.Description("Sort field: id or gmt_create.")),

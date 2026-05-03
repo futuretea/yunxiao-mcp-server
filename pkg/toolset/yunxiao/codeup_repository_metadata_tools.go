@@ -19,7 +19,7 @@ func codeupRepositoryTagTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_tags",
 				mcp.WithDescription("List tags in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size.")),
@@ -38,7 +38,7 @@ func codeupRepositoryMemberTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_repository_members",
 				mcp.WithDescription("List members of a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithNumber("accessLevel", mcp.Description("Minimum access level: 20, 30, or 40.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -53,7 +53,7 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_protected_branches",
 				mcp.WithDescription("List protected branch rules in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -62,9 +62,9 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_protected_branch",
 				mcp.WithDescription("Get a protected branch rule in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Protected branch rule ID.")),
+				mcp.WithString("protectedBranchRuleId", mcp.Required(), mcp.Description("Protected branch rule ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetProtectedBranch,
@@ -72,7 +72,7 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_push_rules",
 				mcp.WithDescription("List push rules in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -81,7 +81,7 @@ func codeupRepositoryPolicyTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_push_rule",
 				mcp.WithDescription("Get a push rule in a CodeUp repository."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
 				mcp.WithString("pushRuleId", mcp.Required(), mcp.Description("Push rule ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),

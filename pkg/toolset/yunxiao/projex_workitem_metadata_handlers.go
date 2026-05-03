@@ -6,7 +6,7 @@ import (
 )
 
 func handleListWorkitemAttachments(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "workitemId")
 	if err != nil {
 		return "", err
 	}
@@ -33,7 +33,7 @@ func handleGetWorkitemFile(ctx context.Context, client any, params map[string]an
 }
 
 func handleListWorkitemRelationRecords(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, workItemID, err := requiredOrganizationAndNamedID(params, "workitemId")
 	if err != nil {
 		return "", err
 	}
@@ -53,7 +53,7 @@ func handleListWorkitemRelationRecords(ctx context.Context, client any, params m
 }
 
 func handleListLabels(ctx context.Context, client any, params map[string]any) (string, error) {
-	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "id")
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -74,7 +74,7 @@ func requiredOrganizationWorkitemAndFile(params map[string]any) (string, string,
 	if err != nil {
 		return "", "", "", err
 	}
-	fileID, err := requiredString(params, "id")
+	fileID, err := requiredString(params, "fileId")
 	if err != nil {
 		return "", "", "", err
 	}

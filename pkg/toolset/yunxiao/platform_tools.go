@@ -64,9 +64,8 @@ func platformBasicTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_organization",
 				mcp.WithDescription("Get a Yunxiao organization by ID."),
-				mcp.WithString("id",
-					mcp.Required(),
-					mcp.Description("Organization ID."),
+				mcp.WithString("organizationId",
+					mcp.Description("Organization ID. Defaults to the user's sole organization when omitted."),
 				),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -80,7 +79,7 @@ func platformDepartmentTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_organization_departments",
 				mcp.WithDescription("List departments in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("parentId", mcp.Description("Parent department ID.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size from 1 to 100.")),
@@ -91,8 +90,8 @@ func platformDepartmentTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_organization_department_info",
 				mcp.WithDescription("Get Yunxiao organization department details."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Department ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("departmentId", mcp.Required(), mcp.Description("Department ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetOrganizationDepartmentInfo,
@@ -100,8 +99,8 @@ func platformDepartmentTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_organization_department_ancestors",
 				mcp.WithDescription("List ancestor departments for a Yunxiao organization department."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
-				mcp.WithString("id", mcp.Required(), mcp.Description("Department ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
+				mcp.WithString("departmentId", mcp.Required(), mcp.Description("Department ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetOrganizationDepartmentAncestors,
@@ -114,7 +113,7 @@ func platformMemberTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_organization_members",
 				mcp.WithDescription("List members in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithNumber("page", mcp.Description("Page number.")),
 				mcp.WithNumber("perPage", mcp.Description("Page size from 1 to 100.")),
 				mcp.WithReadOnlyHintAnnotation(true),
@@ -124,7 +123,7 @@ func platformMemberTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_organization_member_info",
 				mcp.WithDescription("Get Yunxiao organization member details by member ID."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("memberId", mcp.Required(), mcp.Description("Organization member ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -133,7 +132,7 @@ func platformMemberTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_organization_member_info_by_user_id",
 				mcp.WithDescription("Get Yunxiao organization member details by user ID."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("userId", mcp.Required(), mcp.Description("Yunxiao user ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
@@ -142,7 +141,7 @@ func platformMemberTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("search_organization_members",
 				mcp.WithDescription("Search members in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithArray("deptIds", mcp.Description("Department IDs."), mcp.WithStringItems()),
 				mcp.WithString("query", mcp.Description("Member search query.")),
 				mcp.WithBoolean("includeChildren", mcp.Description("Whether to include child departments.")),
@@ -163,7 +162,7 @@ func platformRoleAndUserTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("list_organization_roles",
 				mcp.WithDescription("List roles in a Yunxiao organization."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListOrganizationRoles,
@@ -171,7 +170,7 @@ func platformRoleAndUserTools() []toolset.ServerTool {
 		{
 			Tool: mcp.NewTool("get_organization_role",
 				mcp.WithDescription("Get a Yunxiao organization role by ID."),
-				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. Defaults to the user's sole organization when omitted.")),
 				mcp.WithString("roleId", mcp.Required(), mcp.Description("Organization role ID.")),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
