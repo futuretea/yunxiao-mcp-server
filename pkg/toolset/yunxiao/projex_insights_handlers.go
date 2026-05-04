@@ -640,8 +640,8 @@ func handleGetBlockerAnalysis(ctx context.Context, client any, params map[string
 
 func blockerAnalysisFilters(params map[string]any, categories []string) map[string]any {
 	return map[string]any{
-		"categories":    categories,
-		"sampleLimit":   normalizedSampleLimit(params),
+		"categories":  categories,
+		"sampleLimit": normalizedSampleLimit(params),
 	}
 }
 
@@ -820,13 +820,13 @@ func handleGetTeamWorkloadBreakdown(ctx context.Context, client any, params map[
 			for _, item := range data {
 				if itemMap, ok := item.(map[string]any); ok {
 					task := map[string]any{
-						"id":          itemMap["id"],
+						"id":           itemMap["id"],
 						"serialNumber": itemMap["serialNumber"],
-						"subject":     itemMap["subject"],
-						"status":      extractWorkitemStatusName(itemMap),
-						"labels":      extractLabelNames(itemMap),
-						"gmtCreate":   itemMap["gmtCreate"],
-						"category":    category,
+						"subject":      itemMap["subject"],
+						"status":       extractWorkitemStatusName(itemMap),
+						"labels":       extractLabelNames(itemMap),
+						"gmtCreate":    itemMap["gmtCreate"],
+						"category":     category,
 					}
 					breakdown["tasks"] = append(breakdown["tasks"].([]map[string]any), task)
 				}

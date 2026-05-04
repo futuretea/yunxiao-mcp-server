@@ -1,0 +1,93 @@
+version: 2
+before:
+  hooks:
+    - go mod tidy
+dist: releases
+snapshot:
+  version_template: "{{ .Summary }}"
+builds:
+  - id: default
+    env:
+      - CGO_ENABLED=0
+    binary: yunxiao-mcp-server
+    main: ./cmd/yunxiao-mcp-server
+    goarch:
+      - amd64
+      - arm64
+    goos:
+      - darwin
+      - linux
+      - windows
+    tags:
+      - netgo
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      - -X "github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Version=v{{ .Version }}"
+      - -X "github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Commit={{ .FullCommit }}"
+      - -X "github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Date={{ .Date }}"
+archives:
+  - format: tar.gz
+    builds:
+      - default
+    name_template: >-
+      {{ .ProjectName }}_ {{- .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else }}{{ .Arch }}{{ end }}
+checksum:
+  name_template: "{{ .ProjectName }}_v{{ .Version }}_checksums.txt"
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - Merge pull request
+      - Merge branch
+release:
+  github:
+    owner: futuretea
+    name: yunxiao-mcp-server
+  prerelease: auto
+dockers:
+  - image_templates:
+      - "ghcr.io/futuretea/yunxiao-mcp-server:v{{ .Version }}-amd64"
+      - "ghcr.io/futuretea/yunxiao-mcp-server:latest-amd64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--target=release"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--label=org.opencontainers.image.description=Yunxiao MCP Server"
+    goarch: amd64
+  - image_templates:
+      - "ghcr.io/futuretea/yunxiao-mcp-server:v{{ .Version }}-arm64"
+      - "ghcr.io/futuretea/yunxiao-mcp-server:latest-arm64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--target=release"
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--label=org.opencontainers.image.description=Yunxiao MCP Server"
+    goarch: arm64
+docker_manifests:
+  - name_template: "ghcr.io/futuretea/yunxiao-mcp-server:v{{ .Version }}"
+    image_templates:
+      - "ghcr.io/futuretea/yunxiao-mcp-server:v{{ .Version }}-amd64"
+      - "ghcr.io/futuretea/yunxiao-mcp-server:v{{ .Version }}-arm64"
+  - name_template: "ghcr.io/futuretea/yunxiao-mcp-server:latest"
+    image_templates:
+      - "ghcr.io/futuretea/yunxiao-mcp-server:latest-amd64"
+      - "ghcr.io/futuretea/yunxiao-mcp-server:latest-arm64"

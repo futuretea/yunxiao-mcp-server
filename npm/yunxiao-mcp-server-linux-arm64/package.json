@@ -1,0 +1,11 @@
+{
+  "name": "@futuretea/yunxiao-mcp-server-linux-arm64",
+  "version": "0.0.0",
+  "description": "Yunxiao MCP Server binary for linux/arm64",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}

@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 go build \
       -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Date=${BUILD_DATE}" \
     -o /usr/local/bin/yunxiao-mcp-server ./cmd/yunxiao-mcp-server
 
-FROM alpine:3.22 AS runtime
+FROM alpine:3.22 AS release
 
 RUN apk add --no-cache ca-certificates \
     && addgroup -S yunxiao \

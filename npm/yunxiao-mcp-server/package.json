@@ -1,0 +1,39 @@
+{
+  "name": "@futuretea/yunxiao-mcp-server",
+  "version": "0.0.0",
+  "description": "Model Context Protocol (MCP) server for Alibaba Yunxiao DevOps platform",
+  "main": "./bin/index.js",
+  "bin": {
+    "yunxiao-mcp-server": "bin/index.js"
+  },
+  "optionalDependencies": {
+    "@futuretea/yunxiao-mcp-server-darwin-amd64": "0.0.0",
+    "@futuretea/yunxiao-mcp-server-darwin-arm64": "0.0.0",
+    "@futuretea/yunxiao-mcp-server-linux-amd64": "0.0.0",
+    "@futuretea/yunxiao-mcp-server-linux-arm64": "0.0.0",
+    "@futuretea/yunxiao-mcp-server-windows-amd64": "0.0.0",
+    "@futuretea/yunxiao-mcp-server-windows-arm64": "0.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/futuretea/yunxiao-mcp-server.git"
+  },
+  "keywords": [
+    "mcp",
+    "yunxiao",
+    "devops",
+    "model context protocol",
+    "model",
+    "context",
+    "protocol"
+  ],
+  "author": {
+    "name": "futuretea",
+    "url": "https://github.com/futuretea"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/futuretea/yunxiao-mcp-server/issues"
+  },
+  "homepage": "https://github.com/futuretea/yunxiao-mcp-server#readme"
+}
