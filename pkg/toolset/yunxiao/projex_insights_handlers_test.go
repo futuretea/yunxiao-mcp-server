@@ -505,3 +505,312 @@ func TestHandleGetProjectMemberTaskStatusReturnsStatusGroupError(t *testing.T) {
 		t.Fatal("expected statusGroup search error")
 	}
 }
+
+// --- Tests for get_sprint_velocity ---
+
+func TestHandleGetSprintVelocityBuildsCorrectRequests(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/projects/project-1/sprints" {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			seen["sprints"] = true
+			w.Header().Set("x-total", "2")
+			_, _ = w.Write([]byte(`[{"id":"sp-1","name":"Sprint 1"},{"id":"sp-2","name":"Sprint 2"}]`))
+		case http.MethodPost:
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems:search" {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			var body map[string]any
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+				t.Fatalf("decode body: %v", err)
+			}
+			category, _ := body["category"].(string)
+			seen["cat:"+category] = true
+			conditions, _ := body["conditions"].(string)
+			if !strings.Contains(conditions, `"fieldIdentifier":"sprint"`) {
+				t.Fatalf("missing sprint condition: %q", conditions)
+			}
+			w.Header().Set("x-total", "3")
+			_, _ = w.Write([]byte(`[{"id":"wi-1","status":{"stage":"DONE"}},{"id":"wi-2","status":{"stage":"DOING"}},{"id":"wi-3","status":{"stage":"DONE"}}]`))
+		default:
+			t.Fatalf("method = %s", r.Method)
+		}
+	})
+
+	result, err := handleGetSprintVelocity(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+		"sprintCount":    float64(2),
+	})
+	if err != nil {
+		t.Fatalf("handleGetSprintVelocity() error = %v", err)
+	}
+	if !seen["sprints"] {
+		t.Fatal("missing sprints request")
+	}
+	if !seen["cat:Task"] {
+		t.Fatal("missing Task search request")
+	}
+	if !strings.Contains(result, `"sprints"`) {
+		t.Fatalf("result missing sprints: %q", result)
+	}
+	if !strings.Contains(result, `"rate"`) {
+		t.Fatalf("result missing rate: %q", result)
+	}
+}
+
+func TestHandleGetSprintVelocityRejectsEmptyCategories(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without categories")
+	})
+	if _, err := handleGetSprintVelocity(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     ", ,",
+	}); err == nil {
+		t.Fatal("expected missing categories error")
+	}
+}
+
+func TestHandleGetSprintVelocityReturnsSprintError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	if _, err := handleGetSprintVelocity(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("expected sprint list error")
+	}
+}
+
+// --- Tests for get_workitem_status_timeline ---
+
+func TestHandleGetWorkitemStatusTimelineBuildsCorrectRequests(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+				seen["workitem"] = true
+				_, _ = w.Write([]byte(`{"id":"wi-1","subject":"Test"}`))
+			} else if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1/activities" {
+				seen["activities"] = true
+				_, _ = w.Write([]byte(`[{"action":"UPDATE","field":"status","gmtCreate":1234567890,"oldValue":{"name":"backlog"},"newValue":{"name":"doing"}}]`))
+			} else {
+				t.Fatalf("unexpected path = %q", r.URL.Path)
+			}
+		default:
+			t.Fatalf("method = %s", r.Method)
+		}
+	})
+
+	result, err := handleGetWorkitemStatusTimeline(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetWorkitemStatusTimeline() error = %v", err)
+	}
+	if !seen["workitem"] {
+		t.Fatal("missing workitem request")
+	}
+	if !seen["activities"] {
+		t.Fatal("missing activities request")
+	}
+	if !strings.Contains(result, `"timeline"`) {
+		t.Fatalf("result missing timeline: %q", result)
+	}
+	if !strings.Contains(result, `"summary"`) {
+		t.Fatalf("result missing summary: %q", result)
+	}
+}
+
+func TestHandleGetWorkitemStatusTimelineSkipsWorkitemWhenDisabled(t *testing.T) {
+	seen := map[string]bool{}
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+			seen["workitem"] = true
+		}
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1/activities" {
+			seen["activities"] = true
+			_, _ = w.Write([]byte(`[]`))
+		}
+	})
+
+	_, err := handleGetWorkitemStatusTimeline(context.Background(), client, map[string]any{
+		"organizationId":  "org-1",
+		"workitemId":      "wi-1",
+		"includeWorkitem": false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetWorkitemStatusTimeline() error = %v", err)
+	}
+	if seen["workitem"] {
+		t.Fatal("should not fetch workitem when includeWorkitem=false")
+	}
+	if !seen["activities"] {
+		t.Fatal("missing activities request")
+	}
+}
+
+func TestHandleGetWorkitemStatusTimelineRequiresWorkitemId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without workitemId")
+	})
+	if _, err := handleGetWorkitemStatusTimeline(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	}); err == nil {
+		t.Fatal("expected missing workitemId error")
+	}
+}
+
+// --- Tests for get_blocker_analysis ---
+
+func TestHandleGetBlockerAnalysisBuildsCorrectRequests(t *testing.T) {
+	requestCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		switch r.Method {
+		case http.MethodPost:
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems:search" {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			w.Header().Set("x-total", "2")
+			_, _ = w.Write([]byte(`[{"id":"wi-1","status":{"name":"doing"}},{"id":"wi-2","status":{"name":"done"}}]`))
+		case http.MethodGet:
+			if strings.HasSuffix(r.URL.Path, "/relationRecords") {
+				if strings.Contains(r.URL.Path, "wi-1") {
+					_, _ = w.Write([]byte(`[{"relationType":"DEPEND_ON","target":{"status":{"stage":"DOING"}}}]`))
+				} else {
+					_, _ = w.Write([]byte(`[]`))
+				}
+			} else {
+				t.Fatalf("unexpected path = %q", r.URL.Path)
+			}
+		default:
+			t.Fatalf("method = %s", r.Method)
+		}
+	})
+
+	result, err := handleGetBlockerAnalysis(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+		"sampleLimit":    float64(2),
+	})
+	if err != nil {
+		t.Fatalf("handleGetBlockerAnalysis() error = %v", err)
+	}
+	if requestCount != 3 {
+		t.Fatalf("requests = %d, want 3", requestCount)
+	}
+	if !strings.Contains(result, `"blocked"`) {
+		t.Fatalf("result missing blocked: %q", result)
+	}
+	if !strings.Contains(result, `"blocking"`) {
+		t.Fatalf("result missing blocking: %q", result)
+	}
+	if !strings.Contains(result, `"summary"`) {
+		t.Fatalf("result missing summary: %q", result)
+	}
+}
+
+func TestHandleGetBlockerAnalysisRejectsEmptyCategories(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without categories")
+	})
+	if _, err := handleGetBlockerAnalysis(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     ", ,",
+	}); err == nil {
+		t.Fatal("expected missing categories error")
+	}
+}
+
+// --- Tests for get_member_workload_trend ---
+
+func TestHandleGetMemberWorkloadTrendBuildsCorrectRequests(t *testing.T) {
+	requestCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		switch r.Method {
+		case http.MethodGet:
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/projects/project-1/members" {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`[{"userId":"user-1","userName":"Alice"}]`))
+		case http.MethodPost:
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems:search" {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			var body map[string]any
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+				t.Fatalf("decode body: %v", err)
+			}
+			conditions, _ := body["conditions"].(string)
+			if !strings.Contains(conditions, `"fieldIdentifier":"assignedTo"`) {
+				t.Fatalf("missing assignedTo condition: %q", conditions)
+			}
+			w.Header().Set("x-total", "1")
+			_, _ = w.Write([]byte(`[{"id":"wi-1","status":{"name":"doing"},"finishTime":"2099-01-01"}]`))
+		default:
+			t.Fatalf("method = %s", r.Method)
+		}
+	})
+
+	result, err := handleGetMemberWorkloadTrend(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+		"memberLimit":    float64(1),
+	})
+	if err != nil {
+		t.Fatalf("handleGetMemberWorkloadTrend() error = %v", err)
+	}
+	if requestCount != 3 {
+		t.Fatalf("requests = %d, want 3", requestCount)
+	}
+	if !strings.Contains(result, `"members"`) {
+		t.Fatalf("result missing members: %q", result)
+	}
+	if !strings.Contains(result, `"summary"`) {
+		t.Fatalf("result missing summary: %q", result)
+	}
+}
+
+func TestHandleGetMemberWorkloadTrendRejectsEmptyCategories(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler should not issue request without categories")
+	})
+	if _, err := handleGetMemberWorkloadTrend(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     ", ,",
+	}); err == nil {
+		t.Fatal("expected missing categories error")
+	}
+}
+
+func TestHandleGetMemberWorkloadTrendReturnsMembersError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+	if _, err := handleGetMemberWorkloadTrend(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+	}); err == nil {
+		t.Fatal("expected members fetch error")
+	}
+}

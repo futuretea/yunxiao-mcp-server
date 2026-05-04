@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -286,4 +288,473 @@ func copyParams(params map[string]any) map[string]any {
 
 func todayDate() string {
 	return time.Now().Format("2006-01-02")
+}
+
+// --- Predictive Risk Assessment Handlers ---
+
+func handleGetSprintVelocity(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
+	if err != nil {
+		return "", err
+	}
+
+	categories := splitCSV(optionalStringDefault(params, "categories", "Task,Bug"))
+	if len(categories) == 0 {
+		return "", errNoCategories
+	}
+
+	sprintCount := optionalIntDefault(params, "sprintCount", 5)
+	if sprintCount > 20 {
+		sprintCount = 20
+	}
+	if sprintCount <= 0 {
+		sprintCount = 1
+	}
+
+	query := url.Values{}
+	query.Set("page", "1")
+	query.Set("perPage", strconv.Itoa(sprintCount))
+	sprintStatus := optionalStringDefault(params, "sprintStatus", "ARCHIVED,DONE")
+	if sprintStatus != "" {
+		query.Set("status", sprintStatus)
+	}
+
+	sprintPath := projexProjectPath(organizationID, projectID) + "/sprints"
+	sprintResp, err := c.Request(ctx, http.MethodGet, sprintPath, query, nil)
+	if err != nil {
+		return "", fmt.Errorf("list sprints: %w", err)
+	}
+
+	result := map[string]any{
+		"filters": sprintVelocityFilters(params, categories, sprintCount, sprintStatus),
+		"sprints": []any{},
+	}
+
+	sprintData := responsePayload(sprintResp)
+	var sprints []any
+	switch d := sprintData.(type) {
+	case []any:
+		sprints = d
+	case map[string]any:
+		if data, ok := d["data"].([]any); ok {
+			sprints = data
+		}
+	}
+
+	velocityData := make([]map[string]any, 0, len(sprints))
+	for _, sprint := range sprints {
+		sprintMap, ok := sprint.(map[string]any)
+		if !ok {
+			continue
+		}
+		sprintID, _ := sprintMap["id"].(string)
+		sprintName, _ := sprintMap["name"].(string)
+
+		sprintStats := map[string]any{
+			"id":   sprintID,
+			"name": sprintName,
+		}
+
+		categoryStats := map[string]any{}
+		for _, category := range categories {
+			searchParams := copyParams(params)
+			searchParams["sprint"] = sprintID
+			searchParams["sampleLimit"] = 1000
+
+			payload, err := searchSprintWorkitems(ctx, c, organizationID, projectID, sprintID, category, searchParams)
+			if err != nil {
+				continue
+			}
+
+			data, total, _ := extractWorkitemData(payload)
+
+			completed := 0
+			for _, item := range data {
+				if m, ok := item.(map[string]any); ok {
+					if status, ok := m["status"].(map[string]any); ok {
+						if stage, ok := status["stage"].(string); ok && stage == "DONE" {
+							completed++
+						}
+					}
+				}
+			}
+
+			denominator := total
+			if denominator == 0 {
+				denominator = 1
+			}
+			categoryStats[category] = map[string]any{
+				"total":     total,
+				"completed": completed,
+				"rate":      float64(completed) / float64(denominator),
+			}
+		}
+		sprintStats["stats"] = categoryStats
+		velocityData = append(velocityData, sprintStats)
+	}
+	result["sprints"] = velocityData
+
+	return marshalPretty(result)
+}
+
+func sprintVelocityFilters(params map[string]any, categories []string, sprintCount int, sprintStatus string) map[string]any {
+	return map[string]any{
+		"categories":   categories,
+		"sprintCount":  sprintCount,
+		"sprintStatus": sprintStatus,
+	}
+}
+
+func handleGetWorkitemStatusTimeline(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+	organizationID, err := requiredString(params, "organizationId")
+	if err != nil {
+		return "", err
+	}
+	workitemID, err := requiredString(params, "workitemId")
+	if err != nil {
+		return "", err
+	}
+
+	result := map[string]any{
+		"filters": workitemStatusTimelineFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeWorkitem", true) {
+		workitemPath := projexWorkitemPath(organizationID, workitemID)
+		workitem, err := getProjectOverviewSection(ctx, c, "workitem", workitemPath, nil)
+		if err != nil {
+			return "", err
+		}
+		result["workitem"] = workitem
+	}
+
+	activitiesPath := projexWorkitemPath(organizationID, workitemID) + "/activities"
+	activitiesResp, err := c.Request(ctx, http.MethodGet, activitiesPath, nil, nil)
+	if err != nil {
+		return "", fmt.Errorf("activities: %w", err)
+	}
+	activities := responsePayload(activitiesResp)
+
+	timeline := parseStatusTimeline(activities)
+	result["timeline"] = timeline
+
+	if len(timeline) > 0 {
+		stats := calculateTimelineStats(timeline)
+		result["summary"] = stats
+	}
+
+	return marshalPretty(result)
+}
+
+func workitemStatusTimelineFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"workitemId":      optionalStringDefault(params, "workitemId", ""),
+		"includeWorkitem": optionalBoolDefault(params, "includeWorkitem", true),
+	}
+}
+
+func parseStatusTimeline(activities any) []map[string]any {
+	timeline := make([]map[string]any, 0)
+
+	var activityList []any
+	switch a := activities.(type) {
+	case []any:
+		activityList = a
+	case map[string]any:
+		if data, ok := a["data"].([]any); ok {
+			activityList = data
+		}
+	default:
+		return timeline
+	}
+
+	for _, act := range activityList {
+		actMap, ok := act.(map[string]any)
+		if !ok {
+			continue
+		}
+
+		action, _ := actMap["action"].(string)
+		if action == "UPDATE" {
+			field, _ := actMap["field"].(string)
+			if field == "status" {
+				timeline = append(timeline, map[string]any{
+					"timestamp":  actMap["gmtCreate"],
+					"operator":   actMap["operator"],
+					"fromStatus": actMap["oldValue"],
+					"toStatus":   actMap["newValue"],
+					"comment":    actMap["comment"],
+				})
+			}
+		}
+	}
+
+	return timeline
+}
+
+func calculateTimelineStats(timeline []map[string]any) map[string]any {
+	if len(timeline) == 0 {
+		return map[string]any{"totalChanges": 0}
+	}
+
+	statuses := make(map[string]int)
+	for _, entry := range timeline {
+		if to, ok := entry["toStatus"].(map[string]any); ok {
+			if name, ok := to["name"].(string); ok {
+				statuses[name]++
+			}
+		}
+	}
+
+	return map[string]any{
+		"totalChanges": len(timeline),
+		"statusVisits": statuses,
+	}
+}
+
+func handleGetBlockerAnalysis(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
+	if err != nil {
+		return "", err
+	}
+
+	categories := splitCSV(optionalStringDefault(params, "categories", "Task,Bug"))
+	if len(categories) == 0 {
+		return "", errNoCategories
+	}
+
+	result := map[string]any{
+		"filters":  blockerAnalysisFilters(params, categories),
+		"blocked":  map[string]any{},
+		"blocking": map[string]any{},
+		"summary":  map[string]any{},
+	}
+
+	blockedWorkitems := make([]any, 0)
+	blockingWorkitems := make([]any, 0)
+	blockedCounts := make(map[string]int)
+	blockingCounts := make(map[string]int)
+
+	for _, category := range categories {
+		searchParams := copyParams(params)
+		searchParams["perPage"] = normalizedSampleLimit(params)
+
+		body := projectWorkitemSummaryBody(projectID, category, searchParams)
+		path := projexOrganizationPath(organizationID) + "/workitems:search"
+		resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
+		if err != nil {
+			continue
+		}
+
+		payload := responsePayload(resp)
+		data, _, _ := extractWorkitemData(payload)
+
+		for _, item := range data {
+			itemMap, ok := item.(map[string]any)
+			if !ok {
+				continue
+			}
+			itemID, _ := itemMap["id"].(string)
+			if itemID == "" {
+				continue
+			}
+
+			relPath := projexWorkitemPath(organizationID, itemID) + "/relationRecords"
+			relResp, err := c.Request(ctx, http.MethodGet, relPath, nil, nil)
+			if err != nil {
+				continue
+			}
+			relations := responsePayload(relResp)
+
+			hasBlockingDeps := false
+			hasBlockedItems := false
+
+			var relList []any
+			switch r := relations.(type) {
+			case []any:
+				relList = r
+			case map[string]any:
+				if data, ok := r["data"].([]any); ok {
+					relList = data
+				}
+			}
+
+			for _, rel := range relList {
+				relMap, ok := rel.(map[string]any)
+				if !ok {
+					continue
+				}
+				relType, _ := relMap["relationType"].(string)
+
+				if target, ok := relMap["target"].(map[string]any); ok {
+					if status, ok := target["status"].(map[string]any); ok {
+						stage, _ := status["stage"].(string)
+						if relType == "DEPEND_ON" && stage != "DONE" {
+							hasBlockingDeps = true
+						}
+						if relType == "DEPENDED_BY" && stage != "DONE" {
+							hasBlockedItems = true
+						}
+					}
+				}
+			}
+
+			if hasBlockingDeps {
+				blockedWorkitems = append(blockedWorkitems, itemMap)
+				blockedCounts[category]++
+			}
+			if hasBlockedItems {
+				blockingWorkitems = append(blockingWorkitems, itemMap)
+				blockingCounts[category]++
+			}
+		}
+	}
+
+	result["blocked"] = map[string]any{
+		"workitems":  blockedWorkitems,
+		"byCategory": blockedCounts,
+	}
+	result["blocking"] = map[string]any{
+		"workitems":  blockingWorkitems,
+		"byCategory": blockingCounts,
+	}
+	result["summary"] = map[string]any{
+		"totalBlocked":  len(blockedWorkitems),
+		"totalBlocking": len(blockingWorkitems),
+	}
+
+	return marshalPretty(result)
+}
+
+func blockerAnalysisFilters(params map[string]any, categories []string) map[string]any {
+	return map[string]any{
+		"categories":    categories,
+		"sampleLimit":   normalizedSampleLimit(params),
+	}
+}
+
+func handleGetMemberWorkloadTrend(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
+	if err != nil {
+		return "", err
+	}
+
+	categories := splitCSV(optionalStringDefault(params, "categories", "Task,Bug"))
+	if len(categories) == 0 {
+		return "", errNoCategories
+	}
+
+	daysBack := optionalIntDefault(params, "daysBack", 30)
+	memberLimit := optionalIntDefault(params, "memberLimit", 20)
+
+	members, assigneeIDs, err := projectTaskStatusMembers(ctx, c, organizationID, projectID, params)
+	if err != nil {
+		return "", fmt.Errorf("members: %w", err)
+	}
+	if len(assigneeIDs) == 0 {
+		return "", fmt.Errorf("assigneeIds is empty and no project members with userId were returned")
+	}
+
+	cutoffDate := time.Now().AddDate(0, 0, -daysBack).Format("2006-01-02")
+
+	result := map[string]any{
+		"filters": memberWorkloadTrendFilters(params, categories, daysBack, memberLimit),
+		"members": map[string]any{},
+		"summary": map[string]any{},
+	}
+
+	totalActiveTasks := 0
+	totalOverdue := 0
+	memberWorkloads := result["members"].(map[string]any)
+
+	for _, assigneeID := range assigneeIDs {
+		workload := map[string]any{
+			"member":        members[assigneeID],
+			"tasksByStatus": map[string]int{},
+			"totalAssigned": 0,
+			"overdueCount":  0,
+		}
+
+		for _, category := range categories {
+			searchParams := copyParams(params)
+			searchParams["assignedTo"] = assigneeID
+			searchParams["sampleLimit"] = 1000
+
+			payload, err := searchProjectWorkitems(ctx, c, organizationID, projectID, category, searchParams)
+			if err != nil {
+				continue
+			}
+
+			data, _, _ := extractWorkitemData(payload)
+
+			for _, item := range data {
+				if itemMap, ok := item.(map[string]any); ok {
+					workload["totalAssigned"] = workload["totalAssigned"].(int) + 1
+					totalActiveTasks++
+
+					statusName := "Unknown"
+					if status, ok := itemMap["status"].(map[string]any); ok {
+						if name, ok := status["name"].(string); ok {
+							statusName = name
+						}
+					}
+					workload["tasksByStatus"].(map[string]int)[statusName]++
+
+					if finishTime, ok := itemMap["finishTime"].(string); ok && finishTime != "" {
+						if finishTime < todayDate() {
+							workload["overdueCount"] = workload["overdueCount"].(int) + 1
+							totalOverdue++
+						}
+					}
+				}
+			}
+
+			recentParams := copyParams(searchParams)
+			recentParams["updatedAfter"] = cutoffDate
+			recentPayload, _ := searchProjectWorkitems(ctx, c, organizationID, projectID, category, recentParams)
+			recentData, _, _ := extractWorkitemData(recentPayload)
+			workload["recentActivity"] = map[string]any{
+				"updatedInPeriod": len(recentData),
+			}
+		}
+
+		memberWorkloads[assigneeID] = workload
+	}
+
+	denominator := len(assigneeIDs)
+	if denominator == 0 {
+		denominator = 1
+	}
+	result["summary"] = map[string]any{
+		"memberCount":       len(assigneeIDs),
+		"totalActiveTasks":  totalActiveTasks,
+		"totalOverdue":      totalOverdue,
+		"avgTasksPerMember": float64(totalActiveTasks) / float64(denominator),
+	}
+
+	return marshalPretty(result)
+}
+
+func memberWorkloadTrendFilters(params map[string]any, categories []string, daysBack, memberLimit int) map[string]any {
+	return map[string]any{
+		"categories":  categories,
+		"daysBack":    daysBack,
+		"memberLimit": memberLimit,
+	}
 }
