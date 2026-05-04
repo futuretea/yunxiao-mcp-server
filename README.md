@@ -1,32 +1,49 @@
 # Yunxiao MCP Server
 
-Go implementation of an MCP server for Alibaba [Yunxiao](https://www.aliyun.com/product/yunxiao) (云效). Exposes 148 read-only tools across 7 domains via stdio, HTTP Streamable, and SSE transports.
+Go implementation of an MCP server for Alibaba [Yunxiao](https://www.aliyun.com/product/yunxiao) (云效). Exposes 178 read-only tools across 7 domains via stdio, HTTP Streamable, and SSE transports.
 
 ---
 
 ## Quick Start
 
-**Build and run (stdio mode):**
+### npx (Recommended)
+
+No installation required — `npx` downloads the correct platform binary automatically:
+
+```bash
+npx -y @futuretea/yunxiao-mcp-server
+```
+
+With environment variables:
+
+```bash
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> npx -y @futuretea/yunxiao-mcp-server
+```
+
+### Docker
+
+Pre-built images are published to `ghcr.io/futuretea/yunxiao-mcp-server`:
+
+**Stdio mode:**
+
+```bash
+docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ghcr.io/futuretea/yunxiao-mcp-server:latest
+```
+
+**HTTP mode:**
+
+```bash
+docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ghcr.io/futuretea/yunxiao-mcp-server:latest --port 3000
+```
+
+### Build from source
 
 ```bash
 make build
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server
 ```
 
-**HTTP mode:**
-
-```bash
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server --port 3000
-```
-
-**Docker:**
-
-```bash
-docker build -t yunxiao-mcp-server:local .
-docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> yunxiao-mcp-server:local
-```
-
-See [docs/mcp-client-config.md](docs/mcp-client-config.md) for Claude/Cursor/IDE configuration examples.
+See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other IDE setup examples.
 
 ---
 
