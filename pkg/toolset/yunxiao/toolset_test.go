@@ -123,6 +123,7 @@ func expectedProjexToolNames() []string {
 		"get_workitem_status_timeline",
 		"get_blocker_analysis",
 		"get_member_workload_trend",
+		"get_team_workload_breakdown",
 		"list_project_members",
 		"list_project_templates",
 		"list_project_program",

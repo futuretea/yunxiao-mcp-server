@@ -99,5 +99,19 @@ func projexInsightTools() []toolset.ServerTool {
 			),
 			Handler: handleGetMemberWorkloadTrend,
 		},
+		{
+			Tool: mcp.NewTool("get_team_workload_breakdown",
+				mcp.WithDescription("Get a detailed per-member workload breakdown with current active tasks, task subjects, status, labels, and creation dates. Useful for stand-ups, sprint planning, and identifying what each team member is working on right now."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("projectId", mcp.Required(), mcp.Description("Project ID. Use search_projects to discover valid IDs.")),
+				mcp.WithString("assigneeIds", mcp.Description("Comma-separated assignee user IDs. Defaults to project members up to memberLimit.")),
+				mcp.WithString("categories", mcp.Description("Comma-separated work item categories. Defaults to Task,Bug.")),
+				mcp.WithString("status", mcp.Description("Comma-separated status IDs to include. Defaults to all active statuses (backlog,待处理,处理中,测试中,In Review,pending).")),
+				mcp.WithNumber("memberLimit", mcp.Description("Max project members to inspect when assigneeIds is omitted. Defaults to 20.")),
+				mcp.WithNumber("taskLimit", mcp.Description("Max tasks returned per member. Defaults to 10, clamped to 1-50.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetTeamWorkloadBreakdown,
+		},
 	}
 }

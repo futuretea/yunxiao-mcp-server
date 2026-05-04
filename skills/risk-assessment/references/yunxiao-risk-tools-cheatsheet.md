@@ -8,6 +8,7 @@
 | `get_workitem_status_timeline` | 单个任务状态变更时间线 | `workitemId` | 状态变更记录、停留时长、操作人 |
 | `get_blocker_analysis` | 依赖阻塞全景 | `projectId`, `categories`, `sampleLimit` | 被阻塞任务、阻塞他人任务、分类统计 |
 | `get_member_workload_trend` | 成员负载分布与趋势 | `projectId`, `assigneeIds`, `daysBack` | 每成员：任务数、状态分布、逾期数、近期活跃度 |
+| `get_team_workload_breakdown` | 团队任务明细分解 | `projectId`, `assigneeIds`, `taskLimit` | 每成员：任务列表（主题、状态、标签、创建时间）|
 
 ## 辅助工具（配合预测）
 
@@ -43,6 +44,13 @@
 2. get_sprint_overview -> 当前迭代任务分布
 3. list_versions -> 版本截止日期
 4. 计算：剩余任务 / 历史速率 = 预测完成时间
+```
+
+**团队站会 / 任务明细审查**：
+```
+1. get_team_workload_breakdown -> 每个人当前在做什么
+2. (可选) get_workitem_status_timeline -> 某个任务为什么卡住了
+3. (可选) get_project_workitem_detail -> 获取任务详情和评论
 ```
 
 ## 注意事项
