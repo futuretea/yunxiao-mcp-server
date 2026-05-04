@@ -2,6 +2,8 @@ package yunxiao
 
 import (
 	"context"
+	"errors"
+	"net/http"
 	"net/url"
 )
 
@@ -10,7 +12,14 @@ func handleGetCurrentUser(ctx context.Context, client any, params map[string]any
 	if err != nil {
 		return "", err
 	}
-	return c.GetJSON(ctx, "/platform/users:me", nil)
+	result, err := c.GetJSON(ctx, "/platform/users:me", nil)
+	if err != nil {
+		var apiErr *APIError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound {
+			return c.GetJSON(ctx, "/platform/user", nil)
+		}
+	}
+	return result, err
 }
 
 func handleGetCurrentOrganizationInfo(ctx context.Context, client any, params map[string]any) (string, error) {

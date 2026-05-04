@@ -28,6 +28,39 @@ func TestHandleGetCurrentUserBuildsPath(t *testing.T) {
 	}
 }
 
+func TestHandleGetCurrentUserFallbackToCloudAPI(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if callCount == 1 {
+			if r.URL.Path != "/oapi/v1/platform/users:me" {
+				t.Fatalf("first path = %q", r.URL.Path)
+			}
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte(`{"error":"not found"}`))
+			return
+		}
+		if r.URL.Path != "/oapi/v1/platform/user" {
+			t.Fatalf("fallback path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"id":"user-cloud"}`))
+	})
+
+	result, err := handleGetCurrentUser(context.Background(), client, nil)
+	if err != nil {
+		t.Fatalf("handleGetCurrentUser() error = %v", err)
+	}
+	if callCount != 2 {
+		t.Fatalf("expected 2 calls, got %d", callCount)
+	}
+	if !strings.Contains(result, `"id"`) {
+		t.Fatalf("result = %q", result)
+	}
+}
+
 func TestHandleGetCurrentOrganizationInfoBuildsPath(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/oapi/v1/platform/users:me" {
