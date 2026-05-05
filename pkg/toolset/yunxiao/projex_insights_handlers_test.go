@@ -596,13 +596,14 @@ func TestHandleGetWorkitemStatusTimelineBuildsCorrectRequests(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+			switch r.URL.Path {
+			case "/oapi/v1/projex/organizations/org-1/workitems/wi-1":
 				seen["workitem"] = true
 				_, _ = w.Write([]byte(`{"id":"wi-1","subject":"Test"}`))
-			} else if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1/activities" {
+			case "/oapi/v1/projex/organizations/org-1/workitems/wi-1/activities":
 				seen["activities"] = true
 				_, _ = w.Write([]byte(`[{"action":"UPDATE","field":"status","gmtCreate":1234567890,"oldValue":{"name":"backlog"},"newValue":{"name":"doing"}}]`))
-			} else {
+			default:
 				t.Fatalf("unexpected path = %q", r.URL.Path)
 			}
 		default:

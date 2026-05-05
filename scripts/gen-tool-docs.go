@@ -8,6 +8,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Param struct {
@@ -55,7 +58,10 @@ func main() {
 		domainTools[domain] = append(domainTools[domain], tools...)
 	}
 
-	os.MkdirAll("docs", 0755)
+	if err := os.MkdirAll("docs", 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "mkdir docs: %v\n", err)
+		os.Exit(1)
+	}
 
 	for domain, tools := range domainTools {
 		if len(tools) == 0 {
@@ -251,20 +257,10 @@ func extractStringLit(expr ast.Expr) string {
 	return strings.Trim(lit.Value, `"`)
 }
 
-func isEnhancedTool(name string) bool {
-	suffixes := []string{"_overview", "_summary", "_dashboard", "_board", "_status", "_detail", "_context"}
-	for _, s := range suffixes {
-		if strings.HasSuffix(name, s) {
-			return true
-		}
-	}
-	return false
-}
-
 func writeDomainDoc(filename, domain string, tools []Tool) error {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("# %s Tools\n\n", strings.Title(domain)))
-	b.WriteString(fmt.Sprintf("This document describes the %d read-only MCP tools in the %s domain.\n\n", len(tools), domain))
+	fmt.Fprintf(&b, "# %s Tools\n\n", cases.Title(language.English).String(domain))
+	fmt.Fprintf(&b, "This document describes the %d read-only MCP tools in the %s domain.\n\n", len(tools), domain)
 
 	var enhancedTools []Tool
 	for _, t := range tools {
@@ -278,7 +274,7 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 		b.WriteString("| Tool | Description |\n")
 		b.WriteString("|------|-------------|\n")
 		for _, t := range enhancedTools {
-			b.WriteString(fmt.Sprintf("| `%s` | %s |\n", t.Name, t.Description))
+			fmt.Fprintf(&b, "| `%s` | %s |\n", t.Name, t.Description)
 		}
 		b.WriteString("\n")
 	}
@@ -297,7 +293,7 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 		b.WriteString("## Pagination\n\n")
 		b.WriteString("Tools in this domain use the following pagination scheme(s):\n\n")
 		for _, m := range modes {
-			b.WriteString(fmt.Sprintf("- %s\n", m))
+			fmt.Fprintf(&b, "- %s\n", m)
 		}
 		b.WriteString("\n")
 	}
@@ -313,18 +309,18 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 		if t.Enhanced {
 			name = fmt.Sprintf("**`%s`**", t.Name)
 		}
-		b.WriteString(fmt.Sprintf("| %s | %s |\n", name, t.Description))
+		fmt.Fprintf(&b, "| %s | %s |\n", name, t.Description)
 	}
 	b.WriteString("\n")
 
 	for _, t := range tools {
-		b.WriteString(fmt.Sprintf("### %s\n\n", t.Name))
-		b.WriteString(fmt.Sprintf("**Description**: %s\n\n", t.Description))
+		fmt.Fprintf(&b, "### %s\n\n", t.Name)
+		fmt.Fprintf(&b, "**Description**: %s\n\n", t.Description)
 		if t.Enhanced {
 			b.WriteString("**Type**: Enhanced aggregation tool\n\n")
 		}
 		if t.PaginationMode != "" {
-			b.WriteString(fmt.Sprintf("**Pagination**: %s\n\n", t.PaginationMode))
+			fmt.Fprintf(&b, "**Pagination**: %s\n\n", t.PaginationMode)
 		}
 		if len(t.Params) > 0 {
 			b.WriteString("**Parameters**:\n\n")
@@ -339,7 +335,7 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 				if desc == "" {
 					desc = "-"
 				}
-				b.WriteString(fmt.Sprintf("| `%s` | %s | %s | %s |\n", p.Name, p.Type, req, desc))
+				fmt.Fprintf(&b, "| `%s` | %s | %s | %s |\n", p.Name, p.Type, req, desc)
 			}
 			b.WriteString("\n")
 		} else {

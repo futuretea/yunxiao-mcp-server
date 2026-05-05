@@ -118,7 +118,7 @@ func newVersionCommand(streams IOStreams) *cobra.Command {
 		Use:   "version",
 		Short: "print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintln(streams.Out, version.GetVersionInfo())
+			_, _ = fmt.Fprintln(streams.Out, version.GetVersionInfo())
 		},
 	}
 	command.SetOut(streams.Out)

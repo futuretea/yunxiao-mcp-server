@@ -114,7 +114,7 @@ func TestSSEEndpointCarriesQueryTokenToMessageEndpoint(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GET /sse: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status = %d", resp.StatusCode)
@@ -181,7 +181,7 @@ func TestStreamableMCPUsesRequestAccessTokenForToolCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("POST /mcp: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -239,7 +239,7 @@ func TestSSEMessageUsesQueryAccessTokenForToolCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GET /sse: %v", err)
 	}
-	defer sseResp.Body.Close()
+	defer func() { _ = sseResp.Body.Close() }()
 	if sseResp.StatusCode != http.StatusOK {
 		t.Fatalf("SSE status = %d", sseResp.StatusCode)
 	}
@@ -271,7 +271,7 @@ func TestSSEMessageUsesQueryAccessTokenForToolCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("POST /message: %v", err)
 	}
-	defer messageResp.Body.Close()
+	defer func() { _ = messageResp.Body.Close() }()
 	if messageResp.StatusCode != http.StatusAccepted {
 		body, _ := io.ReadAll(messageResp.Body)
 		t.Fatalf("message status = %d body = %s", messageResp.StatusCode, body)
@@ -322,7 +322,7 @@ func TestHandlerShutdownCancelsActiveStreamableHTTPGet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GET /mcp: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status = %d", resp.StatusCode)
 	}
@@ -393,7 +393,7 @@ func TestLoggingResponseWriterIsIdempotent(t *testing.T) {
 	}
 
 	// Write should not override status if already set
-	lrw.Write([]byte("body"))
+	_, _ = lrw.Write([]byte("body"))
 	if rec.Code != http.StatusCreated {
 		t.Fatalf("recorder code = %d, want %d", rec.Code, http.StatusCreated)
 	}
@@ -447,7 +447,7 @@ func TestServeStartsAndShutsDown(t *testing.T) {
 		t.Fatalf("listen: %v", err)
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
-	listener.Close()
+	_ = listener.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
@@ -468,7 +468,7 @@ func TestServeReturnsListenError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("listen: %v", err)
 	}
-	defer listener.Close()
+	defer func() { _ = listener.Close() }()
 	port := listener.Addr().(*net.TCPAddr).Port
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)

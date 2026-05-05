@@ -87,7 +87,7 @@ func TestRootCommandStartsAndShutsDownHTTPServer(t *testing.T) {
 		t.Fatalf("listen: %v", err)
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
-	listener.Close()
+	_ = listener.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
