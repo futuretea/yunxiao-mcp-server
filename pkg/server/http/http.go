@@ -34,7 +34,9 @@ func Serve(ctx context.Context, mcpServer *mcpserver.Server, staticConfig *confi
 	defer stop()
 
 	serverErr := make(chan error, 1)
+	serverDone := make(chan struct{})
 	go func() {
+		defer close(serverDone)
 		log.Info().
 			Str("addr", httpServer.Addr).
 			Str("mcp", MCPEndpoint).
@@ -57,6 +59,7 @@ func Serve(ctx context.Context, mcpServer *mcpserver.Server, staticConfig *confi
 	if err := handler.Shutdown(shutdownCtx); err != nil {
 		return err
 	}
+	<-serverDone
 	return nil
 }
 
