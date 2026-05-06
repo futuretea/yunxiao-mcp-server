@@ -1,12 +1,12 @@
 BINARY_NAME ?= yunxiao-mcp-server
-VERSION ?= dev
-COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
 DATE ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS := -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Version=$(VERSION) \
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Commit=$(COMMIT) \
 	-X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Date=$(DATE)
 
-.PHONY: build test lint format tidy ci smoke clean coverage docs
+.PHONY: build test lint format tidy ci smoke clean coverage docs build-all-platforms npm-copy-binaries npm-publish
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o bin/$(BINARY_NAME) ./cmd/yunxiao-mcp-server
@@ -50,6 +50,7 @@ OSES = darwin linux windows
 ARCHS = amd64 arm64
 
 NPM_VERSION ?= $(shell echo $(shell git describe --tags --always) | sed 's/^v//')
+NPM_PUBLISH_FLAGS ?= --access=public
 
 CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),bin/$(BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,)))
 CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),./npm/$(BINARY_NAME)-$(os)-$(arch)/bin/))
@@ -68,19 +69,23 @@ npm-copy-binaries: build-all-platforms
 	))
 
 npm-publish: npm-copy-binaries
-	$(foreach os,$(OSES),$(foreach arch,$(ARCHS), \
+	test -f README.md
+	test -f LICENSE
+	@test -n "$$NPM_TOKEN" || (echo "NPM_TOKEN is required"; exit 1)
+	@set -e; $(foreach os,$(OSES),$(foreach arch,$(ARCHS), \
 		DIRNAME="$(BINARY_NAME)-$(os)-$(arch)"; \
 		cd npm/$$DIRNAME; \
-		echo '//registry.npmjs.org/:_authToken=$(NPM_TOKEN)' >> .npmrc; \
-		jq '.version = "$(NPM_VERSION)"' package.json > tmp.json && mv tmp.json package.json; \
-		npm publish --access=public; \
+		printf '%s\n' "//registry.npmjs.org/:_authToken=$$NPM_TOKEN" >> .npmrc; \
+		jq '.version = "$(NPM_VERSION)"' package.json > tmp.json; \
+		mv tmp.json package.json; \
+		npm publish $(NPM_PUBLISH_FLAGS); \
 		cd ../..; \
 	))
 	cp README.md LICENSE ./npm/$(BINARY_NAME)/
-	echo '//registry.npmjs.org/:_authToken=$(NPM_TOKEN)' >> ./npm/$(BINARY_NAME)/.npmrc
+	@printf '%s\n' "//registry.npmjs.org/:_authToken=$$NPM_TOKEN" >> ./npm/$(BINARY_NAME)/.npmrc
 	jq '.version = "$(NPM_VERSION)"' ./npm/$(BINARY_NAME)/package.json > tmp.json && mv tmp.json ./npm/$(BINARY_NAME)/package.json
 	jq '.optionalDependencies |= with_entries(.value = "$(NPM_VERSION)")' ./npm/$(BINARY_NAME)/package.json > tmp.json && mv tmp.json ./npm/$(BINARY_NAME)/package.json
-	cd npm/$(BINARY_NAME) && npm publish --access=public
+	cd npm/$(BINARY_NAME) && npm publish $(NPM_PUBLISH_FLAGS)
 
 clean:
 	rm -rf bin coverage.out $(CLEAN_TARGETS)

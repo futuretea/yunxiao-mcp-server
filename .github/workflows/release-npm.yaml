@@ -3,7 +3,7 @@ name: Release NPM
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,20 +20,7 @@ permissions:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - os: linux
-            arch: amd64
-          - os: linux
-            arch: arm64
-          - os: darwin
-            arch: amd64
-          - os: darwin
-            arch: arm64
-          - os: windows
-            arch: amd64
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,91 +31,16 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Build
-        env:
-          GOOS: ${{ matrix.os }}
-          GOARCH: ${{ matrix.arch }}
-        run: |
-          output="bin/${{ matrix.os }}-${{ matrix.arch }}/yunxiao-mcp-server"
-          if [ "${{ matrix.os }}" = "windows" ]; then
-            output="${output}.exe"
-          fi
-          mkdir -p "$(dirname "$output")"
-          go build -ldflags "-s -w \
-            -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Version=${{ github.ref_name }} \
-            -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Commit=${{ github.sha }} \
-            -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            -o "$output" ./cmd/yunxiao-mcp-server
+        run: make build-all-platforms
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: yunxiao-mcp-server-${{ matrix.os }}-${{ matrix.arch }}
-          path: bin/${{ matrix.os }}-${{ matrix.arch }}/yunxiao-mcp-server*
-
-  github-release:
-    name: GitHub Release
-    needs: release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-          merge-multiple: false
-
-      - name: Create Release
+      - name: Upload artifacts
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           make_latest: true
-          files: artifacts/**/*
+          files: |
+            LICENSE
+            bin/yunxiao-mcp-server-*
 
-  npm-publish:
-    name: Publish NPM
-    needs: release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-          merge-multiple: false
-
-      - name: Copy binaries to npm packages
-        run: |
-          for dir in artifacts/yunxiao-mcp-server-*; do
-            name=$(basename "$dir")
-            mkdir -p "npm/$name/bin"
-            cp "$dir"/yunxiao-mcp-server* "npm/$name/bin/"
-          done
-
-      - name: Publish platform packages
-        run: |
-          for dir in npm/yunxiao-mcp-server-*; do
-            if [ -f "$dir/package.json" ]; then
-              cd "$dir"
-              echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' >> .npmrc
-              jq '.version = "${{ github.ref_name }}"' package.json > tmp.json && mv tmp.json package.json
-              npm publish --access=public
-              cd ../..
-            fi
-          done
-
-      - name: Publish main package
-        run: |
-          cp README.md LICENSE ./npm/yunxiao-mcp-server/
-          echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' >> ./npm/yunxiao-mcp-server/.npmrc
-          jq '.version = "${{ github.ref_name }}"' ./npm/yunxiao-mcp-server/package.json > tmp.json && mv tmp.json ./npm/yunxiao-mcp-server/package.json
-          jq '.optionalDependencies |= with_entries(.value = "${{ github.ref_name }}")' ./npm/yunxiao-mcp-server/package.json > tmp.json && mv tmp.json ./npm/yunxiao-mcp-server/package.json
-          cd npm/yunxiao-mcp-server && npm publish --access=public
+      - name: Publish npm
+        run: make npm-publish
