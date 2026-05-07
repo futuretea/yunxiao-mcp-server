@@ -37,10 +37,16 @@ func NewServer(configuration Configuration) (*Server, error) {
 		return nil, fmt.Errorf("static config is required")
 	}
 
+	clientOptions := []yunxiaoToolset.ClientOption{}
+	if configuration.InsecureSkipTLSVerify {
+		clientOptions = append(clientOptions, yunxiaoToolset.WithInsecureSkipTLSVerify(true))
+	}
+
 	client, err := yunxiaoToolset.NewClient(
 		configuration.BaseURL,
 		configuration.AccessToken,
 		time.Duration(configuration.RequestTimeoutSeconds)*time.Second,
+		clientOptions...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("create Yunxiao client: %w", err)

@@ -51,6 +51,43 @@ func TestClientGetJSONAddsAuthHeaderAndAPIBasePath(t *testing.T) {
 	}
 }
 
+func TestClientRejectsSelfSignedTLSByDefault(t *testing.T) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	_, err = client.GetJSON(context.Background(), "/platform/users:me", nil)
+	if err == nil {
+		t.Fatal("GetJSON() expected TLS verification error")
+	}
+}
+
+func TestClientAllowsSelfSignedTLSWhenConfigured(t *testing.T) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second, WithInsecureSkipTLSVerify(true))
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	result, err := client.GetJSON(context.Background(), "/platform/users:me", nil)
+	if err != nil {
+		t.Fatalf("GetJSON() error = %v", err)
+	}
+	if result != "{\n  \"ok\": true\n}" {
+		t.Fatalf("result = %q", result)
+	}
+}
+
 func TestClientUsesAccessTokenFromContext(t *testing.T) {
 	var gotToken string
 

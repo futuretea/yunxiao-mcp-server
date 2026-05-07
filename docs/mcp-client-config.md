@@ -101,6 +101,8 @@ Use these endpoints:
 
 When running behind a reverse proxy, set `YUNXIAO_MCP_SSE_BASE_URL` or `--sse-base-url` so SSE clients receive the public message URL.
 
+For trusted internal Yunxiao-compatible endpoints with private or self-signed certificates, set `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY=true` or pass `--insecure-skip-tls-verify`. Keep this disabled for public endpoints.
+
 For a shared HTTP service, clients can pass their own token per request:
 
 ```text

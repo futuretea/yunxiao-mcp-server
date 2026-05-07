@@ -50,6 +50,7 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 	command.Flags().String("log-level", "info", "log level: trace, debug, info, warn, error, fatal, panic, disabled")
 	command.Flags().String("base-url", config.DefaultBaseURL, "Yunxiao OpenAPI host or API base URL")
 	command.Flags().String("access-token", "", "Yunxiao access token; also read from YUNXIAO_MCP_ACCESS_TOKEN or YUNXIAO_ACCESS_TOKEN")
+	command.Flags().Bool("insecure-skip-tls-verify", false, "skip Yunxiao server TLS certificate verification")
 	command.Flags().Bool("read-only", true, "run in read-only mode")
 	command.Flags().StringSlice("enabled-tools", []string{}, "comma-separated list of tool names to enable")
 	command.Flags().StringSlice("disabled-tools", []string{}, "comma-separated list of tool names to disable")
@@ -65,19 +66,20 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 
 func bindFlags(v *viper.Viper, cmd *cobra.Command) error {
 	bindings := map[string]string{
-		"port":                    "port",
-		"sse_base_url":            "sse-base-url",
-		"log_level":               "log-level",
-		"base_url":                "base-url",
-		"access_token":            "access-token",
-		"read_only":               "read-only",
-		"enabled_tools":           "enabled-tools",
-		"disabled_tools":          "disabled-tools",
-		"enabled_domains":         "enable-domains",
-		"disabled_domains":        "disable-domains",
-		"project_focused":         "project-focused",
-		"minimal":                 "minimal",
-		"request_timeout_seconds": "request-timeout-seconds",
+		"port":                     "port",
+		"sse_base_url":             "sse-base-url",
+		"log_level":                "log-level",
+		"base_url":                 "base-url",
+		"access_token":             "access-token",
+		"insecure_skip_tls_verify": "insecure-skip-tls-verify",
+		"read_only":                "read-only",
+		"enabled_tools":            "enabled-tools",
+		"disabled_tools":           "disabled-tools",
+		"enabled_domains":          "enable-domains",
+		"disabled_domains":         "disable-domains",
+		"project_focused":          "project-focused",
+		"minimal":                  "minimal",
+		"request_timeout_seconds":  "request-timeout-seconds",
 	}
 
 	for key, flag := range bindings {

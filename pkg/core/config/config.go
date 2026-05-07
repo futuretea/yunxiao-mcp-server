@@ -21,6 +21,7 @@ type StaticConfig struct {
 	LogLevel              string   `mapstructure:"log_level"`
 	BaseURL               string   `mapstructure:"base_url"`
 	AccessToken           string   `mapstructure:"access_token"`
+	InsecureSkipTLSVerify bool     `mapstructure:"insecure_skip_tls_verify"`
 	ReadOnly              bool     `mapstructure:"read_only"`
 	EnabledTools          []string `mapstructure:"enabled_tools"`
 	DisabledTools         []string `mapstructure:"disabled_tools"`
@@ -70,6 +71,7 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	v.SetDefault("sse_base_url", "")
 	v.SetDefault("log_level", "info")
 	v.SetDefault("base_url", DefaultBaseURL)
+	v.SetDefault("insecure_skip_tls_verify", false)
 	v.SetDefault("read_only", true)
 	v.SetDefault("enabled_tools", []string{})
 	v.SetDefault("disabled_tools", []string{})
@@ -114,8 +116,9 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 
 func bindEnvironment(v *viper.Viper) error {
 	envBindings := map[string][]string{
-		"access_token": {"YUNXIAO_MCP_ACCESS_TOKEN", "YUNXIAO_ACCESS_TOKEN"},
-		"base_url":     {"YUNXIAO_MCP_BASE_URL", "YUNXIAO_API_BASE_URL"},
+		"access_token":             {"YUNXIAO_MCP_ACCESS_TOKEN", "YUNXIAO_ACCESS_TOKEN"},
+		"base_url":                 {"YUNXIAO_MCP_BASE_URL", "YUNXIAO_API_BASE_URL"},
+		"insecure_skip_tls_verify": {"YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY"},
 	}
 
 	for key, names := range envBindings {

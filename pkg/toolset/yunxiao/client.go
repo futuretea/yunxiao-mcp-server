@@ -3,6 +3,7 @@ package yunxiao
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,6 +27,20 @@ const (
 )
 
 type accessTokenContextKey struct{}
+
+type clientOptions struct {
+	insecureSkipTLSVerify bool
+}
+
+// ClientOption customizes the Yunxiao OpenAPI client.
+type ClientOption func(*clientOptions)
+
+// WithInsecureSkipTLSVerify configures whether the client skips server TLS verification.
+func WithInsecureSkipTLSVerify(skip bool) ClientOption {
+	return func(options *clientOptions) {
+		options.insecureSkipTLSVerify = skip
+	}
+}
 
 // Client is a minimal Yunxiao OpenAPI client.
 type Client struct {
@@ -119,17 +134,36 @@ func friendlyAPIError(err error) error {
 }
 
 // NewClient creates a Yunxiao OpenAPI client.
-func NewClient(baseURL, accessToken string, timeout time.Duration) (*Client, error) {
+func NewClient(baseURL, accessToken string, timeout time.Duration, opts ...ClientOption) (*Client, error) {
 	parsed, err := normalizeAPIBaseURL(baseURL)
 	if err != nil {
 		return nil, err
 	}
+	options := clientOptions{}
+	for _, opt := range opts {
+		if opt != nil {
+			opt(&options)
+		}
+	}
+
 	return &Client{
 		baseURL:     parsed,
 		accessToken: strings.TrimSpace(accessToken),
-		httpClient:  &http.Client{Timeout: timeout},
+		httpClient:  newHTTPClient(timeout, options),
 		userAgent:   fmt.Sprintf("modelcontextprotocol/%s/%s", version.BinaryName, version.Version),
 	}, nil
+}
+
+func newHTTPClient(timeout time.Duration, options clientOptions) *http.Client {
+	client := &http.Client{Timeout: timeout}
+	if !options.insecureSkipTLSVerify {
+		return client
+	}
+
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // Explicit opt-in for private/self-signed Yunxiao endpoints.
+	client.Transport = transport
+	return client
 }
 
 // ResolveDefaultOrgID fetches the user's organizations and, if exactly one exists,

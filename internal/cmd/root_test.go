@@ -37,7 +37,7 @@ func TestRootCommandHelp(t *testing.T) {
 	if err := command.Execute(); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
-	for _, want := range []string{"Yunxiao MCP Server", "--port", "--access-token"} {
+	for _, want := range []string{"Yunxiao MCP Server", "--port", "--access-token", "--insecure-skip-tls-verify"} {
 		if !strings.Contains(out.String(), want) {
 			t.Fatalf("stdout = %q, missing %q", out.String(), want)
 		}

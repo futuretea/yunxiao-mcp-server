@@ -75,8 +75,11 @@ Priority: explicit values > flags > environment > config file > defaults.
 | `YUNXIAO_MCP_ACCESS_TOKEN` | Yunxiao access token | — |
 | `YUNXIAO_MCP_BASE_URL` | API base URL or host | `https://openapi-rdc.aliyuncs.com` |
 | `YUNXIAO_MCP_SSE_BASE_URL` | Public SSE base URL (reverse proxy) | — |
+| `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY` | Skip Yunxiao server TLS certificate verification for private/self-signed endpoints | `false` |
 
 Legacy aliases `YUNXIAO_ACCESS_TOKEN` and `YUNXIAO_API_BASE_URL` are also supported.
+
+Use `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY=true` or `--insecure-skip-tls-verify` only for trusted internal endpoints where certificate validation cannot be fixed.
 
 ### Per-Request Tokens (HTTP/SSE)
 

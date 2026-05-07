@@ -84,6 +84,19 @@ func TestLoadConfigReadsPrefixedEnvironment(t *testing.T) {
 	}
 }
 
+func TestLoadConfigReadsInsecureSkipTLSVerifyEnvironment(t *testing.T) {
+	t.Setenv("YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY", "true")
+
+	cfg, err := LoadConfig("", viper.New())
+	if err != nil {
+		t.Fatalf("LoadConfig() error = %v", err)
+	}
+
+	if !cfg.InsecureSkipTLSVerify {
+		t.Fatal("InsecureSkipTLSVerify = false, want true")
+	}
+}
+
 func TestLoadConfigReadsLegacyEnvironment(t *testing.T) {
 	t.Setenv("YUNXIAO_MCP_ACCESS_TOKEN", "")
 	t.Setenv("YUNXIAO_MCP_BASE_URL", "")
@@ -224,6 +237,7 @@ func TestLoadConfigNormalizesToolFilters(t *testing.T) {
 func TestLoadConfigUsesNewViperWhenNil(t *testing.T) {
 	t.Setenv("YUNXIAO_MCP_ACCESS_TOKEN", "")
 	t.Setenv("YUNXIAO_MCP_BASE_URL", "")
+	t.Setenv("YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY", "")
 	t.Setenv("YUNXIAO_ACCESS_TOKEN", "")
 	t.Setenv("YUNXIAO_API_BASE_URL", "")
 
@@ -236,6 +250,9 @@ func TestLoadConfigUsesNewViperWhenNil(t *testing.T) {
 	}
 	if cfg.LogLevel != "info" {
 		t.Fatalf("LogLevel = %q, want info", cfg.LogLevel)
+	}
+	if cfg.InsecureSkipTLSVerify {
+		t.Fatal("InsecureSkipTLSVerify = true, want false")
 	}
 }
 
