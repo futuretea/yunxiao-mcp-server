@@ -2,7 +2,9 @@ package yunxiao
 
 import "github.com/futuretea/yunxiao-mcp-server/pkg/toolset"
 
-// minimalToolNames are the core query tools kept in --minimal mode.
+// minimalToolNames are the core tools kept in --minimal mode.
+// Write tools are included here so that --minimal --read-only=false can
+// create and update work items; filterReadOwn removes them when needed.
 var minimalToolNames = map[string]struct{}{
 	// Platform
 	"get_current_user":              {},
@@ -26,6 +28,12 @@ var minimalToolNames = map[string]struct{}{
 
 	// Projex — Members
 	"list_project_members": {},
+
+	// Projex — Write (available when read-only is false)
+	"create_workitem":        {},
+	"update_workitem":        {},
+	"update_workitem_status": {},
+	"add_workitem_comment":   {},
 }
 
 // projectFocusedDomains are the tool domains enabled in project-focused mode.

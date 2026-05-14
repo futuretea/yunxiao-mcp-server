@@ -229,9 +229,13 @@ func TestGetMinimalToolsReturnsExactSet(t *testing.T) {
 		"list_sprints",
 		"get_sprint_overview",
 		"list_project_members",
+		"create_workitem",
+		"update_workitem",
+		"update_workitem_status",
+		"add_workitem_comment",
 	}
 
-	tools := (&Toolset{ReadOnly: true}).GetMinimalTools(nil)
+	tools := (&Toolset{ReadOnly: false}).GetMinimalTools(nil)
 	if len(tools) != len(want) {
 		t.Fatalf("tool count = %d, want %d", len(tools), len(want))
 	}
@@ -246,6 +250,28 @@ func TestGetMinimalToolsReturnsExactSet(t *testing.T) {
 	for _, w := range want {
 		if !names[w] {
 			t.Fatalf("expected minimal tool %q", w)
+		}
+	}
+}
+
+func TestGetMinimalToolsReadOnlyExcludesWriteTools(t *testing.T) {
+	tools := (&Toolset{ReadOnly: true}).GetMinimalTools(nil)
+	for _, tool := range tools {
+		if _, ok := writeToolNames[tool.Tool.Name]; ok {
+			t.Fatalf("read-only minimal mode should exclude write tool %q", tool.Tool.Name)
+		}
+	}
+}
+
+func TestGetMinimalToolsWriteModeIncludesWriteTools(t *testing.T) {
+	tools := (&Toolset{ReadOnly: false}).GetMinimalTools(nil)
+	names := make(map[string]bool, len(tools))
+	for _, tool := range tools {
+		names[tool.Tool.Name] = true
+	}
+	for want := range writeToolNames {
+		if !names[want] {
+			t.Fatalf("write mode minimal should include write tool %q", want)
 		}
 	}
 }
