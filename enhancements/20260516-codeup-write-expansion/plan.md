@@ -1,5 +1,11 @@
 # Plan: Codeup Write Tool Expansion — First Safe Slice
 
+## Status
+
+- ✅ `add_change_request_comment` — delivered (10c6f6e)
+- ✅ `create_change_request` — delivered (6ada299)
+- ⏸️ `create_merge_request` — deferred (API contract unverified in reference project)
+
 ## Scope
 
 3 POST-based write tools: `create_change_request`, `add_change_request_comment`, `create_merge_request`. All gated behind `read_only=false`.
