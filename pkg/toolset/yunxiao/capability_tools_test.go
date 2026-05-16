@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 	"testing"
+
+	"github.com/mark3labs/mcp-go/mcp"
 )
 
 func TestHandleDescribeToolset(t *testing.T) {
@@ -57,5 +59,26 @@ func TestIsReadOnlyTool(t *testing.T) {
 	}
 	if readOnlyCount == len(allTools) {
 		t.Error("expected some non-read-only tools")
+	}
+}
+
+func TestIsReadOnlyToolBranches(t *testing.T) {
+	yes := true
+	no := false
+	tests := []struct {
+		name string
+		tool mcp.Tool
+		want bool
+	}{
+		{"nil hint", mcp.Tool{}, false},
+		{"hint true", mcp.Tool{Annotations: mcp.ToolAnnotation{ReadOnlyHint: &yes}}, true},
+		{"hint false", mcp.Tool{Annotations: mcp.ToolAnnotation{ReadOnlyHint: &no}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isReadOnlyTool(tt.tool); got != tt.want {
+				t.Fatalf("isReadOnlyTool() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
