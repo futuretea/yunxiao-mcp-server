@@ -221,6 +221,17 @@ func TestHandleUpdateWorkitemNoFields(t *testing.T) {
 	}
 }
 
+func TestHandleUpdateWorkitemNilClient(t *testing.T) {
+	_, err := handleUpdateWorkitem(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+		"subject":        "Updated",
+	})
+	if err == nil {
+		t.Fatal("expected error for nil client")
+	}
+}
+
 func TestHandleUpdateWorkitemAPIError(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
