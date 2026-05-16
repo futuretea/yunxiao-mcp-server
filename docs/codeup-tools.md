@@ -1,8 +1,8 @@
 # Codeup Tools
 
-This document describes the 24 MCP tools in the codeup domain.
+This document describes the 26 MCP tools in the codeup domain.
 
-Access summary: 24 read-only, 0 write-capable.
+Access summary: 24 read-only, 2 write-capable.
 
 ## Enhanced Tools
 
@@ -51,6 +51,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_change_requests` | Read-only | List CodeUp change requests (merge requests) across repositories in a Yunxiao organization. Use this to find pending reviews or track merged changes. |
 | `list_change_request_patch_sets` | Read-only | List patch sets (diff iterations) for a CodeUp merge request. Use this to review how a merge request evolved across multiple pushes. |
 | `list_change_request_comments` | Read-only | List comments on a CodeUp merge request. Use this to review feedback, inline discussions, and approval threads. |
+| `create_change_request` | Write-capable | Create a new Codeup change request. |
+| `add_change_request_comment` | Write-capable | Add a comment to a Codeup change request. |
 
 ### list_ssh_keys
 
@@ -499,4 +501,38 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `state` | string | No | Comment state: OPENED or DRAFT. Defaults to OPENED. |
 | `resolved` | boolean | No | Whether to list resolved comments. Defaults to false. Set to true to see resolved threads. |
 | `filePath` | string | No | File path filter for inline comments. Use this to narrow comments to a specific file. |
+
+### create_change_request
+
+**Description**: Create a new Codeup change request.
+
+**Access**: Write-capable (requires `read_only=false`)
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | Yes | Yunxiao organization ID. |
+| `repositoryId` | string | Yes | Repository ID or path (e.g., 'org%2Frepo'). |
+| `title` | string | Yes | Change request title. |
+| `sourceBranch` | string | Yes | Source branch name. |
+| `targetBranch` | string | Yes | Target branch name. |
+| `sourceProjectId` | string | No | Source project numeric ID. Defaults to repository numeric ID if omitted. |
+| `targetProjectId` | string | No | Target project numeric ID. Defaults to repository numeric ID if omitted. |
+| `description` | string | No | Change request description. |
+
+### add_change_request_comment
+
+**Description**: Add a comment to a Codeup change request.
+
+**Access**: Write-capable (requires `read_only=false`)
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | Yes | Yunxiao organization ID. |
+| `repositoryId` | string | Yes | Repository ID or path (e.g., 'org%2Frepo'). |
+| `localId` | string | Yes | Change request local ID. |
+| `content` | string | Yes | Comment content (plain text or Markdown). |
 
