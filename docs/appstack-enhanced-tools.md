@@ -8,6 +8,7 @@ This document describes the enhanced aggregation tools in the Appstack (applicat
 |------|---------|-----------|
 | `get_application_overview` | Application dashboard with basic info, environments, and recent orchestrations | 1 + up to 2 |
 | `get_environment_overview` | Environment dashboard with basic info, variable groups, and latest orchestration | 1 + up to 2 |
+| `get_release_overview` | System release dashboard with members, products, and attached change requests | 1 + up to 3 |
 
 ## Common Behaviors
 
