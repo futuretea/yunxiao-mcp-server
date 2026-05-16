@@ -46,6 +46,16 @@ func ClassifyError(err error) ErrorCategory {
 	return ""
 }
 
+// WrapError prepends an error category tag for MCP consumer pattern matching.
+// Uncategorized errors are returned unchanged.
+func WrapError(err error) error {
+	cat := ClassifyError(err)
+	if cat == "" {
+		return err
+	}
+	return fmt.Errorf("[%s] %w", cat, err)
+}
+
 // friendlyAPIError wraps an APIError with actionable guidance for LLM consumers.
 // Non-API errors are returned unchanged.
 func friendlyAPIError(err error) error {
