@@ -88,7 +88,7 @@ Use `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY=true` or `--insecure-skip-tls-verify` 
 
 | Option | Default | Purpose |
 |--------|---------|---------|
-| `read_only` / `--read-only` | `true` | Excludes write-capable tools. Set `read_only=false` only when Projex work item mutations are intended. |
+| `read_only` / `--read-only` | `true` | Excludes write-capable tools. Set `read_only=false` only when work item or change request/merge request mutations are intended. |
 | `project_focused` / `--project-focused` | `false` | Registers a focused platform + Projex catalog, hiding low-value raw tools with enhanced alternatives. |
 | `minimal` / `--minimal` | `false` | Registers the smallest project-centric catalog. Write tools still require `read_only=false`. |
 | `enabled_tools` / `--enabled-tools` | `[]` | Explicit tool allow-list by name. |
