@@ -61,6 +61,49 @@ func TestHandleCreateChangeRequestMissingTitle(t *testing.T) {
 	}
 }
 
+func TestHandleCreateChangeRequestNilClient(t *testing.T) {
+	_, err := handleCreateChangeRequest(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"repositoryId":   "repo-1",
+		"title":          "Test",
+		"sourceBranch":   "feature/x",
+		"targetBranch":   "main",
+	})
+	if err == nil {
+		t.Fatal("expected error for nil client")
+	}
+}
+
+func TestHandleCreateChangeRequestMissingSourceBranch(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleCreateChangeRequest(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"repositoryId":   "repo-1",
+		"title":          "Test",
+		"targetBranch":   "main",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing sourceBranch")
+	}
+}
+
+func TestHandleCreateChangeRequestMissingTargetBranch(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleCreateChangeRequest(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"repositoryId":   "repo-1",
+		"title":          "Test",
+		"sourceBranch":   "feature/x",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing targetBranch")
+	}
+}
+
 func TestHandleCreateChangeRequestAPIError(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
