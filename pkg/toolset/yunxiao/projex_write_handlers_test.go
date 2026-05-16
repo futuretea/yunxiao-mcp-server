@@ -349,6 +349,70 @@ func TestHandleUpdateWorkitemStatusReturnsCommentError(t *testing.T) {
 	}
 }
 
+func TestHandleUpdateWorkitemStatusMissingOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleUpdateWorkitemStatus(context.Background(), client, map[string]any{
+		"workitemId": "wi-1",
+		"statusId":   "status-2",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing organizationId")
+	}
+}
+
+func TestHandleUpdateWorkitemStatusMissingWorkitemId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleUpdateWorkitemStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"statusId":       "status-2",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing workitemId")
+	}
+}
+
+func TestHandleUpdateWorkitemStatusMissingStatusId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleUpdateWorkitemStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing statusId")
+	}
+}
+
+func TestHandleUpdateWorkitemStatusNilClient(t *testing.T) {
+	_, err := handleUpdateWorkitemStatus(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+		"statusId":       "status-2",
+	})
+	if err == nil {
+		t.Fatal("expected error for nil client")
+	}
+}
+
+func TestHandleUpdateWorkitemStatusAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "server error", http.StatusInternalServerError)
+	})
+	_, err := handleUpdateWorkitemStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+		"statusId":       "status-2",
+	})
+	if err == nil {
+		t.Fatal("expected API error")
+	}
+}
+
 func TestHandleAddWorkitemComment(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

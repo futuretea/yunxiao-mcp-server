@@ -179,6 +179,70 @@ func TestHandleGetTeamWorkloadBreakdownBuildsCorrectRequests(t *testing.T) {
 	}
 }
 
+func TestClampTaskLimit(t *testing.T) {
+	tests := []struct {
+		limit int
+		want  int
+	}{
+		{-5, 1},
+		{-1, 1},
+		{0, 1},
+		{1, 1},
+		{25, 25},
+		{50, 50},
+		{51, 50},
+		{100, 50},
+	}
+	for _, tt := range tests {
+		got := clampTaskLimit(tt.limit)
+		if got != tt.want {
+			t.Errorf("clampTaskLimit(%d) = %d, want %d", tt.limit, got, tt.want)
+		}
+	}
+}
+
+func TestExtractWorkitemStatusName(t *testing.T) {
+	tests := []struct {
+		name    string
+		itemMap map[string]any
+		want    string
+	}{
+		{
+			"valid status",
+			map[string]any{"status": map[string]any{"name": "DOING"}},
+			"DOING",
+		},
+		{
+			"missing status key",
+			map[string]any{"id": "wi-1"},
+			"Unknown",
+		},
+		{
+			"status is not a map",
+			map[string]any{"status": "DOING"},
+			"Unknown",
+		},
+		{
+			"status map without name",
+			map[string]any{"status": map[string]any{"stage": "dev"}},
+			"Unknown",
+		},
+		{
+			"empty map",
+			map[string]any{},
+			"Unknown",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := extractWorkitemStatusName(tt.itemMap)
+			if got != tt.want {
+				t.Errorf("extractWorkitemStatusName(%v) = %q, want %q", tt.itemMap, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestHandleGetTeamWorkloadBreakdownRejectsEmptyCategories(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("handler should not issue request without categories")

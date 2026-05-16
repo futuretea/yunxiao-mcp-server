@@ -1,8 +1,8 @@
 # Flow Tools
 
-This document describes the 8 MCP tools in the flow domain.
+This document describes the 10 MCP tools in the flow domain.
 
-Access summary: 8 read-only, 0 write-capable.
+Access summary: 8 read-only, 2 write-capable.
 
 ## Enhanced Tools
 
@@ -33,6 +33,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_pipeline_runs` | Read-only | List execution runs for a Flow pipeline. Use this to review historical runs and their statuses. For the latest run only, use get_latest_pipeline_run. |
 | `list_pipeline_jobs_by_category` | Read-only | List jobs (tasks) within a Flow pipeline grouped by category. Use this after identifying a pipeline to see its build, deploy, and test stages. |
 | `list_pipeline_job_historys` | Read-only | List execution history for a specific Flow pipeline job. Use this to track how a particular job (e.g., a deploy step) has performed across multiple runs. |
+| `pass_pipeline_validate` | Write-capable | Pass (approve) a pipeline validation job. |
+| `refuse_pipeline_validate` | Write-capable | Refuse (reject) a pipeline validation job. |
 
 ### list_pipeline_relations
 
@@ -172,4 +174,34 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `identifier` | string | Yes | Pipeline job identifier (string). Use list_pipeline_jobs_by_category to discover job identifiers. |
 | `page` | number | No | Page number for pagination. Starts at 1. |
 | `perPage` | number | No | Page size for pagination. Yunxiao supports up to 30. |
+
+### pass_pipeline_validate
+
+**Description**: Pass (approve) a pipeline validation job.
+
+**Access**: Write-capable (requires `read_only=false`)
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | Yes | Yunxiao organization ID. |
+| `pipelineId` | string | Yes | Pipeline ID. |
+| `pipelineRunId` | string | Yes | Pipeline run ID. |
+| `jobId` | string | Yes | Validation job ID. |
+
+### refuse_pipeline_validate
+
+**Description**: Refuse (reject) a pipeline validation job.
+
+**Access**: Write-capable (requires `read_only=false`)
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | Yes | Yunxiao organization ID. |
+| `pipelineId` | string | Yes | Pipeline ID. |
+| `pipelineRunId` | string | Yes | Pipeline run ID. |
+| `jobId` | string | Yes | Validation job ID. |
 

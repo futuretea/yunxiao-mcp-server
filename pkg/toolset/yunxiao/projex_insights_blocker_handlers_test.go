@@ -169,6 +169,34 @@ func TestHandleGetBlockerAnalysisSkipsNonMapItems(t *testing.T) {
 	}
 }
 
+func TestParseAnyList(t *testing.T) {
+	tests := []struct {
+		name string
+		data any
+		want int // expected length, -1 for nil
+	}{
+		{"slice", []any{"a", "b"}, 2},
+		{"map with data key", map[string]any{"data": []any{"x", "y", "z"}}, 3},
+		{"empty map", map[string]any{}, -1},
+		{"map with non-list data", map[string]any{"data": "string"}, -1},
+		{"string input", "not a list", -1},
+		{"int input", 42, -1},
+		{"nil input", nil, -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseAnyList(tt.data)
+			if tt.want < 0 {
+				if got != nil {
+					t.Fatalf("parseAnyList(%v) = %v, want nil", tt.data, got)
+				}
+			} else if len(got) != tt.want {
+				t.Fatalf("parseAnyList(%v) len = %d, want %d", tt.data, len(got), tt.want)
+			}
+		})
+	}
+}
+
 func TestHandleGetBlockerAnalysisRejectsEmptyCategories(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("handler should not issue request without categories")

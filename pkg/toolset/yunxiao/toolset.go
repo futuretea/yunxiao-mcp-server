@@ -40,6 +40,8 @@ var minimalToolNames = map[string]struct{}{
 	"close_change_request":       {},
 	"reopen_change_request":      {},
 	"merge_change_request":       {},
+	"pass_pipeline_validate":     {},
+	"refuse_pipeline_validate":   {},
 }
 
 // projectFocusedDomains are the tool domains enabled in project-focused mode.
@@ -84,6 +86,8 @@ var writeToolNames = map[string]struct{}{
 	"close_change_request":       {},
 	"reopen_change_request":      {},
 	"merge_change_request":       {},
+	"pass_pipeline_validate":     {},
+	"refuse_pipeline_validate":   {},
 }
 
 // Toolset exposes Yunxiao OpenAPI tools.
@@ -109,6 +113,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 	tools = append(tools, withDomain(appstackTools(), "appstack")...)
 	tools = append(tools, withDomain(lingmaTools(), "lingma")...)
 	tools = append(tools, withDomain(apiCallTools(), "api")...)
+	tools = append(tools, withDomain(flowWriteTools(), "flow")...)
 	tools = append(tools, withDomain(capabilityTools(), "meta")...)
 	return t.filterReadOnly(tools)
 }
