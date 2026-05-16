@@ -6,7 +6,7 @@ This project is GA-ready for local MCP use as a default-read-only Yunxiao OpenAP
 
 - Transports: stdio, Streamable HTTP, SSE, and `/healthz`.
 - Authentication: a startup default Yunxiao token, with request-level HTTP/SSE token override through `x-yunxiao-token` or `yunxiao_access_token`.
-- Tool surface: 124 read-only MCP tools in the default `read_only=true` catalog. The full catalog contains 134 tools: 124 read-only tools plus 10 write-capable tools (4 Projex: `create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`; 6 Codeup: `create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`) that are exposed only when `read_only=false`.
+- Tool surface: 130 read-only MCP tools in the default `read_only=true` catalog. The full catalog contains 140 tools: 130 read-only tools plus 10 write-capable tools (4 Projex: `create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`; 6 Codeup: `create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`) that are exposed only when `read_only=false`.
 - Safety boundary: read-only API access by default. Write-capable tools require an explicit `read_only=false` configuration and are limited to Projex work item and Codeup change request/merge request operations. Other endpoints with create, update, delete, execute, approve, refuse, or state-changing semantics are not exposed, even when Yunxiao models them as `GET`.
 
 ## Release Gate
