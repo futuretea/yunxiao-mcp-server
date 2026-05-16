@@ -34,6 +34,7 @@ var minimalToolNames = map[string]struct{}{
 	"update_workitem":            {},
 	"update_workitem_status":     {},
 	"add_workitem_comment":       {},
+	"create_change_request":      {},
 	"add_change_request_comment": {},
 }
 
@@ -73,6 +74,7 @@ var writeToolNames = map[string]struct{}{
 	"update_workitem":            {},
 	"update_workitem_status":     {},
 	"add_workitem_comment":       {},
+	"create_change_request":      {},
 	"add_change_request_comment": {},
 }
 
