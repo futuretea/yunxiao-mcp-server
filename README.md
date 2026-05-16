@@ -1,6 +1,6 @@
 # Yunxiao MCP Server
 
-Go implementation of an MCP server for Alibaba [Yunxiao](https://www.aliyun.com/product/yunxiao) (云效). Exposes a default read-only MCP catalog via stdio, HTTP Streamable, and SSE transports, with four Projex write tools available only when `read_only=false`.
+Go implementation of an MCP server for Alibaba [Yunxiao](https://www.aliyun.com/product/yunxiao) (云效). Exposes a default read-only MCP catalog via stdio, HTTP Streamable, and SSE transports, with ten write-capable tools (4 Projex work item operations, 6 Codeup change request/merge request operations) available only when `read_only=false`.
 
 ---
 
@@ -49,12 +49,12 @@ See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other
 
 ## Tools Overview
 
-The default `read_only=true` catalog exposes 130 read-only tools. The full catalog has 134 tools: the same read-only tools plus four Projex write-capable tools (`create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`) when `read_only=false`.
+The default `read_only=true` catalog exposes 130 read-only tools. The full catalog has 140 tools: 130 read-only tools plus ten write-capable tools — four Projex work item operations (`create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`) and six Codeup change request/merge request operations (`create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`) — when `read_only=false`.
 
 | Domain | Tools | Access | Description |
 |--------|-------|--------|-------------|
 | **Projex** | 45 | 41 read-only, 4 write-capable | Projects, iterations, work items, milestones, test cases |
-| **Codeup** | 24 | read-only | Repositories, branches, commits, merge requests, code review |
+| **Codeup** | 30 | 24 read-only, 6 write-capable | Repositories, branches, commits, merge requests, change requests, code review |
 | **Flow** | 8 | read-only | Pipelines, runs, build tasks |
 | **Appstack** | 31 | read-only | Applications, environments, releases, change orders |
 | **Platform** | 18 | read-only | Organizations, departments, members, roles |
