@@ -36,6 +36,10 @@ var minimalToolNames = map[string]struct{}{
 	"add_workitem_comment":       {},
 	"create_change_request":      {},
 	"add_change_request_comment": {},
+	"create_merge_request":       {},
+	"close_change_request":       {},
+	"reopen_change_request":      {},
+	"merge_change_request":       {},
 }
 
 // projectFocusedDomains are the tool domains enabled in project-focused mode.
@@ -76,6 +80,10 @@ var writeToolNames = map[string]struct{}{
 	"add_workitem_comment":       {},
 	"create_change_request":      {},
 	"add_change_request_comment": {},
+	"create_merge_request":       {},
+	"close_change_request":       {},
+	"reopen_change_request":      {},
+	"merge_change_request":       {},
 }
 
 // Toolset exposes Yunxiao OpenAPI tools.

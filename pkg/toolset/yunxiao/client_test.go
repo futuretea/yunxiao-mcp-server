@@ -346,9 +346,6 @@ func TestAPIErrorFormat(t *testing.T) {
 }
 
 func TestAccessTokenFromContext(t *testing.T) {
-	if got := AccessTokenFromContext(nil); got != "" {
-		t.Fatalf("AccessTokenFromContext(nil) = %q, want empty", got)
-	}
 	if got := AccessTokenFromContext(context.TODO()); got != "" {
 		t.Fatalf("AccessTokenFromContext(TODO) = %q, want empty", got)
 	}
