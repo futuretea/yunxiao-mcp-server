@@ -1,6 +1,8 @@
 # Lingma Tools
 
-This document describes the 4 read-only MCP tools in the lingma domain.
+This document describes the 4 MCP tools in the lingma domain.
+
+Access summary: 4 read-only, 0 write-capable.
 
 ## Pagination
 
@@ -10,16 +12,18 @@ Tools in this domain use the following pagination scheme(s):
 
 ## Tool Inventory
 
-| Tool | Description |
-|------|-------------|
-| `list_knowledge_bases` | List Tongyi Lingma knowledge bases in a Yunxiao organization. Knowledge bases contain curated documents for AI-assisted code completion and chat. |
-| `list_kb_files` | List files in a Tongyi Lingma knowledge base. Use list_knowledge_bases to discover valid kbId values. |
-| `list_kb_members` | List members with access to a Tongyi Lingma knowledge base. Use list_knowledge_bases to discover valid kbId values. |
-| `list_developer_members` | List Tongyi Lingma developer members in a Yunxiao organization. Use this to analyze AI coding assistant adoption across teams. |
+| Tool | Access | Description |
+|------|--------|-------------|
+| `list_knowledge_bases` | Read-only | List Tongyi Lingma knowledge bases in a Yunxiao organization. Knowledge bases contain curated documents for AI-assisted code completion and chat. |
+| `list_kb_files` | Read-only | List files in a Tongyi Lingma knowledge base. Use list_knowledge_bases to discover valid kbId values. |
+| `list_kb_members` | Read-only | List members with access to a Tongyi Lingma knowledge base. Use list_knowledge_bases to discover valid kbId values. |
+| `list_developer_members` | Read-only | List Tongyi Lingma developer members in a Yunxiao organization. Use this to analyze AI coding assistant adoption across teams. |
 
 ### list_knowledge_bases
 
 **Description**: List Tongyi Lingma knowledge bases in a Yunxiao organization. Knowledge bases contain curated documents for AI-assisted code completion and chat.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -40,6 +44,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: List files in a Tongyi Lingma knowledge base. Use list_knowledge_bases to discover valid kbId values.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -58,6 +64,8 @@ Tools in this domain use the following pagination scheme(s):
 
 **Description**: List members with access to a Tongyi Lingma knowledge base. Use list_knowledge_bases to discover valid kbId values.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -75,6 +83,8 @@ Tools in this domain use the following pagination scheme(s):
 ### list_developer_members
 
 **Description**: List Tongyi Lingma developer members in a Yunxiao organization. Use this to analyze AI coding assistant adoption across teams.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 

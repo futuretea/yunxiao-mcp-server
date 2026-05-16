@@ -1,13 +1,13 @@
 # GA Readiness
 
-This project is GA-ready for local MCP use as a read-only Yunxiao OpenAPI server.
+This project is GA-ready for local MCP use as a default-read-only Yunxiao OpenAPI server.
 
 ## Scope
 
 - Transports: stdio, Streamable HTTP, SSE, and `/healthz`.
 - Authentication: a startup default Yunxiao token, with request-level HTTP/SSE token override through `x-yunxiao-token` or `yunxiao_access_token`.
-- Tool surface: 125 read-only MCP tools: 101 Yunxiao OpenAPI tools plus 22 enhanced aggregation tools (10 Projex, 4 Codeup, 2 Flow, 3 Appstack, 3 Platform), plus 2 meta tools (`call_yunxiao_api` for arbitrary read-only endpoint access, and `describe_toolset` for capability discovery). All registered with MCP read-only annotations and covered by `TestToolsetIncludesBaseReadTools`.
-- Safety boundary: read-only API access only. Endpoints with create, update, delete, execute, approve, refuse, or other state-changing semantics are not exposed, even when Yunxiao models them as `GET`.
+- Tool surface: 130 read-only MCP tools in the default `read_only=true` catalog. The full catalog contains 134 tools: 130 read-only tools plus four Projex write-capable tools (`create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`) that are exposed only when `read_only=false`.
+- Safety boundary: read-only API access by default. Write-capable tools require an explicit `read_only=false` configuration and are limited to Projex work item create/update/status/comment operations. Other endpoints with create, update, delete, execute, approve, refuse, or state-changing semantics are not exposed, even when Yunxiao models them as `GET`.
 
 ## Release Gate
 
@@ -43,4 +43,4 @@ When adding any deferred endpoint:
 - Keep it in a separate commit with focused handler and tool tests.
 - Preserve large integer IDs as strings unless the API contract proves they fit safely in JSON numbers.
 - Add path and query tests that assert exact request shape, including array query encoding.
-- For mutation endpoints, introduce an explicit non-read-only mode instead of adding them to the default GA toolset.
+- For mutation endpoints, keep them outside the default `read_only=true` catalog and require an explicit non-read-only mode.

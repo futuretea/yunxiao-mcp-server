@@ -1,6 +1,8 @@
 # Flow Tools
 
-This document describes the 8 read-only MCP tools in the flow domain.
+This document describes the 8 MCP tools in the flow domain.
+
+Access summary: 8 read-only, 0 write-capable.
 
 ## Enhanced Tools
 
@@ -21,20 +23,22 @@ Tools in this domain use the following pagination scheme(s):
 
 Tools marked in **bold** are enhanced aggregation tools.
 
-| Tool | Description |
-|------|-------------|
-| `list_pipeline_relations` | List objects related to a Flow pipeline, such as variable groups. Use this to discover pipeline dependencies and linked resources. |
-| **`get_pipeline_overview`** | Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call. |
-| **`get_pipeline_run_overview`** | Get a comprehensive overview of a Flow pipeline run including run details and pipeline jobs by category in one read-only call. |
-| `list_resource_members` | List members who have access to a Flow resource (e.g., a pipeline or host group). Use this to discover who can manage or trigger a pipeline. |
-| `list_pipelines` | List Flow CI/CD pipelines in a Yunxiao organization. Use this to discover pipelines and obtain their IDs before calling pipeline-scoped tools. For a comprehensive view of a single pipeline including latest run and history, use get_pipeline_overview instead. |
-| `list_pipeline_runs` | List execution runs for a Flow pipeline. Use this to review historical runs and their statuses. For the latest run only, use get_latest_pipeline_run. |
-| `list_pipeline_jobs_by_category` | List jobs (tasks) within a Flow pipeline grouped by category. Use this after identifying a pipeline to see its build, deploy, and test stages. |
-| `list_pipeline_job_historys` | List execution history for a specific Flow pipeline job. Use this to track how a particular job (e.g., a deploy step) has performed across multiple runs. |
+| Tool | Access | Description |
+|------|--------|-------------|
+| `list_pipeline_relations` | Read-only | List objects related to a Flow pipeline, such as variable groups. Use this to discover pipeline dependencies and linked resources. |
+| **`get_pipeline_overview`** | Read-only | Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call. |
+| **`get_pipeline_run_overview`** | Read-only | Get a comprehensive overview of a Flow pipeline run including run details and pipeline jobs by category in one read-only call. |
+| `list_resource_members` | Read-only | List members who have access to a Flow resource (e.g., a pipeline or host group). Use this to discover who can manage or trigger a pipeline. |
+| `list_pipelines` | Read-only | List Flow CI/CD pipelines in a Yunxiao organization. Use this to discover pipelines and obtain their IDs before calling pipeline-scoped tools. For a comprehensive view of a single pipeline including latest run and history, use get_pipeline_overview instead. |
+| `list_pipeline_runs` | Read-only | List execution runs for a Flow pipeline. Use this to review historical runs and their statuses. For the latest run only, use get_latest_pipeline_run. |
+| `list_pipeline_jobs_by_category` | Read-only | List jobs (tasks) within a Flow pipeline grouped by category. Use this after identifying a pipeline to see its build, deploy, and test stages. |
+| `list_pipeline_job_historys` | Read-only | List execution history for a specific Flow pipeline job. Use this to track how a particular job (e.g., a deploy step) has performed across multiple runs. |
 
 ### list_pipeline_relations
 
 **Description**: List objects related to a Flow pipeline, such as variable groups. Use this to discover pipeline dependencies and linked resources.
+
+**Access**: Read-only
 
 **Parameters**:
 
@@ -47,6 +51,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### get_pipeline_overview
 
 **Description**: Get a comprehensive overview of a Flow pipeline including basic info, latest run, and recent run history in one read-only call.
+
+**Access**: Read-only
 
 **Type**: Enhanced aggregation tool
 
@@ -62,6 +68,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### get_pipeline_run_overview
 
 **Description**: Get a comprehensive overview of a Flow pipeline run including run details and pipeline jobs by category in one read-only call.
+
+**Access**: Read-only
 
 **Type**: Enhanced aggregation tool
 
@@ -79,6 +87,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List members who have access to a Flow resource (e.g., a pipeline or host group). Use this to discover who can manage or trigger a pipeline.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -90,6 +100,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_pipelines
 
 **Description**: List Flow CI/CD pipelines in a Yunxiao organization. Use this to discover pipelines and obtain their IDs before calling pipeline-scoped tools. For a comprehensive view of a single pipeline including latest run and history, use get_pipeline_overview instead.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -111,6 +123,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List execution runs for a Flow pipeline. Use this to review historical runs and their statuses. For the latest run only, use get_latest_pipeline_run.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -130,6 +144,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List jobs (tasks) within a Flow pipeline grouped by category. Use this after identifying a pipeline to see its build, deploy, and test stages.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -141,6 +157,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_pipeline_job_historys
 
 **Description**: List execution history for a specific Flow pipeline job. Use this to track how a particular job (e.g., a deploy step) has performed across multiple runs.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 

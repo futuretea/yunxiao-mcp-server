@@ -1,6 +1,8 @@
 # Appstack Tools
 
-This document describes the 31 read-only MCP tools in the appstack domain.
+This document describes the 31 MCP tools in the appstack domain.
+
+Access summary: 31 read-only, 0 write-capable.
 
 ## Enhanced Tools
 
@@ -24,43 +26,45 @@ Tools in this domain use the following pagination scheme(s):
 
 Tools marked in **bold** are enhanced aggregation tools.
 
-| Tool | Description |
-|------|-------------|
-| `search_app_templates` | Search AppStack application templates. Use this to discover templates before creating or deploying applications. |
-| `list_environments` | List AppStack environments for an application. Use list_applications to discover valid application names. |
-| `list_application_members` | List members of an AppStack application. Use list_applications to discover valid application names. |
-| `list_application_sources` | List source repositories attached to an AppStack application. Use list_applications to discover valid application names. |
-| `list_resource_instances` | List AppStack resource instances in a resource pool. Use list_resource_pools to discover valid pool names. |
-| **`get_application_overview`** | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. Use this after discovering applications via list_applications or list_attached_apps. |
-| **`get_environment_overview`** | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. Use this after identifying an application and environment via get_application_overview. |
-| **`get_release_overview`** | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows. |
-| `list_global_vars` | Search AppStack global variable groups. Use this to discover variable group IDs before reading or updating specific groups. |
-| `search_releases` | Search AppStack releases in a Yunxiao organization. Use this to discover releases before calling get_release_overview or other release-specific tools. |
-| `list_system_release_workflows` | List AppStack release workflows for a system. Use this after discovering a system via list_systems to find releases and their workflows. |
-| `list_release_members` | List members of an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
-| `list_release_products` | List products attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
-| `list_attached_change_requests` | List change requests attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
-| `list_release_executions` | List execution records for an AppStack system release. Use this after discovering release workflow and stage details via list_system_release_workflows or get_release_overview. |
-| `list_systems` | List AppStack systems in a Yunxiao organization. Use this as the entry point to discover systems before calling other system-specific tools. |
-| `list_attached_apps` | List applications attached to an AppStack system. Use this to discover applications within a system before calling get_application_overview. |
-| `list_system_members` | List members of an AppStack system. Use this after discovering a system via list_systems. |
-| `list_applications` | List AppStack applications in a Yunxiao organization. AppStack manages deployment environments and release pipelines. |
-| `list_app_orchestration` | List AppStack orchestrations for an application. Orchestrations define deployment workflows and environment configurations. |
-| `list_app_release_workflows` | List AppStack release workflows for an application. Release workflows model multi-stage deployment pipelines. |
-| `list_app_release_workflow_briefs` | List AppStack release workflow briefs for an application. Briefs provide a condensed view of workflow definitions. |
-| `list_app_release_stage_briefs` | List AppStack release stage briefs for an application release workflow. Stages represent individual deployment phases within a workflow. |
-| `list_app_release_stage_runs` | List AppStack release stage execution records. Each record represents a single run of a deployment stage. |
-| `list_app_release_stage_exec_metadata` | List integrated change metadata for an AppStack release stage execution. Metadata includes linked work items and commits. |
-| `list_appstack_change_request_executions` | List execution records for an AppStack change request. Change requests track planned deployments. |
-| `list_appstack_change_request_work_items` | List work items for an AppStack change request. Work items represent linked Projex tasks or requirements. |
-| `list_change_order_versions` | List AppStack change order versions. Change orders track actual deployments and their versions. |
-| `list_change_orders_by_origin` | List AppStack change orders by creation origin. Use this to trace deployments back to their source (e.g., a Flow pipeline). |
-| `list_change_order_job_logs` | List logs for an AppStack change order job. Job logs capture deployment script output. |
-| `find_task_operation_log` | Get an AppStack deployment task operation log. Operation logs record manual or automated actions taken during deployment. |
+| Tool | Access | Description |
+|------|--------|-------------|
+| `search_app_templates` | Read-only | Search AppStack application templates. Use this to discover templates before creating or deploying applications. |
+| `list_environments` | Read-only | List AppStack environments for an application. Use list_applications to discover valid application names. |
+| `list_application_members` | Read-only | List members of an AppStack application. Use list_applications to discover valid application names. |
+| `list_application_sources` | Read-only | List source repositories attached to an AppStack application. Use list_applications to discover valid application names. |
+| `list_resource_instances` | Read-only | List AppStack resource instances in a resource pool. Use list_resource_pools to discover valid pool names. |
+| **`get_application_overview`** | Read-only | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. Use this after discovering applications via list_applications or list_attached_apps. |
+| **`get_environment_overview`** | Read-only | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. Use this after identifying an application and environment via get_application_overview. |
+| **`get_release_overview`** | Read-only | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_global_vars` | Read-only | Search AppStack global variable groups. Use this to discover variable group IDs before reading or updating specific groups. |
+| `search_releases` | Read-only | Search AppStack releases in a Yunxiao organization. Use this to discover releases before calling get_release_overview or other release-specific tools. |
+| `list_system_release_workflows` | Read-only | List AppStack release workflows for a system. Use this after discovering a system via list_systems to find releases and their workflows. |
+| `list_release_members` | Read-only | List members of an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_release_products` | Read-only | List products attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_attached_change_requests` | Read-only | List change requests attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows. |
+| `list_release_executions` | Read-only | List execution records for an AppStack system release. Use this after discovering release workflow and stage details via list_system_release_workflows or get_release_overview. |
+| `list_systems` | Read-only | List AppStack systems in a Yunxiao organization. Use this as the entry point to discover systems before calling other system-specific tools. |
+| `list_attached_apps` | Read-only | List applications attached to an AppStack system. Use this to discover applications within a system before calling get_application_overview. |
+| `list_system_members` | Read-only | List members of an AppStack system. Use this after discovering a system via list_systems. |
+| `list_applications` | Read-only | List AppStack applications in a Yunxiao organization. AppStack manages deployment environments and release pipelines. |
+| `list_app_orchestration` | Read-only | List AppStack orchestrations for an application. Orchestrations define deployment workflows and environment configurations. |
+| `list_app_release_workflows` | Read-only | List AppStack release workflows for an application. Release workflows model multi-stage deployment pipelines. |
+| `list_app_release_workflow_briefs` | Read-only | List AppStack release workflow briefs for an application. Briefs provide a condensed view of workflow definitions. |
+| `list_app_release_stage_briefs` | Read-only | List AppStack release stage briefs for an application release workflow. Stages represent individual deployment phases within a workflow. |
+| `list_app_release_stage_runs` | Read-only | List AppStack release stage execution records. Each record represents a single run of a deployment stage. |
+| `list_app_release_stage_exec_metadata` | Read-only | List integrated change metadata for an AppStack release stage execution. Metadata includes linked work items and commits. |
+| `list_appstack_change_request_executions` | Read-only | List execution records for an AppStack change request. Change requests track planned deployments. |
+| `list_appstack_change_request_work_items` | Read-only | List work items for an AppStack change request. Work items represent linked Projex tasks or requirements. |
+| `list_change_order_versions` | Read-only | List AppStack change order versions. Change orders track actual deployments and their versions. |
+| `list_change_orders_by_origin` | Read-only | List AppStack change orders by creation origin. Use this to trace deployments back to their source (e.g., a Flow pipeline). |
+| `list_change_order_job_logs` | Read-only | List logs for an AppStack change order job. Job logs capture deployment script output. |
+| `find_task_operation_log` | Read-only | Get an AppStack deployment task operation log. Operation logs record manual or automated actions taken during deployment. |
 
 ### search_app_templates
 
 **Description**: Search AppStack application templates. Use this to discover templates before creating or deploying applications.
+
+**Access**: Read-only
 
 **Pagination**: Keyset (nextToken)
 
@@ -81,6 +85,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List AppStack environments for an application. Use list_applications to discover valid application names.
 
+**Access**: Read-only
+
 **Pagination**: Keyset (nextToken)
 
 **Parameters**:
@@ -100,6 +106,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List members of an AppStack application. Use list_applications to discover valid application names.
 
+**Access**: Read-only
+
 **Pagination**: Offset (current/pageSize)
 
 **Parameters**:
@@ -114,6 +122,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_application_sources
 
 **Description**: List source repositories attached to an AppStack application. Use list_applications to discover valid application names.
+
+**Access**: Read-only
 
 **Pagination**: Keyset (nextToken)
 
@@ -134,6 +144,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List AppStack resource instances in a resource pool. Use list_resource_pools to discover valid pool names.
 
+**Access**: Read-only
+
 **Pagination**: Keyset (nextToken)
 
 **Parameters**:
@@ -153,6 +165,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. Use this after discovering applications via list_applications or list_attached_apps.
 
+**Access**: Read-only
+
 **Type**: Enhanced aggregation tool
 
 **Parameters**:
@@ -170,6 +184,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. Use this after identifying an application and environment via get_application_overview.
 
+**Access**: Read-only
+
 **Type**: Enhanced aggregation tool
 
 **Parameters**:
@@ -185,6 +201,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### get_release_overview
 
 **Description**: Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows.
+
+**Access**: Read-only
 
 **Type**: Enhanced aggregation tool
 
@@ -204,6 +222,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Search AppStack global variable groups. Use this to discover variable group IDs before reading or updating specific groups.
 
+**Access**: Read-only
+
 **Pagination**: Offset (current/pageSize)
 
 **Parameters**:
@@ -218,6 +238,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### search_releases
 
 **Description**: Search AppStack releases in a Yunxiao organization. Use this to discover releases before calling get_release_overview or other release-specific tools.
+
+**Access**: Read-only
 
 **Pagination**: Keyset (nextToken)
 
@@ -239,6 +261,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List AppStack release workflows for a system. Use this after discovering a system via list_systems to find releases and their workflows.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -249,6 +273,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_release_members
 
 **Description**: List members of an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows.
+
+**Access**: Read-only
 
 **Parameters**:
 
@@ -262,6 +288,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List products attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -273,6 +301,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_attached_change_requests
 
 **Description**: List change requests attached to an AppStack system release. Use this after discovering a release via search_releases or list_system_release_workflows.
+
+**Access**: Read-only
 
 **Pagination**: Offset (current/pageSize)
 
@@ -289,6 +319,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_release_executions
 
 **Description**: List execution records for an AppStack system release. Use this after discovering release workflow and stage details via list_system_release_workflows or get_release_overview.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -310,6 +342,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List AppStack systems in a Yunxiao organization. Use this as the entry point to discover systems before calling other system-specific tools.
 
+**Access**: Read-only
+
 **Pagination**: Offset (current/pageSize)
 
 **Parameters**:
@@ -323,6 +357,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_attached_apps
 
 **Description**: List applications attached to an AppStack system. Use this to discover applications within a system before calling get_application_overview.
+
+**Access**: Read-only
 
 **Pagination**: Offset (current/pageSize)
 
@@ -339,6 +375,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List members of an AppStack system. Use this after discovering a system via list_systems.
 
+**Access**: Read-only
+
 **Pagination**: Offset (current/pageSize)
 
 **Parameters**:
@@ -353,6 +391,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_applications
 
 **Description**: List AppStack applications in a Yunxiao organization. AppStack manages deployment environments and release pipelines.
+
+**Access**: Read-only
 
 **Pagination**: Keyset (nextToken)
 
@@ -372,6 +412,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List AppStack orchestrations for an application. Orchestrations define deployment workflows and environment configurations.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -382,6 +424,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_app_release_workflows
 
 **Description**: List AppStack release workflows for an application. Release workflows model multi-stage deployment pipelines.
+
+**Access**: Read-only
 
 **Parameters**:
 
@@ -394,6 +438,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List AppStack release workflow briefs for an application. Briefs provide a condensed view of workflow definitions.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -404,6 +450,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_app_release_stage_briefs
 
 **Description**: List AppStack release stage briefs for an application release workflow. Stages represent individual deployment phases within a workflow.
+
+**Access**: Read-only
 
 **Parameters**:
 
@@ -416,6 +464,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_app_release_stage_runs
 
 **Description**: List AppStack release stage execution records. Each record represents a single run of a deployment stage.
+
+**Access**: Read-only
 
 **Pagination**: Keyset (nextToken)
 
@@ -438,6 +488,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List integrated change metadata for an AppStack release stage execution. Metadata includes linked work items and commits.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -451,6 +503,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_appstack_change_request_executions
 
 **Description**: List execution records for an AppStack change request. Change requests track planned deployments.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -472,6 +526,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List work items for an AppStack change request. Work items represent linked Projex tasks or requirements.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -483,6 +539,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_change_order_versions
 
 **Description**: List AppStack change order versions. Change orders track actual deployments and their versions.
+
+**Access**: Read-only
 
 **Pagination**: Offset (current/pageSize)
 
@@ -501,6 +559,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List AppStack change orders by creation origin. Use this to trace deployments back to their source (e.g., a Flow pipeline).
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -514,6 +574,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_change_order_job_logs
 
 **Description**: List logs for an AppStack change order job. Job logs capture deployment script output.
+
+**Access**: Read-only
 
 **Pagination**: Offset (current/pageSize)
 
@@ -531,6 +593,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### find_task_operation_log
 
 **Description**: Get an AppStack deployment task operation log. Operation logs record manual or automated actions taken during deployment.
+
+**Access**: Read-only
 
 **Parameters**:
 
