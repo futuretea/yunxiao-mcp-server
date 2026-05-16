@@ -15,7 +15,7 @@ func handleGetRepositoryOverview(ctx context.Context, client any, params map[str
 		return "", err
 	}
 
-	repoPath := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID)
+	repoPath := codeupRepositoryPath(organizationID, repositoryID)
 
 	repository, err := getProjectOverviewSection(ctx, c, "repository", repoPath, nil)
 	if err != nil {
@@ -27,45 +27,71 @@ func handleGetRepositoryOverview(ctx context.Context, client any, params map[str
 		"filters":    repositoryOverviewFilters(params),
 	}
 
-	if optionalBoolDefault(params, "includeBranches", true) {
-		branches, err := getProjectOverviewSection(ctx, c, "branches", repoPath+"/branches", pageOneLimitQuery(params, "branchLimit", 5))
-		if err != nil {
-			return "", err
-		}
+	branches, err := fetchBranches(ctx, c, params, repoPath)
+	if err != nil {
+		return "", err
+	}
+	if branches != nil {
 		overview["branches"] = branches
 	}
 
-	refName := optionalStringDefault(params, "refName", "")
-	if refName == "" {
-		if repoMap, ok := repository.(map[string]any); ok {
-			if db, ok := repoMap["defaultBranch"].(string); ok && db != "" {
-				refName = db
-			}
-		}
-	}
+	refName := resolveRefName(params, repository)
 
-	if optionalBoolDefault(params, "includeCommits", true) && refName != "" {
-		commitQuery := pageOneLimitQuery(params, "commitLimit", 5)
-		commitQuery.Set("refName", refName)
-		commits, err := getProjectOverviewSection(ctx, c, "commits", repoPath+"/commits", commitQuery)
-		if err != nil {
-			return "", err
-		}
+	commits, err := fetchCommits(ctx, c, params, repoPath, refName)
+	if err != nil {
+		return "", err
+	}
+	if commits != nil {
 		overview["commits"] = commits
 	}
 
-	if optionalBoolDefault(params, "includeMergeRequests", true) {
-		mrQuery := pageOneLimitQuery(params, "mrLimit", 5)
-		mrQuery.Set("state", optionalStringDefault(params, "mrState", "opened"))
-		mrQuery.Add("repositoryIds", repositoryID)
-		mrs, err := getProjectOverviewSection(ctx, c, "mergeRequests", codeupOrganizationPath(organizationID)+"/mergeRequests", mrQuery)
-		if err != nil {
-			return "", err
-		}
+	mrs, err := fetchMergeRequests(ctx, c, params, organizationID, repositoryID)
+	if err != nil {
+		return "", err
+	}
+	if mrs != nil {
 		overview["mergeRequests"] = mrs
 	}
 
 	return marshalPretty(overview)
+}
+
+func fetchBranches(ctx context.Context, c *Client, params map[string]any, repoPath string) (any, error) {
+	if !optionalBoolDefault(params, "includeBranches", true) {
+		return nil, nil
+	}
+	return getProjectOverviewSection(ctx, c, "branches", repoPath+"/branches", pageOneLimitQuery(params, "branchLimit", 5))
+}
+
+func resolveRefName(params map[string]any, repository any) string {
+	if refName := optionalStringDefault(params, "refName", ""); refName != "" {
+		return refName
+	}
+	if repoMap, ok := repository.(map[string]any); ok {
+		if db, ok := repoMap["defaultBranch"].(string); ok {
+			return db
+		}
+	}
+	return ""
+}
+
+func fetchCommits(ctx context.Context, c *Client, params map[string]any, repoPath, refName string) (any, error) {
+	if !optionalBoolDefault(params, "includeCommits", true) || refName == "" {
+		return nil, nil
+	}
+	commitQuery := pageOneLimitQuery(params, "commitLimit", 5)
+	commitQuery.Set("refName", refName)
+	return getProjectOverviewSection(ctx, c, "commits", repoPath+"/commits", commitQuery)
+}
+
+func fetchMergeRequests(ctx context.Context, c *Client, params map[string]any, organizationID, repositoryID string) (any, error) {
+	if !optionalBoolDefault(params, "includeMergeRequests", true) {
+		return nil, nil
+	}
+	mrQuery := pageOneLimitQuery(params, "mrLimit", 5)
+	mrQuery.Set("state", optionalStringDefault(params, "mrState", "opened"))
+	mrQuery.Add("repositoryIds", repositoryID)
+	return getProjectOverviewSection(ctx, c, "mergeRequests", codeupOrganizationPath(organizationID)+"/mergeRequests", mrQuery)
 }
 
 func repositoryOverviewFilters(params map[string]any) map[string]any {
