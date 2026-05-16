@@ -70,6 +70,46 @@ func TestHandleGetMemberWorkloadTrendRejectsEmptyCategories(t *testing.T) {
 	}
 }
 
+func TestHandleGetMemberWorkloadTrendEmptyAssignees(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, _ = w.Write([]byte(`[]`))
+		} else {
+			_, _ = w.Write([]byte(`[]`))
+		}
+	})
+	_, err := handleGetMemberWorkloadTrend(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+		"categories":     "Task",
+	})
+	if err == nil {
+		t.Fatal("expected error for empty assignee IDs")
+	}
+}
+
+func TestHandleGetMemberWorkloadTrendMissingProjectId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleGetMemberWorkloadTrend(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing projectId")
+	}
+}
+
+func TestHandleGetMemberWorkloadTrendNilClient(t *testing.T) {
+	_, err := handleGetMemberWorkloadTrend(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"projectId":      "project-1",
+	})
+	if err == nil {
+		t.Fatal("expected error for nil client")
+	}
+}
+
 func TestHandleGetMemberWorkloadTrendReturnsMembersError(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
