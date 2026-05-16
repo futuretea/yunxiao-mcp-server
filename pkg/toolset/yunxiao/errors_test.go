@@ -54,6 +54,25 @@ func TestClassifyErrorWrapped(t *testing.T) {
 	}
 }
 
+func TestClassifyErrorValidationError(t *testing.T) {
+	valErr := &ValidationError{Msg: "name is required"}
+	category := ClassifyError(valErr)
+	if category != ErrValidation {
+		t.Fatalf("ClassifyError(ValidationError) = %q, want %q", category, ErrValidation)
+	}
+}
+
+func TestWrapErrorValidationError(t *testing.T) {
+	valErr := &ValidationError{Msg: "name is required"}
+	got := WrapError(valErr)
+	if got == nil || got == valErr {
+		t.Fatal("WrapError should wrap ValidationError")
+	}
+	if !strings.Contains(got.Error(), "[validation]") {
+		t.Fatalf("WrapError(ValidationError) = %q, want prefix [validation]", got.Error())
+	}
+}
+
 func TestFriendlyAPIErrorReturnsNilOnNonAPIError(t *testing.T) {
 	err := errors.New("plain error")
 	got := friendlyAPIError(err)

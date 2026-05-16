@@ -19,9 +19,37 @@ const (
 	ErrNetwork    ErrorCategory = "network"
 )
 
+// ValidationError represents a request validation failure (missing/invalid parameters).
+type ValidationError struct {
+	Msg string
+}
+
+func (e *ValidationError) Error() string {
+	return e.Msg
+}
+
+// taggedError marks an error that has already been category-tagged.
+type taggedError struct {
+	err      error
+	category ErrorCategory
+}
+
+func (e *taggedError) Error() string {
+	return fmt.Sprintf("[%s] %s", e.category, e.err)
+}
+
+func (e *taggedError) Unwrap() error {
+	return e.err
+}
+
 // ClassifyError returns the error category for an error.
 // Uncategorized errors return the zero value (empty string).
 func ClassifyError(err error) ErrorCategory {
+	var tagged *taggedError
+	if errors.As(err, &tagged) {
+		return tagged.category
+	}
+
 	var apiErr *APIError
 	if errors.As(err, &apiErr) {
 		switch {
@@ -38,6 +66,11 @@ func ClassifyError(err error) ErrorCategory {
 		}
 	}
 
+	var valErr *ValidationError
+	if errors.As(err, &valErr) {
+		return ErrValidation
+	}
+
 	var netErr net.Error
 	if errors.As(err, &netErr) {
 		return ErrNetwork
@@ -47,13 +80,20 @@ func ClassifyError(err error) ErrorCategory {
 }
 
 // WrapError prepends an error category tag for MCP consumer pattern matching.
-// Uncategorized errors are returned unchanged.
+// Uncategorized errors and already-tagged errors are returned unchanged.
 func WrapError(err error) error {
+	if err == nil {
+		return nil
+	}
+	var tagged *taggedError
+	if errors.As(err, &tagged) {
+		return err
+	}
 	cat := ClassifyError(err)
 	if cat == "" {
 		return err
 	}
-	return fmt.Errorf("[%s] %w", cat, err)
+	return &taggedError{err: err, category: cat}
 }
 
 // friendlyAPIError wraps an APIError with actionable guidance for LLM consumers.

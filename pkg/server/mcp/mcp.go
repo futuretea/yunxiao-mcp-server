@@ -191,7 +191,7 @@ func (s *Server) registerTool(tool toolset.ServerTool) {
 		}
 
 		result, err := tool.Handler(ctx, s.client, params)
-		return NewTextResult(result, err), nil
+		return NewTextResult(result, yunxiaoToolset.WrapError(err)), nil
 	})
 
 	s.server.AddTool(tool.Tool, handler)
