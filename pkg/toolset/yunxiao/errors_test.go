@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -66,5 +67,46 @@ func TestFriendlyAPIErrorReturnsUncategorizedOnNonStandardStatus(t *testing.T) {
 	got := friendlyAPIError(apiErr)
 	if got != apiErr {
 		t.Fatal("friendlyAPIError should return uncategorized APIErrors unchanged")
+	}
+}
+
+func TestWrapErrorAddsCategoryPrefix(t *testing.T) {
+	tests := []struct {
+		name     string
+		err      error
+		contains string
+	}{
+		{"auth", &APIError{StatusCode: http.StatusUnauthorized}, "[auth]"},
+		{"permission", &APIError{StatusCode: http.StatusForbidden}, "[permission]"},
+		{"validation", &APIError{StatusCode: http.StatusBadRequest}, "[validation]"},
+		{"rate_limit", &APIError{StatusCode: http.StatusTooManyRequests}, "[rate_limit]"},
+		{"server", &APIError{StatusCode: http.StatusInternalServerError}, "[server]"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := WrapError(tt.err)
+			if got == nil || got == tt.err {
+				t.Fatal("WrapError should wrap categorized errors")
+			}
+			if !strings.Contains(got.Error(), tt.contains) {
+				t.Fatalf("WrapError() = %q, want prefix %q", got.Error(), tt.contains)
+			}
+		})
+	}
+}
+
+func TestWrapErrorPassthroughUncategorized(t *testing.T) {
+	err := errors.New("something failed")
+	got := WrapError(err)
+	if got != err {
+		t.Fatal("WrapError should pass through uncategorized errors unchanged")
+	}
+}
+
+func TestWrapErrorPassthroughNil(t *testing.T) {
+	got := WrapError(nil)
+	if got != nil {
+		t.Fatal("WrapError(nil) should return nil")
 	}
 }

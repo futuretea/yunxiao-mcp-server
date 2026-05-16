@@ -14,7 +14,7 @@ import (
 func (c *Client) GetJSON(ctx context.Context, path string, query url.Values) (string, error) {
 	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
 	if err != nil {
-		return "", friendlyAPIError(err)
+		return "", WrapError(friendlyAPIError(err))
 	}
 	return prettyJSON(resp.Body), nil
 }
@@ -23,7 +23,7 @@ func (c *Client) GetJSON(ctx context.Context, path string, query url.Values) (st
 func (c *Client) GetJSONWithMetadata(ctx context.Context, path string, query url.Values) (string, error) {
 	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
 	if err != nil {
-		return "", friendlyAPIError(err)
+		return "", WrapError(friendlyAPIError(err))
 	}
 	return prettyResponseJSON(resp), nil
 }
@@ -32,7 +32,7 @@ func (c *Client) GetJSONWithMetadata(ctx context.Context, path string, query url
 func (c *Client) PostJSONWithMetadata(ctx context.Context, path string, body any) (string, error) {
 	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
 	if err != nil {
-		return "", friendlyAPIError(err)
+		return "", WrapError(friendlyAPIError(err))
 	}
 	return prettyResponseJSON(resp), nil
 }
@@ -41,7 +41,7 @@ func (c *Client) PostJSONWithMetadata(ctx context.Context, path string, body any
 func (c *Client) PutJSONWithMetadata(ctx context.Context, path string, body any) (string, error) {
 	resp, err := c.Request(ctx, http.MethodPut, path, nil, body)
 	if err != nil {
-		return "", friendlyAPIError(err)
+		return "", WrapError(friendlyAPIError(err))
 	}
 	return prettyResponseJSON(resp), nil
 }
