@@ -13,7 +13,7 @@ var errNoCategories = errors.New("categories must include at least one category"
 func getClient(client any) (*Client, error) {
 	c, ok := client.(*Client)
 	if !ok || c == nil {
-		return nil, fmt.Errorf("yunxiao client is not configured")
+		return nil, &ValidationError{Msg: "yunxiao client is not configured"}
 	}
 	return c, nil
 }
@@ -21,7 +21,7 @@ func getClient(client any) (*Client, error) {
 func requiredString(params map[string]any, key string) (string, error) {
 	value, _ := params[key].(string)
 	if strings.TrimSpace(value) == "" {
-		return "", fmt.Errorf("%s is required", key)
+		return "", &ValidationError{Msg: fmt.Sprintf("%s is required", key)}
 	}
 	return value, nil
 }
@@ -78,7 +78,7 @@ func requiredNumberPathString(params map[string]any, key string) (string, error)
 	switch value := params[key].(type) {
 	case float64:
 		if value != math.Trunc(value) {
-			return "", fmt.Errorf("%s must be an integer", key)
+			return "", &ValidationError{Msg: fmt.Sprintf("%s must be an integer", key)}
 		}
 		return strconv.FormatInt(int64(value), 10), nil
 	case int:
@@ -90,5 +90,5 @@ func requiredNumberPathString(params map[string]any, key string) (string, error)
 			return value, nil
 		}
 	}
-	return "", fmt.Errorf("%s is required", key)
+	return "", &ValidationError{Msg: fmt.Sprintf("%s is required", key)}
 }
