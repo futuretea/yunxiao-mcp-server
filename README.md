@@ -49,13 +49,13 @@ See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other
 
 ## Tools Overview
 
-The default `read_only=true` catalog exposes 130 read-only tools. The full catalog has 140 tools: 130 read-only tools plus ten write-capable tools — four Projex work item operations (`create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`) and six Codeup change request/merge request operations (`create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`) — when `read_only=false`.
+The default `read_only=true` catalog exposes 130 read-only tools. The full catalog has 142 tools: 130 read-only tools plus twelve write-capable tools — four Projex work item operations (`create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`), six Codeup change request/merge request operations (`create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`), and two Flow pipeline validation operations (`pass_pipeline_validate`, `refuse_pipeline_validate`) — when `read_only=false`.
 
 | Domain | Tools | Access | Description |
 |--------|-------|--------|-------------|
 | **Projex** | 45 | 41 read-only, 4 write-capable | Projects, iterations, work items, milestones, test cases |
 | **Codeup** | 30 | 24 read-only, 6 write-capable | Repositories, branches, commits, merge requests, change requests, code review |
-| **Flow** | 8 | read-only | Pipelines, runs, build tasks |
+| **Flow** | 10 | 8 read-only, 2 write-capable | Pipelines, runs, build tasks, validation |
 | **Appstack** | 31 | read-only | Applications, environments, releases, change orders |
 | **Platform** | 18 | read-only | Organizations, departments, members, roles |
 | **Packages** | 2 | read-only | Artifact repositories and versions |

@@ -76,6 +76,55 @@ func TestHandleGetSprintVelocityRejectsEmptyCategories(t *testing.T) {
 	}
 }
 
+func TestClampSprintCount(t *testing.T) {
+	tests := []struct {
+		n    int
+		want int
+	}{
+		{-5, 1},
+		{-1, 1},
+		{0, 1},
+		{1, 1},
+		{10, 10},
+		{20, 20},
+		{21, 20},
+		{100, 20},
+	}
+	for _, tt := range tests {
+		got := clampSprintCount(tt.n)
+		if got != tt.want {
+			t.Errorf("clampSprintCount(%d) = %d, want %d", tt.n, got, tt.want)
+		}
+	}
+}
+
+func TestParseSprintList(t *testing.T) {
+	tests := []struct {
+		name string
+		data any
+		want int
+	}{
+		{"slice", []any{"a"}, 1},
+		{"map with data", map[string]any{"data": []any{"x", "y"}}, 2},
+		{"empty map", map[string]any{}, -1},
+		{"map with non-list data", map[string]any{"data": 123}, -1},
+		{"string", "nope", -1},
+		{"nil", nil, -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseSprintList(tt.data)
+			if tt.want < 0 {
+				if got != nil {
+					t.Fatalf("parseSprintList(%v) = %v, want nil", tt.data, got)
+				}
+			} else if len(got) != tt.want {
+				t.Fatalf("parseSprintList(%v) len = %d, want %d", tt.data, len(got), tt.want)
+			}
+		})
+	}
+}
+
 func TestHandleGetSprintVelocityReturnsSprintError(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)

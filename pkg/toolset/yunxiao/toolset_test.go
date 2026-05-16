@@ -239,6 +239,8 @@ func TestGetMinimalToolsReturnsExactSet(t *testing.T) {
 		"close_change_request",
 		"reopen_change_request",
 		"merge_change_request",
+		"pass_pipeline_validate",
+		"refuse_pipeline_validate",
 	}
 
 	tools := (&Toolset{ReadOnly: false}).GetMinimalTools(nil)
@@ -249,7 +251,7 @@ func TestGetMinimalToolsReturnsExactSet(t *testing.T) {
 	names := make(map[string]bool, len(tools))
 	for _, tool := range tools {
 		names[tool.Tool.Name] = true
-		if tool.Domain != "platform" && tool.Domain != "projex" && tool.Domain != "codeup" {
+		if tool.Domain != "platform" && tool.Domain != "projex" && tool.Domain != "codeup" && tool.Domain != "flow" {
 			t.Fatalf("tool %q has unexpected domain %q", tool.Tool.Name, tool.Domain)
 		}
 	}

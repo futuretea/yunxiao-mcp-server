@@ -6,7 +6,7 @@ This project is GA-ready for local MCP use as a default-read-only Yunxiao OpenAP
 
 - Transports: stdio, Streamable HTTP, SSE, and `/healthz`.
 - Authentication: a startup default Yunxiao token, with request-level HTTP/SSE token override through `x-yunxiao-token` or `yunxiao_access_token`.
-- Tool surface: 130 read-only MCP tools in the default `read_only=true` catalog. The full catalog contains 140 tools: 130 read-only tools plus 10 write-capable tools (4 Projex: `create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`; 6 Codeup: `create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`) that are exposed only when `read_only=false`.
+- Tool surface: 130 read-only MCP tools in the default `read_only=true` catalog. The full catalog contains 142 tools: 130 read-only tools plus 12 write-capable tools (4 Projex: `create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`; 6 Codeup: `create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`; 2 Flow: `pass_pipeline_validate`, `refuse_pipeline_validate`) that are exposed only when `read_only=false`.
 - Safety boundary: read-only API access by default. Write-capable tools require an explicit `read_only=false` configuration and are limited to Projex work item and Codeup change request/merge request operations. Other endpoints with create, update, delete, execute, approve, refuse, or state-changing semantics are not exposed, even when Yunxiao models them as `GET`.
 
 ## Release Gate
@@ -31,8 +31,6 @@ These endpoints are intentionally not exposed in the GA read-only surface.
 | `ListAuditLogsForAdmin` | `/platform/auditLogs` | Enterprise-admin sensitive read. Organization-scoped audit logs are exposed as `list_audit_logs`; admin-wide audit access needs an explicit admin-mode and security review. |
 | `ListUserPersonalAccessTokens` | `/platform/users/admin/personalAccessTokens` | Enterprise-admin sensitive token metadata. Expose only with an explicit admin-mode, redaction policy, and audit guidance. |
 | `DeleteWorkitemFile` | `/projex/organizations/{organizationId}/workitems/{workitemId}/deletefile/{id}` | Uses `GET` but deletes a work item file. This is mutation behavior and is outside the read-only GA scope. |
-| `UpdatePassPipelineValidate` | `/flow/organizations/{organizationId}/pipelines/{pipelineId}/pipelineRuns/{pipelineRunId}/jobs/{jobId}/pass` | Uses `GET` but changes pipeline validation state. This belongs in a future mutation mode with confirmation controls. |
-| `UpdateRefusePipelineValidate` | `/flow/organizations/{organizationId}/pipelines/{pipelineId}/pipelineRuns/{pipelineRunId}/jobs/{jobId}/refuse` | Uses `GET` but changes pipeline validation state. This belongs in a future mutation mode with confirmation controls. |
 | `GetPipelineRunV2` | `/flow/organizations/{organizationId}/pipelines/{pipelineId}/runs/{pipelineRunId}/v2` | The swagger path includes `pipelineRunId`, but the operation parameter list omits it. Defer until the contract is fixed or a trusted reference confirms the request shape. |
 | `getMachineGroupDefault` | `/flow/organizations/{organizationId}/build/machinegroup/default` | Swagger declares a path parameter that is not present in the path. Defer until the contract is fixed or a trusted reference confirms the request shape. |
 
