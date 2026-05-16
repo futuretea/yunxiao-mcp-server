@@ -179,6 +179,40 @@ func TestHandleUpdateWorkitemStatusWithoutComment(t *testing.T) {
 	}
 }
 
+func TestHandleUpdateWorkitemStatusReturnsCommentError(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		switch callCount {
+		case 1:
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1/status" {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`{"success":true}`))
+		case 2:
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1/comments" {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			http.Error(w, "comment failed", http.StatusInternalServerError)
+		default:
+			t.Fatalf("unexpected call %d", callCount)
+		}
+	})
+
+	_, err := handleUpdateWorkitemStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+		"statusId":       "status-2",
+		"comment":        "Moving to done",
+	})
+	if err == nil || !strings.Contains(err.Error(), "add status comment") {
+		t.Fatalf("expected comment error, got %v", err)
+	}
+	if callCount != 2 {
+		t.Fatalf("expected 2 API calls, got %d", callCount)
+	}
+}
+
 func TestHandleAddWorkitemComment(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

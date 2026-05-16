@@ -109,7 +109,9 @@ func handleUpdateWorkitemStatus(ctx context.Context, client any, params map[stri
 
 	if comment, _ := params["comment"].(string); comment != "" {
 		commentBody := map[string]any{"content": comment}
-		_, _ = c.PostJSONWithMetadata(ctx, projexWorkitemPath(organizationID, workitemID)+"/comments", commentBody)
+		if _, err := c.PostJSONWithMetadata(ctx, projexWorkitemPath(organizationID, workitemID)+"/comments", commentBody); err != nil {
+			return "", fmt.Errorf("add status comment: %w", err)
+		}
 	}
 
 	return result, nil
