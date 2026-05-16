@@ -125,6 +125,48 @@ func TestParseStatusTimeline(t *testing.T) {
 	}
 }
 
+func TestHandleGetWorkitemStatusTimelineNilClient(t *testing.T) {
+	_, err := handleGetWorkitemStatusTimeline(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	})
+	if err == nil {
+		t.Fatal("expected error for nil client")
+	}
+}
+
+func TestHandleGetWorkitemStatusTimelineActivitiesError(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		if callCount == 1 {
+			_, _ = w.Write([]byte(`{"id":"wi-1","subject":"Test"}`))
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
+	_, err := handleGetWorkitemStatusTimeline(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	})
+	if err == nil {
+		t.Fatal("expected error for activities API failure")
+	}
+}
+
+func TestHandleGetWorkitemStatusTimelineWorkitemFetchError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	_, err := handleGetWorkitemStatusTimeline(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+	})
+	if err == nil {
+		t.Fatal("expected error for workitem fetch failure")
+	}
+}
+
 func TestHandleGetWorkitemStatusTimelineRequiresWorkitemId(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("handler should not issue request without workitemId")

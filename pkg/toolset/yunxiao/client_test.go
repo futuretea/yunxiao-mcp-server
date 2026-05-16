@@ -366,6 +366,13 @@ func TestWithAccessTokenReturnsOriginalContextForEmptyToken(t *testing.T) {
 	}
 }
 
+func TestPrettyJSONReturnsFormattedForValidJSON(t *testing.T) {
+	got := prettyJSON([]byte(`{"key":"value"}`))
+	if !strings.Contains(got, `"key"`) || !strings.Contains(got, `"value"`) {
+		t.Fatalf("prettyJSON() = %q, want formatted", got)
+	}
+}
+
 func TestPrettyJSONReturnsRawForInvalidJSON(t *testing.T) {
 	invalid := []byte(`{invalid`)
 	if got := prettyJSON(invalid); got != string(invalid) {
