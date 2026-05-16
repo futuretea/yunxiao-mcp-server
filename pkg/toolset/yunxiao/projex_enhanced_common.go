@@ -107,15 +107,25 @@ func mergeConditions(existing, extra string) string {
 	if extra == "" {
 		return existing
 	}
-	var existingArr, extraArr []map[string]any
-	existingArrErr := json.Unmarshal([]byte(existing), &existingArr)
-	extraArrErr := json.Unmarshal([]byte(extra), &extraArr)
-	if existingArrErr == nil && extraArrErr == nil {
-		merged := append(existingArr, extraArr...)
-		mergedBytes, _ := json.Marshal(merged)
-		return string(mergedBytes)
+	if result, ok := mergeConditionsAsArrays(existing, extra); ok {
+		return result
 	}
+	return mergeConditionGroups(existing, extra)
+}
 
+func mergeConditionsAsArrays(existing, extra string) (string, bool) {
+	var existingArr, extraArr []map[string]any
+	if err := json.Unmarshal([]byte(existing), &existingArr); err != nil {
+		return "", false
+	}
+	if err := json.Unmarshal([]byte(extra), &extraArr); err != nil {
+		return "", false
+	}
+	mergedBytes, _ := json.Marshal(append(existingArr, extraArr...))
+	return string(mergedBytes), true
+}
+
+func mergeConditionGroups(existing, extra string) string {
 	var existingObj, extraObj map[string]any
 	if err := json.Unmarshal([]byte(existing), &existingObj); err != nil {
 		return existing
