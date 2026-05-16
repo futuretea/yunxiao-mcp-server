@@ -76,6 +76,55 @@ func TestHandleGetWorkitemStatusTimelineSkipsWorkitemWhenDisabled(t *testing.T) 
 	}
 }
 
+func TestParseStatusTimeline(t *testing.T) {
+	tests := []struct {
+		name       string
+		activities any
+		wantLen    int
+	}{
+		{"nil", nil, 0},
+		{"string input", "not-activities", 0},
+		{
+			"array with status update",
+			[]any{
+				map[string]any{"action": "UPDATE", "field": "status", "gmtCreate": float64(100), "operator": "user1", "oldValue": "backlog", "newValue": "doing"},
+			},
+			1,
+		},
+		{
+			"array with non-status update",
+			[]any{
+				map[string]any{"action": "UPDATE", "field": "subject", "gmtCreate": float64(200)},
+				map[string]any{"action": "CREATE", "field": "status", "gmtCreate": float64(300)},
+			},
+			0,
+		},
+		{
+			"map with data key",
+			map[string]any{"data": []any{
+				map[string]any{"action": "UPDATE", "field": "status", "gmtCreate": float64(400), "operator": "u2", "oldValue": "doing", "newValue": "done"},
+			}},
+			1,
+		},
+		{"map without data key", map[string]any{"total": 5}, 0},
+		{"map with non-list data", map[string]any{"data": "not-a-list"}, 0},
+		{
+			"skips non-map items",
+			[]any{"not-a-map", map[string]any{"action": "UPDATE", "field": "status", "gmtCreate": float64(500)}},
+			1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseStatusTimeline(tt.activities)
+			if len(got) != tt.wantLen {
+				t.Fatalf("parseStatusTimeline() len = %d, want %d", len(got), tt.wantLen)
+			}
+		})
+	}
+}
+
 func TestHandleGetWorkitemStatusTimelineRequiresWorkitemId(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("handler should not issue request without workitemId")
