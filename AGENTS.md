@@ -55,7 +55,7 @@ pkg/toolset/yunxiao/       # All Yunxiao tool definitions and handlers
 | File | Purpose |
 |------|---------|
 | `pkg/toolset/yunxiao/*_tools.go` | 140 MCP tool schemas across 7 domains (130 read-only + 10 write-capable tools gated behind read_only=false) |
-| `pkg/toolset/yunxiao/projex_enhanced_*.go` | 9 enhanced aggregation tools |
+| `pkg/toolset/yunxiao/projex_enhanced_*.go` | 8 enhanced aggregation tools |
 | `pkg/toolset/yunxiao/codeup_write_*.go` | 6 Codeup write tools (create_change_request, add_change_request_comment, create_merge_request, close_change_request, reopen_change_request, merge_change_request) |
 | `pkg/toolset/yunxiao/client.go` | HTTP client with auth, pagination, and error handling |
 | `docs/ga-readiness.md` | Release gate checklist and deferred endpoints |
