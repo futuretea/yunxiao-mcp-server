@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -99,35 +98,6 @@ func (e *APIError) Error() string {
 		return fmt.Sprintf("Yunxiao API error: %s %s returned status %d", e.Method, e.URL, e.StatusCode)
 	}
 	return fmt.Sprintf("Yunxiao API error: %s %s returned status %d: %s", e.Method, e.URL, e.StatusCode, e.Body)
-}
-
-// friendlyAPIError wraps an APIError with actionable guidance for LLM consumers.
-// Non-API errors are returned unchanged.
-func friendlyAPIError(err error) error {
-	var apiErr *APIError
-	if !errors.As(err, &apiErr) {
-		return err
-	}
-
-	var suggestion string
-	switch apiErr.StatusCode {
-	case http.StatusUnauthorized:
-		suggestion = "Authentication failed. Verify that your access token is valid and not expired."
-	case http.StatusForbidden:
-		suggestion = "Access denied. Your token may not have permission for this resource."
-	case http.StatusNotFound:
-		suggestion = "Resource not found. Verify that the project ID, work item ID, pipeline ID, or other identifiers are correct. Use search_projects, search_workitems, or list_pipelines to find valid IDs."
-	case http.StatusBadRequest:
-		suggestion = "Invalid request parameters. Check that required fields are present, IDs are correct, and enum values are valid. Use the corresponding get_*_context or list_* tools to discover valid values."
-	case http.StatusTooManyRequests:
-		suggestion = "Rate limit exceeded. Wait a moment before retrying."
-	case http.StatusInternalServerError, http.StatusBadGateway, http.StatusServiceUnavailable:
-		suggestion = "Yunxiao service temporarily unavailable. Retry the request later."
-	default:
-		return err
-	}
-
-	return fmt.Errorf("%w\n\nSuggestion: %s", apiErr, suggestion)
 }
 
 // NewClient creates a Yunxiao OpenAPI client.
