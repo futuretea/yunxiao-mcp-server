@@ -246,12 +246,67 @@ func TestHandleAddWorkitemComment(t *testing.T) {
 	}
 }
 
+func TestHandleAddWorkitemCommentMissingOrganizationId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleAddWorkitemComment(context.Background(), client, map[string]any{
+		"workitemId": "wi-1",
+		"content":    "test",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing organizationId")
+	}
+}
+
+func TestHandleAddWorkitemCommentMissingWorkitemId(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleAddWorkitemComment(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"content":        "test",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing workitemId")
+	}
+}
+
 func TestHandleAddWorkitemCommentMissingContent(t *testing.T) {
-	_, err := handleAddWorkitemComment(context.Background(), nil, map[string]any{
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleAddWorkitemComment(context.Background(), client, map[string]any{
 		"organizationId": "org-1",
 		"workitemId":     "wi-1",
 	})
 	if err == nil {
 		t.Fatal("expected error for missing content")
+	}
+}
+
+func TestHandleAddWorkitemCommentNilClient(t *testing.T) {
+	_, err := handleAddWorkitemComment(context.Background(), nil, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+		"content":        "test",
+	})
+	if err == nil {
+		t.Fatal("expected error for nil client")
+	}
+}
+
+func TestHandleAddWorkitemCommentAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"error":"internal error"}`))
+	})
+	_, err := handleAddWorkitemComment(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+		"content":        "test",
+	})
+	if err == nil {
+		t.Fatal("expected error for API error response")
 	}
 }
