@@ -8,6 +8,20 @@ import (
 func codeupWriteTools() []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
+			Tool: mcp.NewTool("create_change_request",
+				mcp.WithDescription("Create a new Codeup change request."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository ID or path (e.g., 'org%2Frepo').")),
+				mcp.WithString("title", mcp.Required(), mcp.Description("Change request title.")),
+				mcp.WithString("sourceBranch", mcp.Required(), mcp.Description("Source branch name.")),
+				mcp.WithString("targetBranch", mcp.Required(), mcp.Description("Target branch name.")),
+				mcp.WithString("sourceProjectId", mcp.Description("Source project numeric ID. Defaults to repository numeric ID if omitted.")),
+				mcp.WithString("targetProjectId", mcp.Description("Target project numeric ID. Defaults to repository numeric ID if omitted.")),
+				mcp.WithString("description", mcp.Description("Change request description.")),
+			),
+			Handler: handleCreateChangeRequest,
+		},
+		{
 			Tool: mcp.NewTool("add_change_request_comment",
 				mcp.WithDescription("Add a comment to a Codeup change request."),
 				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),

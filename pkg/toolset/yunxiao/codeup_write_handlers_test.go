@@ -8,6 +8,76 @@ import (
 	"testing"
 )
 
+func TestHandleCreateChangeRequest(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("method = %s, want POST", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/codeup/organizations/org-1/repositories/repo-1/changeRequests" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if body["title"] != "Test CR" {
+			t.Fatalf("title = %v", body["title"])
+		}
+		if body["sourceBranch"] != "feature/x" {
+			t.Fatalf("sourceBranch = %v", body["sourceBranch"])
+		}
+
+		_, _ = w.Write([]byte(`{"id":"1","title":"Test CR"}`))
+	})
+
+	result, err := handleCreateChangeRequest(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"repositoryId":   "repo-1",
+		"title":          "Test CR",
+		"sourceBranch":   "feature/x",
+		"targetBranch":   "main",
+	})
+	if err != nil {
+		t.Fatalf("handleCreateChangeRequest() error = %v", err)
+	}
+	if !strings.Contains(result, "Test CR") {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleCreateChangeRequestMissingTitle(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("unexpected API call")
+	})
+	_, err := handleCreateChangeRequest(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"repositoryId":   "repo-1",
+		"sourceBranch":   "feature/x",
+		"targetBranch":   "main",
+	})
+	if err == nil {
+		t.Fatal("expected error for missing title")
+	}
+}
+
+func TestHandleCreateChangeRequestAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"error":"boom"}`))
+	})
+	_, err := handleCreateChangeRequest(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"repositoryId":   "repo-1",
+		"title":          "Test",
+		"sourceBranch":   "feature/x",
+		"targetBranch":   "main",
+	})
+	if err == nil {
+		t.Fatal("expected error for API failure")
+	}
+}
+
 func TestHandleAddChangeRequestComment(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
