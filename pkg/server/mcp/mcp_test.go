@@ -489,8 +489,13 @@ func TestRegisterToolFillsDefaultOrganizationID(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client, _ := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
-	_ = client.ResolveDefaultOrgID(context.Background())
+	client, err := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
 
 	s := &Server{
 		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
@@ -514,10 +519,61 @@ func TestRegisterToolFillsDefaultOrganizationID(t *testing.T) {
 		t.Fatal("mock_tool should be registered")
 	}
 
-	_, err := registered.Handler(context.Background(), mcp.CallToolRequest{
+	_, err = registered.Handler(context.Background(), mcp.CallToolRequest{
 		Params: mcp.CallToolParams{
 			Name:      "mock_tool",
 			Arguments: map[string]any{},
+		},
+	})
+	if err != nil {
+		t.Fatalf("handler error = %v", err)
+	}
+
+	if gotParams["organizationId"] != "default-org" {
+		t.Fatalf("organizationId = %q, want default-org", gotParams["organizationId"])
+	}
+}
+
+func TestRegisterToolReplacesBlankOrganizationIDWithDefault(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`[{"id":"default-org"}]`))
+	}))
+	defer ts.Close()
+
+	client, err := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
+
+	s := &Server{
+		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
+		server:        server.NewMCPServer("test", "1.0.0"),
+		client:        client,
+	}
+
+	var gotParams map[string]any
+	mockTool := toolset.ServerTool{
+		Tool: mcp.NewTool("mock_tool"),
+		Handler: func(ctx context.Context, c any, params map[string]any) (string, error) {
+			gotParams = params
+			return "ok", nil
+		},
+	}
+
+	s.registerTool(mockTool)
+
+	registered := s.server.GetTool("mock_tool")
+	if registered == nil {
+		t.Fatal("mock_tool should be registered")
+	}
+
+	_, err = registered.Handler(context.Background(), mcp.CallToolRequest{
+		Params: mcp.CallToolParams{
+			Name:      "mock_tool",
+			Arguments: map[string]any{"organizationId": " \t "},
 		},
 	})
 	if err != nil {
@@ -535,8 +591,13 @@ func TestRegisterToolPreservesExistingOrganizationID(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client, _ := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
-	_ = client.ResolveDefaultOrgID(context.Background())
+	client, err := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
 
 	s := &Server{
 		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
@@ -560,7 +621,7 @@ func TestRegisterToolPreservesExistingOrganizationID(t *testing.T) {
 		t.Fatal("mock_tool should be registered")
 	}
 
-	_, err := registered.Handler(context.Background(), mcp.CallToolRequest{
+	_, err = registered.Handler(context.Background(), mcp.CallToolRequest{
 		Params: mcp.CallToolParams{
 			Name:      "mock_tool",
 			Arguments: map[string]any{"organizationId": "provided-org"},

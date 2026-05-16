@@ -184,7 +184,7 @@ func (s *Server) registerTool(tool toolset.ServerTool) {
 			params = map[string]any{}
 		}
 
-		if orgID, ok := params["organizationId"].(string); !ok || orgID == "" {
+		if orgID, ok := params["organizationId"].(string); !ok || strings.TrimSpace(orgID) == "" {
 			if s.client.DefaultOrgID != "" {
 				params["organizationId"] = s.client.DefaultOrgID
 			}

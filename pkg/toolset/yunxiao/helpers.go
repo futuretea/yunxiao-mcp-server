@@ -3,6 +3,9 @@ package yunxiao
 import (
 	"errors"
 	"fmt"
+	"math"
+	"strconv"
+	"strings"
 )
 
 var errNoCategories = errors.New("categories must include at least one category")
@@ -17,7 +20,7 @@ func getClient(client any) (*Client, error) {
 
 func requiredString(params map[string]any, key string) (string, error) {
 	value, _ := params[key].(string)
-	if value == "" {
+	if strings.TrimSpace(value) == "" {
 		return "", fmt.Errorf("%s is required", key)
 	}
 	return value, nil
@@ -69,4 +72,23 @@ func requiredOrganizationAndPipeline(params map[string]any) (string, string, err
 		return "", "", err
 	}
 	return organizationID, pipelineID, nil
+}
+
+func requiredNumberPathString(params map[string]any, key string) (string, error) {
+	switch value := params[key].(type) {
+	case float64:
+		if value != math.Trunc(value) {
+			return "", fmt.Errorf("%s must be an integer", key)
+		}
+		return strconv.FormatInt(int64(value), 10), nil
+	case int:
+		return strconv.Itoa(value), nil
+	case int64:
+		return strconv.FormatInt(value, 10), nil
+	case string:
+		if value = strings.TrimSpace(value); value != "" {
+			return value, nil
+		}
+	}
+	return "", fmt.Errorf("%s is required", key)
 }

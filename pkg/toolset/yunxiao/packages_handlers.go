@@ -2,9 +2,7 @@ package yunxiao
 
 import (
 	"context"
-	"fmt"
 	"net/url"
-	"strconv"
 )
 
 func handleListPackageRepositories(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -91,20 +89,4 @@ func requiredOrganizationAndPackageRepo(params map[string]any) (string, string, 
 		return "", "", err
 	}
 	return organizationID, repoID, nil
-}
-
-func requiredNumberPathString(params map[string]any, key string) (string, error) {
-	switch value := params[key].(type) {
-	case float64:
-		return strconv.FormatInt(int64(value), 10), nil
-	case int:
-		return strconv.Itoa(value), nil
-	case int64:
-		return strconv.FormatInt(value, 10), nil
-	case string:
-		if value != "" {
-			return value, nil
-		}
-	}
-	return "", fmt.Errorf("%s is required", key)
 }
