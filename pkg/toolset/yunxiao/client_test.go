@@ -412,6 +412,18 @@ func TestClientPostJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
 	}
 }
 
+func TestClientPutJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
+	client, err := NewClient("https://example.com", "token-1", time.Millisecond)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	_, err = client.PutJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": "value"})
+	if err == nil {
+		t.Fatal("PutJSONWithMetadata() expected request error")
+	}
+}
+
 func TestEncodeRepositoryID(t *testing.T) {
 	tests := []struct {
 		name string
