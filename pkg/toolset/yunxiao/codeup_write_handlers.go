@@ -41,6 +41,91 @@ func handleCreateChangeRequest(ctx context.Context, client any, params map[strin
 	return c.PostJSONWithMetadata(ctx, path, body)
 }
 
+func handleCreateMergeRequest(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, repositoryID, err := requiredOrganizationAndRepository(params)
+	if err != nil {
+		return "", err
+	}
+	title, err := requiredString(params, "title")
+	if err != nil {
+		return "", err
+	}
+	sourceBranch, err := requiredString(params, "sourceBranch")
+	if err != nil {
+		return "", err
+	}
+	targetBranch, err := requiredString(params, "targetBranch")
+	if err != nil {
+		return "", err
+	}
+
+	body := map[string]any{
+		"title":        title,
+		"sourceBranch": sourceBranch,
+		"targetBranch": targetBranch,
+	}
+	setOptionalStringBody(body, params, "description")
+	setOptionalStringBody(body, params, "sourceProjectId")
+	setOptionalStringBody(body, params, "targetProjectId")
+
+	if assigneeIds, ok := params["assigneeIds"].([]any); ok && len(assigneeIds) > 0 {
+		body["assigneeIds"] = assigneeIds
+	}
+
+	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/mergeRequests"
+	return c.PostJSONWithMetadata(ctx, path, body)
+}
+
+func handleCloseChangeRequest(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, repositoryID, localID, err := requiredOrganizationRepositoryAndLocalID(params)
+	if err != nil {
+		return "", err
+	}
+
+	path := changeRequestPath(organizationID, repositoryID, localID) + "/close"
+	return c.PostJSONWithMetadata(ctx, path, map[string]any{})
+}
+
+func handleReopenChangeRequest(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, repositoryID, localID, err := requiredOrganizationRepositoryAndLocalID(params)
+	if err != nil {
+		return "", err
+	}
+
+	path := changeRequestPath(organizationID, repositoryID, localID) + "/reopen"
+	return c.PostJSONWithMetadata(ctx, path, map[string]any{})
+}
+
+func handleMergeChangeRequest(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, repositoryID, localID, err := requiredOrganizationRepositoryAndLocalID(params)
+	if err != nil {
+		return "", err
+	}
+
+	path := changeRequestPath(organizationID, repositoryID, localID) + "/merge"
+	return c.PostJSONWithMetadata(ctx, path, map[string]any{})
+}
+
 func handleAddChangeRequestComment(ctx context.Context, client any, params map[string]any) (string, error) {
 	c, err := getClient(client)
 	if err != nil {

@@ -235,6 +235,10 @@ func TestGetMinimalToolsReturnsExactSet(t *testing.T) {
 		"add_workitem_comment",
 		"create_change_request",
 		"add_change_request_comment",
+		"create_merge_request",
+		"close_change_request",
+		"reopen_change_request",
+		"merge_change_request",
 	}
 
 	tools := (&Toolset{ReadOnly: false}).GetMinimalTools(nil)
