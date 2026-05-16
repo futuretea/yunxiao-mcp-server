@@ -258,3 +258,25 @@ func TestHandleCallYunxiaoAPIDefaultsToGET(t *testing.T) {
 		t.Fatalf("handleCallYunxiaoAPI() error = %v", err)
 	}
 }
+
+func TestHandleCallYunxiaoAPIRequestError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"error":"boom"}`))
+	})
+	_, err := handleCallYunxiaoAPI(context.Background(), client, map[string]any{
+		"path": "/platform/users:me",
+	})
+	if err == nil {
+		t.Fatal("expected error for API request failure")
+	}
+}
+
+func TestHandleCallYunxiaoAPINilClient(t *testing.T) {
+	_, err := handleCallYunxiaoAPI(context.Background(), nil, map[string]any{
+		"path": "/platform/users:me",
+	})
+	if err == nil {
+		t.Fatal("expected error for nil client")
+	}
+}
