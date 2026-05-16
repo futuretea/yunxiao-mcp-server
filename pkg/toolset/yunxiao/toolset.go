@@ -30,10 +30,11 @@ var minimalToolNames = map[string]struct{}{
 	"list_project_members": {},
 
 	// Projex — Write (available when read-only is false)
-	"create_workitem":        {},
-	"update_workitem":        {},
-	"update_workitem_status": {},
-	"add_workitem_comment":   {},
+	"create_workitem":            {},
+	"update_workitem":            {},
+	"update_workitem_status":     {},
+	"add_workitem_comment":       {},
+	"add_change_request_comment": {},
 }
 
 // projectFocusedDomains are the tool domains enabled in project-focused mode.
@@ -68,10 +69,11 @@ var projectFocusedHiddenTools = map[string]struct{}{
 
 // writeToolNames are tools that perform mutations and are excluded in read-only mode.
 var writeToolNames = map[string]struct{}{
-	"create_workitem":        {},
-	"update_workitem":        {},
-	"update_workitem_status": {},
-	"add_workitem_comment":   {},
+	"create_workitem":            {},
+	"update_workitem":            {},
+	"update_workitem_status":     {},
+	"add_workitem_comment":       {},
+	"add_change_request_comment": {},
 }
 
 // Toolset exposes Yunxiao OpenAPI tools.

@@ -18,6 +18,7 @@ func codeupTools() []toolset.ServerTool {
 	tools = append(tools, codeupMergeRequestTools()...)
 	tools = append(tools, codeupChangeRequestTools()...)
 	tools = append(tools, codeupEnhancedTools()...)
+	tools = append(tools, codeupWriteTools()...)
 	return tools
 }
 
