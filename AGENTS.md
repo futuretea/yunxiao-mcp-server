@@ -70,7 +70,7 @@ pkg/toolset/yunxiao/       # All Yunxiao tool definitions and handlers
 3. Add tests in the matching `*_test.go` file.
 4. Run `make ci` and `make coverage-check`.
 5. Run `make docs` to regenerate domain documentation.
-6. Update `docs/projex-enhanced-tools.md` if the tool is an enhanced aggregation tool.
+6. Update the corresponding `docs/<domain>-enhanced-tools.md` and `docs/enhanced-tools-index.md` if the tool is an enhanced aggregation tool.
 
 ## Reference Projects
 
