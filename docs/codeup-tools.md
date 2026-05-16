@@ -1,6 +1,8 @@
 # Codeup Tools
 
-This document describes the 24 read-only MCP tools in the codeup domain.
+This document describes the 24 MCP tools in the codeup domain.
+
+Access summary: 24 read-only, 0 write-capable.
 
 ## Enhanced Tools
 
@@ -23,36 +25,38 @@ Tools in this domain use the following pagination scheme(s):
 
 Tools marked in **bold** are enhanced aggregation tools.
 
-| Tool | Description |
-|------|-------------|
-| `list_ssh_keys` | List SSH keys registered for CodeUp access in a Yunxiao organization. |
-| `list_user_ssh_keys` | List SSH keys registered for a specific Yunxiao user in CodeUp. |
-| `list_webhooks` | List webhooks configured for a CodeUp repository. Webhooks trigger external integrations on repository events. |
-| `list_commit_statuses` | List commit statuses (CI checks) for a specific commit in a CodeUp repository. Use this to verify whether a commit has passed automated checks. |
-| `list_check_runs` | List check runs (CI pipeline executions) for a branch, tag, or commit in a CodeUp repository. Use this to monitor CI/CD status. |
-| **`get_repository_overview`** | Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. This is the best starting point when exploring a new repository. |
-| **`get_change_request_overview`** | Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call. |
-| **`get_commit_overview`** | Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call. |
-| **`get_branch_overview`** | Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call. |
-| `list_group_members` | List members of a CodeUp group (namespace). Use this to discover who has access to repositories within the group. |
-| `list_merge_requests` | List legacy CodeUp merge requests across repositories in a Yunxiao organization. For change requests (new merge request format), use list_change_requests instead. |
-| `list_template_repositories` | List CodeUp template repositories in a Yunxiao organization. Templates are pre-configured repositories used as starting points for new projects. |
-| `list_namespaces` | List CodeUp namespaces or groups in a Yunxiao organization. Namespaces organize repositories into hierarchical groups. |
-| `list_tags` | List tags (version markers) in a CodeUp repository. Use this to discover release versions. |
-| `list_repository_members` | List members who have access to a CodeUp repository. Use this to discover user IDs for assignment or review. |
-| `list_protected_branches` | List protected branch rules in a CodeUp repository. Protected branches enforce review and CI requirements before merging. |
-| `list_push_rules` | List push rules (commit restrictions) in a CodeUp repository. Push rules enforce commit message formats and file path restrictions. |
-| `list_repositories` | List CodeUp (Git) repositories in a Yunxiao organization. Use this to discover repositories and obtain their IDs before calling repository-scoped tools. For a comprehensive view of a single repository, use get_repository_overview instead. |
-| `list_branches` | List branches in a CodeUp repository. Use this to discover available branches before checking out code or reviewing merge requests. |
-| `list_files` | List files and directories in a CodeUp repository tree. Use this to explore repository structure. |
-| `list_commits` | List commits in a CodeUp repository. Use this to review recent changes and commit history. |
-| `list_change_requests` | List CodeUp change requests (merge requests) across repositories in a Yunxiao organization. Use this to find pending reviews or track merged changes. |
-| `list_change_request_patch_sets` | List patch sets (diff iterations) for a CodeUp merge request. Use this to review how a merge request evolved across multiple pushes. |
-| `list_change_request_comments` | List comments on a CodeUp merge request. Use this to review feedback, inline discussions, and approval threads. |
+| Tool | Access | Description |
+|------|--------|-------------|
+| `list_ssh_keys` | Read-only | List SSH keys registered for CodeUp access in a Yunxiao organization. |
+| `list_user_ssh_keys` | Read-only | List SSH keys registered for a specific Yunxiao user in CodeUp. |
+| `list_webhooks` | Read-only | List webhooks configured for a CodeUp repository. Webhooks trigger external integrations on repository events. |
+| `list_commit_statuses` | Read-only | List commit statuses (CI checks) for a specific commit in a CodeUp repository. Use this to verify whether a commit has passed automated checks. |
+| `list_check_runs` | Read-only | List check runs (CI pipeline executions) for a branch, tag, or commit in a CodeUp repository. Use this to monitor CI/CD status. |
+| **`get_repository_overview`** | Read-only | Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. This is the best starting point when exploring a new repository. |
+| **`get_change_request_overview`** | Read-only | Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call. |
+| **`get_commit_overview`** | Read-only | Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call. |
+| **`get_branch_overview`** | Read-only | Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call. |
+| `list_group_members` | Read-only | List members of a CodeUp group (namespace). Use this to discover who has access to repositories within the group. |
+| `list_merge_requests` | Read-only | List legacy CodeUp merge requests across repositories in a Yunxiao organization. For change requests (new merge request format), use list_change_requests instead. |
+| `list_template_repositories` | Read-only | List CodeUp template repositories in a Yunxiao organization. Templates are pre-configured repositories used as starting points for new projects. |
+| `list_namespaces` | Read-only | List CodeUp namespaces or groups in a Yunxiao organization. Namespaces organize repositories into hierarchical groups. |
+| `list_tags` | Read-only | List tags (version markers) in a CodeUp repository. Use this to discover release versions. |
+| `list_repository_members` | Read-only | List members who have access to a CodeUp repository. Use this to discover user IDs for assignment or review. |
+| `list_protected_branches` | Read-only | List protected branch rules in a CodeUp repository. Protected branches enforce review and CI requirements before merging. |
+| `list_push_rules` | Read-only | List push rules (commit restrictions) in a CodeUp repository. Push rules enforce commit message formats and file path restrictions. |
+| `list_repositories` | Read-only | List CodeUp (Git) repositories in a Yunxiao organization. Use this to discover repositories and obtain their IDs before calling repository-scoped tools. For a comprehensive view of a single repository, use get_repository_overview instead. |
+| `list_branches` | Read-only | List branches in a CodeUp repository. Use this to discover available branches before checking out code or reviewing merge requests. |
+| `list_files` | Read-only | List files and directories in a CodeUp repository tree. Use this to explore repository structure. |
+| `list_commits` | Read-only | List commits in a CodeUp repository. Use this to review recent changes and commit history. |
+| `list_change_requests` | Read-only | List CodeUp change requests (merge requests) across repositories in a Yunxiao organization. Use this to find pending reviews or track merged changes. |
+| `list_change_request_patch_sets` | Read-only | List patch sets (diff iterations) for a CodeUp merge request. Use this to review how a merge request evolved across multiple pushes. |
+| `list_change_request_comments` | Read-only | List comments on a CodeUp merge request. Use this to review feedback, inline discussions, and approval threads. |
 
 ### list_ssh_keys
 
 **Description**: List SSH keys registered for CodeUp access in a Yunxiao organization.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -69,6 +73,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_user_ssh_keys
 
 **Description**: List SSH keys registered for a specific Yunxiao user in CodeUp.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -87,6 +93,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List webhooks configured for a CodeUp repository. Webhooks trigger external integrations on repository events.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -101,6 +109,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_commit_statuses
 
 **Description**: List commit statuses (CI checks) for a specific commit in a CodeUp repository. Use this to verify whether a commit has passed automated checks.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -118,6 +128,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List check runs (CI pipeline executions) for a branch, tag, or commit in a CodeUp repository. Use this to monitor CI/CD status.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -133,6 +145,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### get_repository_overview
 
 **Description**: Get a comprehensive overview of a CodeUp repository including basic info, branches, recent commits, and merge requests in one read-only call. This is the best starting point when exploring a new repository.
+
+**Access**: Read-only
 
 **Type**: Enhanced aggregation tool
 
@@ -155,6 +169,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Get a comprehensive overview of a CodeUp change request (merge request) including basic info, patch sets, and comments in one read-only call.
 
+**Access**: Read-only
+
 **Type**: Enhanced aggregation tool
 
 **Parameters**:
@@ -173,6 +189,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call.
 
+**Access**: Read-only
+
 **Type**: Enhanced aggregation tool
 
 **Parameters**:
@@ -190,6 +208,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### get_branch_overview
 
 **Description**: Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call.
+
+**Access**: Read-only
 
 **Type**: Enhanced aggregation tool
 
@@ -210,6 +230,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List members of a CodeUp group (namespace). Use this to discover who has access to repositories within the group.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -221,6 +243,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_merge_requests
 
 **Description**: List legacy CodeUp merge requests across repositories in a Yunxiao organization. For change requests (new merge request format), use list_change_requests instead.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -246,6 +270,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List CodeUp template repositories in a Yunxiao organization. Templates are pre-configured repositories used as starting points for new projects.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -260,6 +286,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_namespaces
 
 **Description**: List CodeUp namespaces or groups in a Yunxiao organization. Namespaces organize repositories into hierarchical groups.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -279,6 +307,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List tags (version markers) in a CodeUp repository. Use this to discover release versions.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -297,6 +327,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List members who have access to a CodeUp repository. Use this to discover user IDs for assignment or review.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -309,6 +341,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List protected branch rules in a CodeUp repository. Protected branches enforce review and CI requirements before merging.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -320,6 +354,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List push rules (commit restrictions) in a CodeUp repository. Push rules enforce commit message formats and file path restrictions.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -330,6 +366,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_repositories
 
 **Description**: List CodeUp (Git) repositories in a Yunxiao organization. Use this to discover repositories and obtain their IDs before calling repository-scoped tools. For a comprehensive view of a single repository, use get_repository_overview instead.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -349,6 +387,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List branches in a CodeUp repository. Use this to discover available branches before checking out code or reviewing merge requests.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -366,6 +406,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List files and directories in a CodeUp repository tree. Use this to explore repository structure.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -379,6 +421,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_commits
 
 **Description**: List commits in a CodeUp repository. Use this to review recent changes and commit history.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -401,6 +445,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_change_requests
 
 **Description**: List CodeUp change requests (merge requests) across repositories in a Yunxiao organization. Use this to find pending reviews or track merged changes.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -425,6 +471,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List patch sets (diff iterations) for a CodeUp merge request. Use this to review how a merge request evolved across multiple pushes.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -436,6 +484,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_change_request_comments
 
 **Description**: List comments on a CodeUp merge request. Use this to review feedback, inline discussions, and approval threads.
+
+**Access**: Read-only
 
 **Parameters**:
 

@@ -1,6 +1,6 @@
 # Yunxiao MCP Server
 
-Go implementation of an MCP server for Alibaba [Yunxiao](https://www.aliyun.com/product/yunxiao) (云效). Exposes 178 read-only tools across 7 domains via stdio, HTTP Streamable, and SSE transports.
+Go implementation of an MCP server for Alibaba [Yunxiao](https://www.aliyun.com/product/yunxiao) (云效). Exposes a default read-only MCP catalog via stdio, HTTP Streamable, and SSE transports, with four Projex write tools available only when `read_only=false`.
 
 ---
 
@@ -49,16 +49,19 @@ See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other
 
 ## Tools Overview
 
-| Domain | Basic Tools | Enhanced Tools | Description |
-|--------|------------|----------------|-------------|
-| **Projex** | 44 | 9 | Projects, iterations, work items, milestones, test cases |
-| **Codeup** | 28 | 5 | Repositories, branches, commits, merge requests, code review |
-| **Flow** | 22 | 3 | Pipelines, runs, build tasks |
-| **Appstack** | 13 | 2 | Applications, environments, releases, change orders |
-| **Platform** | 10 | 2 | Organizations, departments, members, roles |
-| **Packages** | 4 | 0 | Artifact repositories and versions |
-| **Lingma** | 4 | 1 | Knowledge bases and usage |
-| **Meta** | 1 | 0 | `describe_toolset` — discover all available tools |
+The default `read_only=true` catalog exposes 130 read-only tools. The full catalog has 134 tools: the same read-only tools plus four Projex write-capable tools (`create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`) when `read_only=false`.
+
+| Domain | Tools | Access | Description |
+|--------|-------|--------|-------------|
+| **Projex** | 45 | 41 read-only, 4 write-capable | Projects, iterations, work items, milestones, test cases |
+| **Codeup** | 24 | read-only | Repositories, branches, commits, merge requests, code review |
+| **Flow** | 8 | read-only | Pipelines, runs, build tasks |
+| **Appstack** | 31 | read-only | Applications, environments, releases, change orders |
+| **Platform** | 18 | read-only | Organizations, departments, members, roles |
+| **Packages** | 2 | read-only | Artifact repositories and versions |
+| **Lingma** | 4 | read-only | Knowledge bases and usage |
+| **API** | 1 | read-only | `call_yunxiao_api` — fallback for supported read-only OpenAPI calls |
+| **Meta** | 1 | read-only | `describe_toolset` — discover all available tools |
 
 **Enhanced tools** aggregate multiple API calls into single user-friendly operations. For example, `get_project_overview` returns project info, members, iterations, milestones, and tags in one call.
 
@@ -80,6 +83,18 @@ Priority: explicit values > flags > environment > config file > defaults.
 Legacy aliases `YUNXIAO_ACCESS_TOKEN` and `YUNXIAO_API_BASE_URL` are also supported.
 
 Use `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY=true` or `--insecure-skip-tls-verify` only for trusted internal endpoints where certificate validation cannot be fixed.
+
+### Tool Modes
+
+| Option | Default | Purpose |
+|--------|---------|---------|
+| `read_only` / `--read-only` | `true` | Excludes write-capable tools. Set `read_only=false` only when Projex work item mutations are intended. |
+| `project_focused` / `--project-focused` | `false` | Registers a focused platform + Projex catalog, hiding low-value raw tools with enhanced alternatives. |
+| `minimal` / `--minimal` | `false` | Registers the smallest project-centric catalog. Write tools still require `read_only=false`. |
+| `enabled_tools` / `--enabled-tools` | `[]` | Explicit tool allow-list by name. |
+| `disabled_tools` / `--disabled-tools` | `[]` | Explicit tool deny-list by name. |
+| `enabled_domains` / `--enable-domains` | `[]` | Explicit domain allow-list, overriding `project_focused`. |
+| `disabled_domains` / `--disable-domains` | `[]` | Explicit domain deny-list. |
 
 ### Per-Request Tokens (HTTP/SSE)
 

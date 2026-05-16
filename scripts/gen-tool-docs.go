@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"golang.org/x/text/cases"
@@ -26,6 +27,7 @@ type Tool struct {
 	Params         []Param
 	PaginationMode string
 	Enhanced       bool
+	ReadOnly       bool
 }
 
 func main() {
@@ -151,6 +153,10 @@ func extractTools(filename string, enhanced bool) ([]Tool, error) {
 				if len(optCall.Args) > 0 {
 					tool.Description = extractStringLit(optCall.Args[0])
 				}
+			case "WithReadOnlyHintAnnotation":
+				if len(optCall.Args) > 0 {
+					tool.ReadOnly = extractBoolLit(optCall.Args[0])
+				}
 			case "WithString", "WithNumber", "WithBoolean", "WithArray":
 				param := extractParam(optCall, optSel.Sel.Name)
 				if param != nil {
@@ -257,10 +263,24 @@ func extractStringLit(expr ast.Expr) string {
 	return strings.Trim(lit.Value, `"`)
 }
 
+func extractBoolLit(expr ast.Expr) bool {
+	ident, ok := expr.(*ast.Ident)
+	return ok && ident.Name == "true"
+}
+
 func writeDomainDoc(filename, domain string, tools []Tool) error {
 	var b strings.Builder
+	readOnlyCount := 0
+	for _, t := range tools {
+		if t.ReadOnly {
+			readOnlyCount++
+		}
+	}
+	writeCapableCount := len(tools) - readOnlyCount
+
 	fmt.Fprintf(&b, "# %s Tools\n\n", cases.Title(language.English).String(domain))
-	fmt.Fprintf(&b, "This document describes the %d read-only MCP tools in the %s domain.\n\n", len(tools), domain)
+	fmt.Fprintf(&b, "This document describes the %d MCP tools in the %s domain.\n\n", len(tools), domain)
+	fmt.Fprintf(&b, "Access summary: %d read-only, %d write-capable.\n\n", readOnlyCount, writeCapableCount)
 
 	var enhancedTools []Tool
 	for _, t := range tools {
@@ -290,6 +310,7 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 		for m := range paginationModes {
 			modes = append(modes, m)
 		}
+		sort.Strings(modes)
 		b.WriteString("## Pagination\n\n")
 		b.WriteString("Tools in this domain use the following pagination scheme(s):\n\n")
 		for _, m := range modes {
@@ -302,20 +323,21 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 	if len(enhancedTools) > 0 {
 		b.WriteString("Tools marked in **bold** are enhanced aggregation tools.\n\n")
 	}
-	b.WriteString("| Tool | Description |\n")
-	b.WriteString("|------|-------------|\n")
+	b.WriteString("| Tool | Access | Description |\n")
+	b.WriteString("|------|--------|-------------|\n")
 	for _, t := range tools {
 		name := fmt.Sprintf("`%s`", t.Name)
 		if t.Enhanced {
 			name = fmt.Sprintf("**`%s`**", t.Name)
 		}
-		fmt.Fprintf(&b, "| %s | %s |\n", name, t.Description)
+		fmt.Fprintf(&b, "| %s | %s | %s |\n", name, accessLabel(t), t.Description)
 	}
 	b.WriteString("\n")
 
 	for _, t := range tools {
 		fmt.Fprintf(&b, "### %s\n\n", t.Name)
 		fmt.Fprintf(&b, "**Description**: %s\n\n", t.Description)
+		fmt.Fprintf(&b, "**Access**: %s\n\n", accessDescription(t))
 		if t.Enhanced {
 			b.WriteString("**Type**: Enhanced aggregation tool\n\n")
 		}
@@ -344,4 +366,18 @@ func writeDomainDoc(filename, domain string, tools []Tool) error {
 	}
 
 	return os.WriteFile(filename, []byte(b.String()), 0644)
+}
+
+func accessLabel(tool Tool) string {
+	if tool.ReadOnly {
+		return "Read-only"
+	}
+	return "Write-capable"
+}
+
+func accessDescription(tool Tool) string {
+	if tool.ReadOnly {
+		return "Read-only"
+	}
+	return "Write-capable (requires `read_only=false`)"
 }

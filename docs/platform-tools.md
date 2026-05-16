@@ -1,6 +1,8 @@
 # Platform Tools
 
-This document describes the 18 read-only MCP tools in the platform domain.
+This document describes the 18 MCP tools in the platform domain.
+
+Access summary: 18 read-only, 0 write-capable.
 
 ## Enhanced Tools
 
@@ -23,30 +25,32 @@ Tools in this domain use the following pagination scheme(s):
 
 Tools marked in **bold** are enhanced aggregation tools.
 
-| Tool | Description |
-|------|-------------|
-| `list_audit_logs` | List audit logs in a Yunxiao organization. Use this to track user actions, resource changes, and security events within a time range. |
-| **`get_organization_overview`** | Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call. |
-| **`get_organization_department_overview`** | Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call. |
-| **`get_organization_group_overview`** | Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call. |
-| `list_enterprise_departments` | List enterprise departments visible to the current Yunxiao user. |
-| `list_organization_groups` | List groups in a Yunxiao organization. Groups are permission-bound collections of users and resources. Use list_organization_members to discover users who can be added to groups. |
-| `list_organization_group_members` | List members in a Yunxiao organization group. Use this to check who belongs to a specific group and their roles. |
-| `get_user` | Get a Yunxiao user by ID or username. |
-| `list_app_extension_features` | List app extension feature implementations for a Yunxiao organization. |
-| `get_current_user` | Get the current Yunxiao user profile for the configured access token. Use this to verify authentication and discover the user's identity, account ID, and default organization. |
-| `get_current_organization_info` | Get the current user's default Yunxiao organization context, including organization ID and name. Use this to discover the default organizationId before calling organization-scoped tools. |
-| `get_user_organizations` | Get Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one. |
-| `list_organizations` | List Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one. |
-| `list_organization_departments` | List departments in a Yunxiao organization. Use this to discover department IDs for filtering members or assigning work items. |
-| `list_organization_members` | List members in a Yunxiao organization. Use this to discover user IDs, names, and roles for assigning work items or mentioning in comments. |
-| `search_organization_members` | Search members in a Yunxiao organization with filters. Use this to find specific users by name, department, or role for assignment or review purposes. |
-| `list_organization_roles` | List roles defined in a Yunxiao organization. Use this to discover role IDs for filtering members or checking permissions. |
-| `list_users` | List Yunxiao users across organizations. Use this to discover user IDs and account information for mentions, assignments, or cross-org collaboration. |
+| Tool | Access | Description |
+|------|--------|-------------|
+| `list_audit_logs` | Read-only | List audit logs in a Yunxiao organization. Use this to track user actions, resource changes, and security events within a time range. |
+| **`get_organization_overview`** | Read-only | Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call. |
+| **`get_organization_department_overview`** | Read-only | Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call. |
+| **`get_organization_group_overview`** | Read-only | Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call. |
+| `list_enterprise_departments` | Read-only | List enterprise departments visible to the current Yunxiao user. |
+| `list_organization_groups` | Read-only | List groups in a Yunxiao organization. Groups are permission-bound collections of users and resources. Use list_organization_members to discover users who can be added to groups. |
+| `list_organization_group_members` | Read-only | List members in a Yunxiao organization group. Use this to check who belongs to a specific group and their roles. |
+| `get_user` | Read-only | Get a Yunxiao user by ID or username. |
+| `list_app_extension_features` | Read-only | List app extension feature implementations for a Yunxiao organization. |
+| `get_current_user` | Read-only | Get the current Yunxiao user profile for the configured access token. Use this to verify authentication and discover the user's identity, account ID, and default organization. |
+| `get_current_organization_info` | Read-only | Get the current user's default Yunxiao organization context, including organization ID and name. Use this to discover the default organizationId before calling organization-scoped tools. |
+| `get_user_organizations` | Read-only | Get Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one. |
+| `list_organizations` | Read-only | List Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one. |
+| `list_organization_departments` | Read-only | List departments in a Yunxiao organization. Use this to discover department IDs for filtering members or assigning work items. |
+| `list_organization_members` | Read-only | List members in a Yunxiao organization. Use this to discover user IDs, names, and roles for assigning work items or mentioning in comments. |
+| `search_organization_members` | Read-only | Search members in a Yunxiao organization with filters. Use this to find specific users by name, department, or role for assignment or review purposes. |
+| `list_organization_roles` | Read-only | List roles defined in a Yunxiao organization. Use this to discover role IDs for filtering members or checking permissions. |
+| `list_users` | Read-only | List Yunxiao users across organizations. Use this to discover user IDs and account information for mentions, assignments, or cross-org collaboration. |
 
 ### list_audit_logs
 
 **Description**: List audit logs in a Yunxiao organization. Use this to track user actions, resource changes, and security events within a time range.
+
+**Access**: Read-only
 
 **Pagination**: Keyset (nextToken)
 
@@ -65,6 +69,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### get_organization_overview
 
 **Description**: Get a comprehensive overview of a Yunxiao organization including basic info, departments, members, groups, and roles in one read-only call.
+
+**Access**: Read-only
 
 **Type**: Enhanced aggregation tool
 
@@ -85,6 +91,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Get a comprehensive overview of a Yunxiao organization department including basic info and ancestor chain in one read-only call.
 
+**Access**: Read-only
+
 **Type**: Enhanced aggregation tool
 
 **Parameters**:
@@ -98,6 +106,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### get_organization_group_overview
 
 **Description**: Get a comprehensive overview of a Yunxiao organization group including basic info and members in one read-only call.
+
+**Access**: Read-only
 
 **Type**: Enhanced aggregation tool
 
@@ -114,6 +124,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List enterprise departments visible to the current Yunxiao user.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -128,6 +140,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List groups in a Yunxiao organization. Groups are permission-bound collections of users and resources. Use list_organization_members to discover users who can be added to groups.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -141,6 +155,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_organization_group_members
 
 **Description**: List members in a Yunxiao organization group. Use this to check who belongs to a specific group and their roles.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -157,6 +173,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Get a Yunxiao user by ID or username.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -166,6 +184,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_app_extension_features
 
 **Description**: List app extension feature implementations for a Yunxiao organization.
+
+**Access**: Read-only
 
 **Parameters**:
 
@@ -178,17 +198,23 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: Get the current Yunxiao user profile for the configured access token. Use this to verify authentication and discover the user's identity, account ID, and default organization.
 
+**Access**: Read-only
+
 **Parameters**: None
 
 ### get_current_organization_info
 
 **Description**: Get the current user's default Yunxiao organization context, including organization ID and name. Use this to discover the default organizationId before calling organization-scoped tools.
 
+**Access**: Read-only
+
 **Parameters**: None
 
 ### get_user_organizations
 
 **Description**: Get Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -203,6 +229,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List Yunxiao organizations visible to the current user. Use this to discover organization IDs and names when the default organization is not the desired one.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -215,6 +243,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_organization_departments
 
 **Description**: List departments in a Yunxiao organization. Use this to discover department IDs for filtering members or assigning work items.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -231,6 +261,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List members in a Yunxiao organization. Use this to discover user IDs, names, and roles for assigning work items or mentioning in comments.
 
+**Access**: Read-only
+
 **Pagination**: Offset (page/perPage)
 
 **Parameters**:
@@ -244,6 +276,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### search_organization_members
 
 **Description**: Search members in a Yunxiao organization with filters. Use this to find specific users by name, department, or role for assignment or review purposes.
+
+**Access**: Read-only
 
 **Pagination**: Keyset (nextToken)
 
@@ -265,6 +299,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 **Description**: List roles defined in a Yunxiao organization. Use this to discover role IDs for filtering members or checking permissions.
 
+**Access**: Read-only
+
 **Parameters**:
 
 | Name | Type | Required | Description |
@@ -274,6 +310,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 ### list_users
 
 **Description**: List Yunxiao users across organizations. Use this to discover user IDs and account information for mentions, assignments, or cross-org collaboration.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 

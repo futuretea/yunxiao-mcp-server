@@ -1,6 +1,8 @@
 # Packages Tools
 
-This document describes the 2 read-only MCP tools in the packages domain.
+This document describes the 2 MCP tools in the packages domain.
+
+Access summary: 2 read-only, 0 write-capable.
 
 ## Pagination
 
@@ -10,14 +12,16 @@ Tools in this domain use the following pagination scheme(s):
 
 ## Tool Inventory
 
-| Tool | Description |
-|------|-------------|
-| `list_package_repositories` | List artifact repositories (Packages) in a Yunxiao organization. Use this to discover repository IDs for listing artifacts. |
-| `list_artifacts` | List artifacts in a Packages repository. Requires a repository ID from list_package_repositories. |
+| Tool | Access | Description |
+|------|--------|-------------|
+| `list_package_repositories` | Read-only | List artifact repositories (Packages) in a Yunxiao organization. Use this to discover repository IDs for listing artifacts. |
+| `list_artifacts` | Read-only | List artifacts in a Packages repository. Requires a repository ID from list_package_repositories. |
 
 ### list_package_repositories
 
 **Description**: List artifact repositories (Packages) in a Yunxiao organization. Use this to discover repository IDs for listing artifacts.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
@@ -34,6 +38,8 @@ Tools in this domain use the following pagination scheme(s):
 ### list_artifacts
 
 **Description**: List artifacts in a Packages repository. Requires a repository ID from list_package_repositories.
+
+**Access**: Read-only
 
 **Pagination**: Offset (page/perPage)
 
