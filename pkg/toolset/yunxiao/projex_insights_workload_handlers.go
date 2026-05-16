@@ -145,13 +145,7 @@ func handleGetTeamWorkloadBreakdown(ctx context.Context, client any, params map[
 	}
 
 	memberLimit := optionalIntDefault(params, "memberLimit", 20)
-	taskLimit := optionalIntDefault(params, "taskLimit", 10)
-	if taskLimit < 1 {
-		taskLimit = 1
-	}
-	if taskLimit > 50 {
-		taskLimit = 50
-	}
+	taskLimit := clampTaskLimit(optionalIntDefault(params, "taskLimit", 10))
 
 	members, assigneeIDs, err := projectTaskStatusMembers(ctx, c, organizationID, projectID, params)
 	if err != nil {
@@ -167,46 +161,57 @@ func handleGetTeamWorkloadBreakdown(ctx context.Context, client any, params map[
 	}
 
 	memberBreakdowns := result["members"].(map[string]any)
-
 	for _, assigneeID := range assigneeIDs {
-		member := members[assigneeID]
-		breakdown := map[string]any{
-			"member": member,
-			"tasks":  []map[string]any{},
-		}
-
-		for _, category := range categories {
-			searchParams := copyParams(params)
-			searchParams["assignedTo"] = assigneeID
-			searchParams["sampleLimit"] = taskLimit
-
-			payload, err := searchProjectWorkitems(ctx, c, organizationID, projectID, category, searchParams)
-			if err != nil {
-				continue
-			}
-
-			data, _, _ := extractWorkitemData(payload)
-
-			for _, item := range data {
-				if itemMap, ok := item.(map[string]any); ok {
-					task := map[string]any{
-						"id":           itemMap["id"],
-						"serialNumber": itemMap["serialNumber"],
-						"subject":      itemMap["subject"],
-						"status":       extractWorkitemStatusName(itemMap),
-						"labels":       extractLabelNames(itemMap),
-						"gmtCreate":    itemMap["gmtCreate"],
-						"category":     category,
-					}
-					breakdown["tasks"] = append(breakdown["tasks"].([]map[string]any), task)
-				}
-			}
-		}
-
-		memberBreakdowns[assigneeID] = breakdown
+		memberBreakdowns[assigneeID] = buildMemberTaskBreakdown(ctx, c, organizationID, projectID, assigneeID, members[assigneeID], categories, taskLimit, params)
 	}
 
 	return marshalPretty(result)
+}
+
+func clampTaskLimit(limit int) int {
+	if limit < 1 {
+		return 1
+	}
+	if limit > 50 {
+		return 50
+	}
+	return limit
+}
+
+func buildMemberTaskBreakdown(ctx context.Context, c *Client, organizationID, projectID, assigneeID string, member any, categories []string, taskLimit int, params map[string]any) map[string]any {
+	breakdown := map[string]any{
+		"member": member,
+		"tasks":  []map[string]any{},
+	}
+
+	for _, category := range categories {
+		searchParams := copyParams(params)
+		searchParams["assignedTo"] = assigneeID
+		searchParams["sampleLimit"] = taskLimit
+
+		payload, err := searchProjectWorkitems(ctx, c, organizationID, projectID, category, searchParams)
+		if err != nil {
+			continue
+		}
+
+		data, _, _ := extractWorkitemData(payload)
+		for _, item := range data {
+			if itemMap, ok := item.(map[string]any); ok {
+				task := map[string]any{
+					"id":           itemMap["id"],
+					"serialNumber": itemMap["serialNumber"],
+					"subject":      itemMap["subject"],
+					"status":       extractWorkitemStatusName(itemMap),
+					"labels":       extractLabelNames(itemMap),
+					"gmtCreate":    itemMap["gmtCreate"],
+					"category":     category,
+				}
+				breakdown["tasks"] = append(breakdown["tasks"].([]map[string]any), task)
+			}
+		}
+	}
+
+	return breakdown
 }
 
 func teamWorkloadBreakdownFilters(params map[string]any, categories []string, memberLimit, taskLimit int) map[string]any {
