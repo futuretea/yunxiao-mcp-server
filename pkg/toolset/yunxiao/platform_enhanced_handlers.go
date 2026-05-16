@@ -27,39 +27,44 @@ func handleGetOrganizationOverview(ctx context.Context, client any, params map[s
 		"filters":      organizationOverviewFilters(params),
 	}
 
-	if optionalBoolDefault(params, "includeDepartments", true) {
-		depts, err := c.GetJSONWithMetadata(ctx, orgPath+"/departments", pageOneLimitQuery(params, "departmentLimit", 5))
-		if err != nil {
-			return "", err
-		}
-		overview["departments"] = depts
+	if err := addOrgSection(ctx, c, params, overview, orgPath, "includeDepartments", "departments", "/departments", "departmentLimit"); err != nil {
+		return "", err
 	}
-
-	if optionalBoolDefault(params, "includeMembers", true) {
-		members, err := c.GetJSONWithMetadata(ctx, orgPath+"/members", pageOneLimitQuery(params, "memberLimit", 5))
-		if err != nil {
-			return "", err
-		}
-		overview["members"] = members
+	if err := addOrgSection(ctx, c, params, overview, orgPath, "includeMembers", "members", "/members", "memberLimit"); err != nil {
+		return "", err
 	}
-
-	if optionalBoolDefault(params, "includeGroups", true) {
-		groups, err := c.GetJSONWithMetadata(ctx, orgPath+"/groups", pageOneLimitQuery(params, "groupLimit", 5))
-		if err != nil {
-			return "", err
-		}
-		overview["groups"] = groups
+	if err := addOrgSection(ctx, c, params, overview, orgPath, "includeGroups", "groups", "/groups", "groupLimit"); err != nil {
+		return "", err
 	}
-
-	if optionalBoolDefault(params, "includeRoles", true) {
-		roles, err := c.GetJSON(ctx, orgPath+"/roles", nil)
-		if err != nil {
-			return "", err
-		}
-		overview["roles"] = roles
+	if err := addOrgSectionDirect(ctx, c, params, overview, orgPath, "includeRoles", "roles", "/roles"); err != nil {
+		return "", err
 	}
 
 	return marshalPretty(overview)
+}
+
+func addOrgSection(ctx context.Context, c *Client, params map[string]any, overview map[string]any, orgPath, flagKey, key, pathSuffix, limitKey string) error {
+	if !optionalBoolDefault(params, flagKey, true) {
+		return nil
+	}
+	val, err := c.GetJSONWithMetadata(ctx, orgPath+pathSuffix, pageOneLimitQuery(params, limitKey, 5))
+	if err != nil {
+		return err
+	}
+	overview[key] = val
+	return nil
+}
+
+func addOrgSectionDirect(ctx context.Context, c *Client, params map[string]any, overview map[string]any, orgPath, flagKey, key, pathSuffix string) error {
+	if !optionalBoolDefault(params, flagKey, true) {
+		return nil
+	}
+	val, err := c.GetJSON(ctx, orgPath+pathSuffix, nil)
+	if err != nil {
+		return err
+	}
+	overview[key] = val
+	return nil
 }
 
 func organizationOverviewFilters(params map[string]any) map[string]any {
