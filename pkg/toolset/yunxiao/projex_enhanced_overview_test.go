@@ -376,4 +376,3 @@ func TestHandleGetProjectWorkitemContextReturnsWorkflowError(t *testing.T) {
 		t.Fatal("handleGetProjectWorkitemContext() expected workflow error")
 	}
 }
-
