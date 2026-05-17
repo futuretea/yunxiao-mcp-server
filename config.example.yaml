@@ -5,8 +5,7 @@ base_url: https://openapi-rdc.aliyuncs.com
 access_token: ""
 insecure_skip_tls_verify: false
 read_only: true
-project_focused: false
-minimal: false
+compact: false
 enabled_tools: []
 disabled_tools: []
 enabled_domains: []

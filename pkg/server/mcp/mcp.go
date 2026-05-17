@@ -73,19 +73,18 @@ func NewServer(configuration Configuration) (*Server, error) {
 
 func (s *Server) registerTools() error {
 	toolsetBuilder := &yunxiaoToolset.Toolset{ReadOnly: s.configuration.ReadOnly}
+	yunxiaoTools := toolsetBuilder.GetTools(s.client)
 
-	var yunxiaoTools []toolset.ServerTool
-	switch {
-	case s.configuration.MinimalMode:
-		yunxiaoTools = toolsetBuilder.GetMinimalTools(s.client)
-	case len(s.configuration.EnabledDomains) > 0:
-		yunxiaoTools = filterToolsByDomains(toolsetBuilder.GetTools(s.client), s.configuration.EnabledDomains, nil)
-	case len(s.configuration.DisabledDomains) > 0:
-		yunxiaoTools = filterToolsByDomains(toolsetBuilder.GetTools(s.client), nil, s.configuration.DisabledDomains)
-	case s.configuration.ProjectFocused:
-		yunxiaoTools = toolsetBuilder.GetProjectFocusedTools(s.client)
-	default:
-		yunxiaoTools = toolsetBuilder.GetTools(s.client)
+	// Stage 1: domain filter
+	if len(s.configuration.EnabledDomains) > 0 {
+		yunxiaoTools = filterToolsByDomains(yunxiaoTools, s.configuration.EnabledDomains, nil)
+	} else if len(s.configuration.DisabledDomains) > 0 {
+		yunxiaoTools = filterToolsByDomains(yunxiaoTools, nil, s.configuration.DisabledDomains)
+	}
+
+	// Stage 2: compact mode — hide raw tools with enhanced alternatives
+	if s.configuration.CompactMode {
+		yunxiaoTools = toolsetBuilder.GetCompactTools(yunxiaoTools)
 	}
 
 	if err := validateToolFilters(yunxiaoTools, s.configuration.EnabledTools, s.configuration.DisabledTools); err != nil {
@@ -99,7 +98,7 @@ func (s *Server) registerTools() error {
 		s.registerTool(tool)
 	}
 	if len(s.enabledTools) == 0 {
-		return fmt.Errorf("no MCP tools enabled; check enabled_tools, disabled_tools, enable_domains, disable_domains")
+		return fmt.Errorf("no MCP tools enabled; check enabled_tools, disabled_tools, enable_domains, disable_domains, compact")
 	}
 
 	log.Info().Int("count", len(s.enabledTools)).Msg("registered MCP tools")

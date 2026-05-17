@@ -19,5 +19,15 @@ func appstackGlobalVarTools() []toolset.ServerTool {
 			),
 			Handler: handleListGlobalVars,
 		},
+		{
+			Tool: mcp.NewTool("get_global_var",
+				mcp.WithDescription("Get an AppStack global variable by name. Use list_global_vars to discover valid global variable names."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("name", mcp.Required(), mcp.Description("Global variable name. Use list_global_vars to discover valid names.")),
+				mcp.WithString("revisionSha", mcp.Description("Optional revision SHA to retrieve a specific version of the variable.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetGlobalVar,
+		},
 	}
 }

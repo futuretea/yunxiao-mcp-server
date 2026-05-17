@@ -2,57 +2,16 @@ package yunxiao
 
 import "github.com/futuretea/yunxiao-mcp-server/pkg/toolset"
 
-// minimalToolNames are the core tools kept in --minimal mode.
-// Write tools are included here so that --minimal --read-only=false can
-// create and update work items; filterReadOwn removes them when needed.
-var minimalToolNames = map[string]struct{}{
-	// Platform
-	"get_current_user":              {},
-	"get_current_organization_info": {},
+// compactHiddenTools are raw tools superseded by enhanced overview alternatives.
+// The rule: if get_X_overview exists, hide get_X.
+var compactHiddenTools = map[string]struct{}{
+	// Platform — superseded by get_organization_overview, get_organization_department_overview, get_organization_group_overview
+	"get_organization":                      {},
+	"get_organization_department_info":      {},
+	"get_organization_department_ancestors": {},
+	"get_organization_group":                {},
 
-	// Projex — Project overview
-	"search_projects":            {},
-	"get_project_overview":       {},
-	"get_project_risk_dashboard": {},
-
-	// Projex — Workitem queries
-	"search_workitems":             {},
-	"get_project_workitem_summary": {},
-	"get_project_workitem_detail":  {},
-	"get_my_project_workitems":     {},
-	"get_project_workitem_board":   {},
-
-	// Projex — Sprint
-	"list_sprints":        {},
-	"get_sprint_overview": {},
-
-	// Projex — Members
-	"list_project_members": {},
-
-	// Projex — Write (available when read-only is false)
-	"create_workitem":            {},
-	"update_workitem":            {},
-	"update_workitem_status":     {},
-	"add_workitem_comment":       {},
-	"create_change_request":      {},
-	"add_change_request_comment": {},
-	"create_merge_request":       {},
-	"close_change_request":       {},
-	"reopen_change_request":      {},
-	"merge_change_request":       {},
-	"pass_pipeline_validate":     {},
-	"refuse_pipeline_validate":   {},
-}
-
-// projectFocusedDomains are the tool domains enabled in project-focused mode.
-var projectFocusedDomains = map[string]struct{}{
-	"platform": {},
-	"projex":   {},
-}
-
-// projectFocusedHiddenTools are raw tools superseded by enhanced alternatives.
-var projectFocusedHiddenTools = map[string]struct{}{
-	// Projex
+	// Projex — superseded by get_project_overview, get_sprint_overview, get_project_workitem_detail, etc.
 	"get_project":                     {},
 	"get_sprint":                      {},
 	"get_workitem":                    {},
@@ -67,11 +26,21 @@ var projectFocusedHiddenTools = map[string]struct{}{
 	"get_work_item_type_field_config": {},
 	"get_work_item_workflow":          {},
 
-	// Platform
-	"get_organization":                      {},
-	"get_organization_department_info":      {},
-	"get_organization_department_ancestors": {},
-	"get_organization_group":                {},
+	// AppStack — superseded by get_application_overview, get_environment_overview, etc.
+	"get_application":  {},
+	"get_environment":  {},
+	"get_change_order": {},
+	"get_release":      {},
+
+	// CodeUp — superseded by get_repository_overview, get_branch_overview, etc.
+	"get_repository":     {},
+	"get_branch":         {},
+	"get_commit":         {},
+	"get_change_request": {},
+
+	// Flow — superseded by get_pipeline_overview, get_pipeline_run_overview
+	"get_pipeline":     {},
+	"get_pipeline_run": {},
 }
 
 // writeToolNames are tools that perform mutations and are excluded in read-only mode.
@@ -118,28 +87,11 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 	return t.filterReadOnly(tools)
 }
 
-// GetMinimalTools returns only the most essential query tools.
-func (t *Toolset) GetMinimalTools(client any) []toolset.ServerTool {
-	all := t.GetTools(client)
-	filtered := make([]toolset.ServerTool, 0, len(minimalToolNames))
-	for _, tool := range all {
-		if _, ok := minimalToolNames[tool.Tool.Name]; ok {
-			filtered = append(filtered, tool)
-		}
-	}
-	return filtered
-}
-
-// GetProjectFocusedTools returns only platform + projex tools, hiding
-// low-value raw tools that have enhanced alternatives.
-func (t *Toolset) GetProjectFocusedTools(client any) []toolset.ServerTool {
-	all := t.GetTools(client)
+// GetCompactTools hides raw tools that have enhanced overview alternatives.
+func (t *Toolset) GetCompactTools(all []toolset.ServerTool) []toolset.ServerTool {
 	filtered := make([]toolset.ServerTool, 0, len(all))
 	for _, tool := range all {
-		if _, ok := projectFocusedDomains[tool.Domain]; !ok {
-			continue
-		}
-		if _, ok := projectFocusedHiddenTools[tool.Tool.Name]; ok {
+		if _, ok := compactHiddenTools[tool.Tool.Name]; ok {
 			continue
 		}
 		filtered = append(filtered, tool)

@@ -56,8 +56,7 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 	command.Flags().StringSlice("disabled-tools", []string{}, "comma-separated list of tool names to disable")
 	command.Flags().StringSlice("enable-domains", []string{}, "comma-separated list of tool domains to enable (e.g. platform,projex)")
 	command.Flags().StringSlice("disable-domains", []string{}, "comma-separated list of tool domains to disable (e.g. codeup,flow)")
-	command.Flags().Bool("project-focused", false, "only register project-focused tools (platform + projex) by default")
-	command.Flags().Bool("minimal", false, "only register essential query tools (~14 tools)")
+	command.Flags().Bool("compact", false, "hide raw API tools that have enhanced overview alternatives, reducing the visible tool surface")
 	command.Flags().Int("request-timeout-seconds", 30, "Yunxiao API request timeout in seconds")
 
 	command.AddCommand(newVersionCommand(streams))
@@ -77,8 +76,7 @@ func bindFlags(v *viper.Viper, cmd *cobra.Command) error {
 		"disabled_tools":           "disabled-tools",
 		"enabled_domains":          "enable-domains",
 		"disabled_domains":         "disable-domains",
-		"project_focused":          "project-focused",
-		"minimal":                  "minimal",
+		"compact":                  "compact",
 		"request_timeout_seconds":  "request-timeout-seconds",
 	}
 

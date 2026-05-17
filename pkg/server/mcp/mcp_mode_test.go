@@ -6,13 +6,13 @@ import (
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
 )
 
-func TestNewServerProjectFocusedMode(t *testing.T) {
+func TestNewServerCompactMode(t *testing.T) {
 	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
 		BaseURL:               config.DefaultBaseURL,
 		LogLevel:              "info",
 		RequestTimeoutSeconds: 30,
 		ReadOnly:              true,
-		ProjectFocused:        true,
+		CompactMode:           true,
 	}})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
@@ -20,19 +20,7 @@ func TestNewServerProjectFocusedMode(t *testing.T) {
 
 	enabled := s.GetEnabledTools()
 
-	// Should include platform tools
-	hasCurrentUser := false
-	for _, name := range enabled {
-		if name == "get_current_user" {
-			hasCurrentUser = true
-			break
-		}
-	}
-	if !hasCurrentUser {
-		t.Fatalf("project-focused mode should include platform tools, got %v", enabled)
-	}
-
-	// Should include projex tools
+	// Should include enhanced tools
 	hasProjectOverview := false
 	for _, name := range enabled {
 		if name == "get_project_overview" {
@@ -41,31 +29,50 @@ func TestNewServerProjectFocusedMode(t *testing.T) {
 		}
 	}
 	if !hasProjectOverview {
-		t.Fatalf("project-focused mode should include projex enhanced tools, got %v", enabled)
+		t.Fatal("compact mode should include get_project_overview")
 	}
 
-	// Should NOT include codeup tools
-	for _, name := range enabled {
-		if name == "list_repositories" {
-			t.Fatalf("project-focused mode should not include codeup tools, got %v", enabled)
-		}
-	}
-
-	// Should NOT include superseded raw projex tools
+	// Should NOT include superseded raw tools
 	for _, name := range enabled {
 		if name == "get_project" {
-			t.Fatalf("project-focused mode should hide superseded raw tool get_project, got %v", enabled)
+			t.Fatalf("compact mode should hide get_project, got %v", enabled)
 		}
+	}
+
+	// Should NOT include superseded appstack tools
+	for _, name := range enabled {
+		if name == "get_application" {
+			t.Fatalf("compact mode should hide get_application, got %v", enabled)
+		}
+	}
+
+	// Should NOT include superseded flow tools
+	for _, name := range enabled {
+		if name == "get_pipeline" {
+			t.Fatalf("compact mode should hide get_pipeline, got %v", enabled)
+		}
+	}
+
+	// Should still include non-superseded raw tools
+	hasPodLog := false
+	for _, name := range enabled {
+		if name == "get_pod_container_log" {
+			hasPodLog = true
+			break
+		}
+	}
+	if !hasPodLog {
+		t.Fatal("compact mode should include non-superseded tools like get_pod_container_log")
 	}
 }
 
-func TestNewServerProjectFocusedModeAllowsExplicitEnable(t *testing.T) {
+func TestNewServerCompactModeAllowsExplicitEnable(t *testing.T) {
 	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
 		BaseURL:               config.DefaultBaseURL,
 		LogLevel:              "info",
 		RequestTimeoutSeconds: 30,
 		ReadOnly:              true,
-		ProjectFocused:        true,
+		CompactMode:           true,
 		EnabledTools:          []string{"get_current_user"},
 	}})
 	if err != nil {
@@ -74,7 +81,7 @@ func TestNewServerProjectFocusedModeAllowsExplicitEnable(t *testing.T) {
 
 	enabled := s.GetEnabledTools()
 	if len(enabled) != 1 || enabled[0] != "get_current_user" {
-		t.Fatalf("explicit enabled tools should override project-focused defaults, got %v", enabled)
+		t.Fatalf("explicit enabled tools should override compact defaults, got %v", enabled)
 	}
 }
 
@@ -119,7 +126,6 @@ func TestNewServerDisableDomainsBlacklist(t *testing.T) {
 			t.Fatalf("disable-domains blacklist should exclude codeup/flow, got %v", enabled)
 		}
 	}
-	// Should still include platform and projex
 	hasPlatform := false
 	hasProjex := false
 	for _, name := range enabled {
@@ -138,14 +144,14 @@ func TestNewServerDisableDomainsBlacklist(t *testing.T) {
 	}
 }
 
-func TestNewServerEnableDomainsOverridesProjectFocused(t *testing.T) {
+func TestNewServerEnableDomainsWithCompact(t *testing.T) {
 	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
 		BaseURL:               config.DefaultBaseURL,
 		LogLevel:              "info",
 		RequestTimeoutSeconds: 30,
 		ReadOnly:              true,
-		ProjectFocused:        true,
-		EnabledDomains:        []string{"platform", "projex", "codeup"},
+		CompactMode:           true,
+		EnabledDomains:        []string{"platform", "projex"},
 	}})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
@@ -153,44 +159,7 @@ func TestNewServerEnableDomainsOverridesProjectFocused(t *testing.T) {
 
 	enabled := s.GetEnabledTools()
 
-	// Should include codeup because enabled_domains overrides project_focused
-	hasCodeup := false
-	for _, name := range enabled {
-		if name == "list_repositories" {
-			hasCodeup = true
-		}
-	}
-	if !hasCodeup {
-		t.Fatalf("enabled_domains should override project_focused, expected codeup tools, got %v", enabled)
-	}
-
-	// Should include list/search tools because enabled_domains does not hide them
-	hasSearchProjects := false
-	for _, name := range enabled {
-		if name == "search_projects" {
-			hasSearchProjects = true
-		}
-	}
-	if !hasSearchProjects {
-		t.Fatalf("enabled_domains should include all projex tools including search_projects, got %v", enabled)
-	}
-}
-
-func TestNewServerMinimalMode(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		MinimalMode:           true,
-	}})
-	if err != nil {
-		t.Fatalf("NewServer() error = %v", err)
-	}
-
-	enabled := s.GetEnabledTools()
-
-	// Should include core platform tools
+	// Should include platform tools
 	hasCurrentUser := false
 	for _, name := range enabled {
 		if name == "get_current_user" {
@@ -199,10 +168,10 @@ func TestNewServerMinimalMode(t *testing.T) {
 		}
 	}
 	if !hasCurrentUser {
-		t.Fatalf("minimal mode should include get_current_user, got %v", enabled)
+		t.Fatal("domain+compact should include platform tools")
 	}
 
-	// Should include core projex tools
+	// Should include projex tools
 	hasProjectOverview := false
 	for _, name := range enabled {
 		if name == "get_project_overview" {
@@ -211,50 +180,31 @@ func TestNewServerMinimalMode(t *testing.T) {
 		}
 	}
 	if !hasProjectOverview {
-		t.Fatalf("minimal mode should include get_project_overview, got %v", enabled)
+		t.Fatal("domain+compact should include projex enhanced tools")
 	}
 
-	// Should NOT include non-core tools like codeup
+	// Should NOT include codeup tools
 	for _, name := range enabled {
 		if name == "list_repositories" {
-			t.Fatalf("minimal mode should not include codeup tools, got %v", enabled)
+			t.Fatalf("domain+compact should not include codeup tools, got %v", enabled)
 		}
 	}
 
-	// Should NOT include platform admin tools
+	// Should NOT include superseded raw tools
 	for _, name := range enabled {
-		if name == "list_organization_departments" {
-			t.Fatalf("minimal mode should not include platform admin tools, got %v", enabled)
+		if name == "get_project" || name == "get_organization" {
+			t.Fatalf("domain+compact should hide superseded raw tool %s, got %v", name, enabled)
 		}
 	}
 
-	// Should NOT include projex metadata tools
+	// Should still include non-superseded list tools
+	hasSearchProjects := false
 	for _, name := range enabled {
-		if name == "get_work_item_type" {
-			t.Fatalf("minimal mode should not include metadata tools, got %v", enabled)
+		if name == "search_projects" {
+			hasSearchProjects = true
 		}
 	}
-}
-
-func TestNewServerMinimalModeOverridesProjectFocused(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		MinimalMode:           true,
-		ProjectFocused:        true,
-	}})
-	if err != nil {
-		t.Fatalf("NewServer() error = %v", err)
-	}
-
-	enabled := s.GetEnabledTools()
-
-	// Minimal should take priority over project-focused
-	for _, name := range enabled {
-		if name == "list_organization_departments" {
-			t.Fatalf("minimal mode should override project_focused, got %v", enabled)
-		}
+	if !hasSearchProjects {
+		t.Fatal("domain+compact should include non-superseded tools like search_projects")
 	}
 }
