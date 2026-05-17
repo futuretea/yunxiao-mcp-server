@@ -15,6 +15,9 @@ var compactHiddenTools = map[string]struct{}{
 	"get_organization_group":                {},
 	// Platform (B) — included in enhanced overviews
 	"list_organization_group_members": {},
+	// Platform (D) — admin / rarely needed
+	"list_enterprise_departments": {},
+	"list_audit_logs":             {},
 
 	// Projex (A) — superseded by get_project_overview, get_sprint_overview, get_project_workitem_detail, etc.
 	"get_project":                     {},
@@ -30,6 +33,12 @@ var compactHiddenTools = map[string]struct{}{
 	"list_labels":                     {},
 	"get_work_item_type_field_config": {},
 	"get_work_item_workflow":          {},
+	// Projex (D) — specialized / rarely needed
+	"list_project_templates":           {},
+	"list_project_program":             {},
+	"list_all_project_roles":           {},
+	"list_current_user_effort_records": {},
+	"list_estimated_efforts":           {},
 
 	// AppStack (A) — superseded by get_application_overview, get_environment_overview, etc.
 	"get_application":  {},
@@ -56,8 +65,18 @@ var compactHiddenTools = map[string]struct{}{
 	"get_branch":         {},
 	"get_commit":         {},
 	"get_change_request": {},
+	// CodeUp (B) — included in enhanced overviews
+	"list_commit_statuses":           {},
+	"list_check_runs":                {},
+	"list_change_request_patch_sets": {},
+	"list_change_request_comments":   {},
 	// CodeUp (D) — specialized
 	"list_template_repositories": {},
+	"list_ssh_keys":              {},
+	"list_user_ssh_keys":         {},
+	"list_webhooks":              {},
+	"list_protected_branches":    {},
+	"list_push_rules":            {},
 
 	// Flow (A) — superseded by get_pipeline_overview, get_pipeline_run_overview
 	"get_pipeline":     {},
