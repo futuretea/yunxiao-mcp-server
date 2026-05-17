@@ -1,20 +1,35 @@
 # Yunxiao MCP Server
 
-Go implementation of an MCP server for Alibaba [Yunxiao](https://www.aliyun.com/product/yunxiao) (云效). Exposes a default read-only MCP catalog via stdio, HTTP Streamable, and SSE transports, with ten write-capable tools (4 Projex work item operations, 6 Codeup change request/merge request operations) available only when `read_only=false`.
+让 AI 编码助手直接对话 [阿里云·云效](https://www.aliyun.com/product/yunxiao) —— 查项目、管迭代、审代码、看流水线，无需离开 IDE。
+
+**默认只读，安全第一。** 142 个工具中 130 个为只读查询，12 个写操作需显式开启 `read_only=false`。
 
 ---
 
-## Quick Start
+## 能做什么？
 
-### npx (Recommended)
+| 场景 | 对应工具 |
+|------|----------|
+| 📋 项目管理 | 查项目、工作项、迭代、里程碑、成员，创建/更新工作项 |
+| 🔍 代码审查 | 查仓库、分支、提交、合并请求、变更请求（CR），创建/关闭/合并 CR |
+| 🚀 流水线 | 查流水线、运行记录、构建任务，审批/拒绝人工卡点 |
+| 📦 发布管控 | 查应用、环境、发布单、变更单、资源 |
+| 🧠 知识库 | 查 Lingma 知识库、成员、文件 |
+| 🤖 AI 使用分析 | 查团队成员 Lingma 采纳情况 |
 
-No installation required — `npx` downloads the correct platform binary automatically:
+> 写操作（创建/更新工作项、管理 CR/MR、流水线审批）仅在 `read_only=false` 时可用。
+
+---
+
+## 快速开始
+
+### npx（零安装）
 
 ```bash
 npx -y @futuretea/yunxiao-mcp-server
 ```
 
-With environment variables:
+带上 token：
 
 ```bash
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> npx -y @futuretea/yunxiao-mcp-server
@@ -22,134 +37,155 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> npx -y @futuretea/yunxiao-mcp-server
 
 ### Docker
 
-Pre-built images are published to `ghcr.io/futuretea/yunxiao-mcp-server`:
-
-**Stdio mode:**
+**Stdio 模式（默认）：**
 
 ```bash
-docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ghcr.io/futuretea/yunxiao-mcp-server:latest
+docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
+  ghcr.io/futuretea/yunxiao-mcp-server:latest
 ```
 
-**HTTP mode:**
+**HTTP 模式：**
 
 ```bash
-docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ghcr.io/futuretea/yunxiao-mcp-server:latest --port 3000
+docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
+  ghcr.io/futuretea/yunxiao-mcp-server:latest --port 3000
 ```
 
-### Build from source
+### 从源码构建
 
 ```bash
 make build
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server
 ```
 
-See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other IDE setup examples.
+### 接入 IDE
+
+参考 [MCP Client Config](docs/mcp-client-config.md) 配置 Claude、Cursor 等客户端。
 
 ---
 
-## Tools Overview
+## 工具概览
 
-The default `read_only=true` catalog exposes 130 read-only tools. The full catalog has 142 tools: 130 read-only tools plus twelve write-capable tools — four Projex work item operations (`create_workitem`, `update_workitem`, `update_workitem_status`, `add_workitem_comment`), six Codeup change request/merge request operations (`create_change_request`, `add_change_request_comment`, `create_merge_request`, `close_change_request`, `reopen_change_request`, `merge_change_request`), and two Flow pipeline validation operations (`pass_pipeline_validate`, `refuse_pipeline_validate`) — when `read_only=false`.
+| 领域 | 工具数 | 权限 | 说明 |
+|------|--------|------|------|
+| **Projex** | 45 | 41 只读 + 4 可写 | 项目、迭代、工作项、里程碑、测试用例 |
+| **Codeup** | 30 | 24 只读 + 6 可写 | 仓库、分支、提交、MR、CR、代码评审 |
+| **Flow** | 10 | 8 只读 + 2 可写 | 流水线、运行记录、构建任务、人工审批 |
+| **Appstack** | 31 | 只读 | 应用、环境、发布单、变更单 |
+| **Platform** | 18 | 只读 | 组织、部门、成员、角色 |
+| **Packages** | 2 | 只读 | 制品仓库与版本 |
+| **Lingma** | 4 | 只读 | 知识库与使用统计 |
+| **API** | 1 | 只读 | 通用 API 调用（兜底） |
+| **Meta** | 1 | 只读 | 工具发现 |
 
-| Domain | Tools | Access | Description |
-|--------|-------|--------|-------------|
-| **Projex** | 45 | 41 read-only, 4 write-capable | Projects, iterations, work items, milestones, test cases |
-| **Codeup** | 30 | 24 read-only, 6 write-capable | Repositories, branches, commits, merge requests, change requests, code review |
-| **Flow** | 10 | 8 read-only, 2 write-capable | Pipelines, runs, build tasks, validation |
-| **Appstack** | 31 | read-only | Applications, environments, releases, change orders |
-| **Platform** | 18 | read-only | Organizations, departments, members, roles |
-| **Packages** | 2 | read-only | Artifact repositories and versions |
-| **Lingma** | 4 | read-only | Knowledge bases and usage |
-| **API** | 1 | read-only | `call_yunxiao_api` — fallback for supported read-only OpenAPI calls |
-| **Meta** | 1 | read-only | `describe_toolset` — discover all available tools |
+### 增强工具
 
-**Enhanced tools** aggregate multiple API calls into single user-friendly operations. For example, `get_project_overview` returns project info, members, iterations, milestones, and tags in one call.
+增强工具将多次 API 调用聚合为一次查询，减少 AI 往返次数：
+
+| 工具 | 聚合内容 |
+|------|----------|
+| `get_project_overview` | 项目信息 + 成员 + 迭代 + 里程碑 + 标签 |
+| `get_project_workitem_detail` | 工作项详情 + 活动 + 评论 + 附件 + 关联 |
+| `get_repository_overview` | 仓库信息 + 默认分支 + 最近提交 + 最近 MR |
+| `get_change_request_overview` | CR 详情 + Patch Sets + 评论 |
+| `get_pipeline_overview` | 流水线信息 + 最近运行 + 历史 |
+
+完整列表见 [Enhanced Tools Index](docs/enhanced-tools-index.md)。
 
 ---
 
-## Configuration
+## 配置
 
-Priority: explicit values > flags > environment > config file > defaults.
+优先级：命令行参数 > 环境变量 > 配置文件 > 默认值。
 
-### Environment Variables
+### 必需
 
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `YUNXIAO_MCP_ACCESS_TOKEN` | Yunxiao access token | — |
-| `YUNXIAO_MCP_BASE_URL` | API base URL or host | `https://openapi-rdc.aliyuncs.com` |
-| `YUNXIAO_MCP_SSE_BASE_URL` | Public SSE base URL (reverse proxy) | — |
-| `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY` | Skip Yunxiao server TLS certificate verification for private/self-signed endpoints | `false` |
+| 变量 | 说明 |
+|------|------|
+| `YUNXIAO_MCP_ACCESS_TOKEN` | 云效访问令牌 |
 
-Legacy aliases `YUNXIAO_ACCESS_TOKEN` and `YUNXIAO_API_BASE_URL` are also supported.
+### 可选
 
-Use `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY=true` or `--insecure-skip-tls-verify` only for trusted internal endpoints where certificate validation cannot be fixed.
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `YUNXIAO_MCP_BASE_URL` | API 地址 | `https://openapi-rdc.aliyuncs.com` |
+| `YUNXIAO_MCP_SSE_BASE_URL` | SSE 公网地址（反向代理场景） | — |
+| `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY` | 跳过 TLS 证书校验（仅内网） | `false` |
 
-### Tool Modes
+兼容旧环境变量 `YUNXIAO_ACCESS_TOKEN` 和 `YUNXIAO_API_BASE_URL`。
 
-| Option | Default | Purpose |
-|--------|---------|---------|
-| `read_only` / `--read-only` | `true` | Excludes write-capable tools. Set `read_only=false` only when work item or change request/merge request mutations are intended. |
-| `project_focused` / `--project-focused` | `false` | Registers a focused platform + Projex catalog, hiding low-value raw tools with enhanced alternatives. |
-| `minimal` / `--minimal` | `false` | Registers the smallest project-centric catalog. Write tools still require `read_only=false`. |
-| `enabled_tools` / `--enabled-tools` | `[]` | Explicit tool allow-list by name. |
-| `disabled_tools` / `--disabled-tools` | `[]` | Explicit tool deny-list by name. |
-| `enabled_domains` / `--enable-domains` | `[]` | Explicit domain allow-list, overriding `project_focused`. |
-| `disabled_domains` / `--disable-domains` | `[]` | Explicit domain deny-list. |
+### 模式切换
 
-### Per-Request Tokens (HTTP/SSE)
+| 参数 | 默认 | 作用 |
+|------|------|------|
+| `--read-only` | `true` | 只读模式。设为 `false` 开启写操作 |
+| `--project-focused` | `false` | 仅加载 Platform + Projex 工具 |
+| `--minimal` | `false` | 最小工具集（约 14 个核心工具） |
+| `--enabled-tools` | — | 按名称白名单启用 |
+| `--disabled-tools` | — | 按名称黑名单禁用 |
+| `--enable-domains` | — | 按领域白名单启用 |
+| `--disable-domains` | — | 按领域黑名单禁用 |
 
-Clients can override the default token per request:
-
-```bash
-curl -H "x-yunxiao-token: <token>" http://localhost:3000/mcp
-# or
-http://localhost:3000/sse?yunxiao_access_token=<token>
-```
-
-### Config File
+### 配置文件
 
 ```bash
 ./bin/yunxiao-mcp-server --config config.example.yaml
 ```
 
-See [config.example.yaml](config.example.yaml) for all options.
-
----
-
-## HTTP Endpoints
-
-| Endpoint | Purpose |
-|----------|---------|
-| `/mcp` | Streamable HTTP MCP |
-| `/sse` | SSE MCP |
-| `/message` | SSE message endpoint |
-| `/healthz` | Health check (returns 503 if tools not registered) |
-
----
-
-## Development
+### 按请求切换 Token（HTTP/SSE）
 
 ```bash
-make format   # gofmt
-make tidy     # go mod tidy
-make lint     # golangci-lint
-make test     # go test ./...
-make build    # build binary to bin/
-make smoke    # local smoke test (default port 39393)
+curl -H "x-yunxiao-token: <token>" http://localhost:3000/mcp
+# 或
+http://localhost:3000/sse?yunxiao_access_token=<token>
 ```
-
-Coverage threshold: 98%. Run `make coverage-check` to verify.
 
 ---
 
-## Documentation
+## HTTP 端点
 
-- [MCP Client Config](docs/mcp-client-config.md) — IDE integration examples
-- [Quick Start Guide](docs/quickstart.md) — Common AI conversation patterns
-- [Enhanced Tools Index](docs/enhanced-tools-index.md) — Aggregated tool reference
-- [Conditions Cookbook](docs/conditions-cookbook.md) — Query filter examples
-- [Pagination Guide](docs/pagination-guide.md) — Pagination mode reference
-- [GA Readiness](docs/ga-readiness.md) — Release checklist and deferred endpoints
+| 端点 | 用途 |
+|------|------|
+| `/mcp` | Streamable HTTP MCP |
+| `/sse` | SSE MCP |
+| `/message` | SSE 消息端点 |
+| `/healthz` | 健康检查（工具未注册时返回 503） |
+
+---
+
+## 安全
+
+- **默认只读**：130 个工具无需写权限，可安全探索。
+- **显式开启写入**：12 个写工具需手动设置 `read_only=false`。
+- **请求级 Token**：HTTP/SSE 模式下支持按请求覆盖 token，多用户场景互不干扰。
+- **不暴露敏感端点**：管理员审计日志、个人令牌查询等高权限端点不在目录中。
+
+---
+
+## 开发
+
+```bash
+make fmt      # 格式化
+make tidy     # 整理依赖
+make lint     # 静态检查
+make test     # 运行测试
+make build    # 构建
+make smoke    # 冒烟测试
+make ci       # CI 全量检查
+```
+
+覆盖率要求 98%，`make coverage-check` 验证。
+
+---
+
+## 文档
+
+- [MCP Client Config](docs/mcp-client-config.md) — IDE 集成示例
+- [Quick Start Guide](docs/quickstart.md) — 常见 AI 对话模式
+- [Enhanced Tools Index](docs/enhanced-tools-index.md) — 增强工具参考
+- [Conditions Cookbook](docs/conditions-cookbook.md) — 查询条件示例
+- [Pagination Guide](docs/pagination-guide.md) — 分页模式参考
+- [GA Readiness](docs/ga-readiness.md) — 发版检查清单
 
 ---
 
