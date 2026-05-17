@@ -28,5 +28,15 @@ func codeupMergeRequestTools() []toolset.ServerTool {
 			),
 			Handler: handleListMergeRequests,
 		},
+		{
+			Tool: mcp.NewTool("get_merge_request",
+				mcp.WithDescription("Get a single legacy CodeUp merge request by ID. Use list_merge_requests to discover valid merge request IDs. For the new format, use get_change_request_overview instead."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("mergeRequestId", mcp.Required(), mcp.Description("Merge request local ID. Use list_merge_requests to discover valid IDs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetMergeRequest,
+		},
 	}
 }
