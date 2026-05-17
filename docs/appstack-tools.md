@@ -1,8 +1,8 @@
 # Appstack Tools
 
-This document describes the 61 MCP tools in the appstack domain.
+This document describes the 62 MCP tools in the appstack domain.
 
-Access summary: 57 read-only, 4 write-capable.
+Access summary: 58 read-only, 4 write-capable.
 
 ## Enhanced Tools
 
@@ -15,6 +15,7 @@ These tools combine multiple Yunxiao OpenAPI calls into single, user-centric ope
 | `get_release_overview` | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows. |
 | `get_system_overview` | Get a comprehensive overview of an Appstack system including basic info, attached applications, and members in one read-only call. Use this after discovering a system via list_systems. |
 | `get_change_order_overview` | Get a comprehensive overview of an Appstack change order including basic info and job list in one read-only call. Use this after discovering a change order via list_change_order_versions. |
+| `get_app_release_workflow_overview` | Get a comprehensive overview of an AppStack application release workflow including workflow info and stage briefs in one read-only call. Use this after discovering a workflow via list_app_release_workflows. |
 | `get_app_release_stage_overview` | Get a comprehensive overview of an AppStack application release stage execution including stage info, pipeline run, and integrated metadata in one read-only call. Use this after discovering executions via list_app_release_stage_runs. |
 
 ## Pagination
@@ -45,6 +46,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | **`get_release_overview`** | Read-only | Get a comprehensive overview of an Appstack system release including basic info, members, products, and attached change requests in one read-only call. Use this after discovering a release via search_releases or list_system_release_workflows. |
 | **`get_system_overview`** | Read-only | Get a comprehensive overview of an Appstack system including basic info, attached applications, and members in one read-only call. Use this after discovering a system via list_systems. |
 | **`get_change_order_overview`** | Read-only | Get a comprehensive overview of an Appstack change order including basic info and job list in one read-only call. Use this after discovering a change order via list_change_order_versions. |
+| **`get_app_release_workflow_overview`** | Read-only | Get a comprehensive overview of an AppStack application release workflow including workflow info and stage briefs in one read-only call. Use this after discovering a workflow via list_app_release_workflows. |
 | **`get_app_release_stage_overview`** | Read-only | Get a comprehensive overview of an AppStack application release stage execution including stage info, pipeline run, and integrated metadata in one read-only call. Use this after discovering executions via list_app_release_stage_runs. |
 | `list_global_vars` | Read-only | Search AppStack global variable groups. Use this to discover variable group IDs before reading or updating specific groups. |
 | `get_global_var` | Read-only | Get an AppStack global variable by name. Use list_global_vars to discover valid global variable names. |
@@ -342,6 +344,23 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
 | `changeOrderSn` | string | Yes | Change order serial number. Use list_change_order_versions to discover valid values. |
 | `includeJobLogs` | boolean | No | Whether to include job list. Defaults to true. |
+
+### get_app_release_workflow_overview
+
+**Description**: Get a comprehensive overview of an AppStack application release workflow including workflow info and stage briefs in one read-only call. Use this after discovering a workflow via list_app_release_workflows.
+
+**Access**: Read-only
+
+**Type**: Enhanced aggregation tool
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_app_release_workflows to discover valid values. |
+| `includeStageBriefs` | boolean | No | Whether to include stage briefs. Defaults to true. |
 
 ### get_app_release_stage_overview
 
