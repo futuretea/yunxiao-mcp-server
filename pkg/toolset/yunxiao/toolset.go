@@ -113,6 +113,7 @@ var writeToolNames = map[string]struct{}{
 	"create_change_order":        {},
 	"execute_job_action":            {},
 	"execute_system_release_stage":  {},
+	"execute_app_release_stage":     {},
 }
 
 // Toolset exposes Yunxiao OpenAPI tools.

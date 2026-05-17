@@ -39,5 +39,16 @@ func appstackWriteTools() []toolset.ServerTool {
 			),
 			Handler: handleExecuteSystemReleaseStage,
 		},
+		{
+			Tool: mcp.NewTool("execute_app_release_stage",
+				mcp.WithDescription("Execute an application release stage. Triggers the deployment pipeline for an app-level release stage. This is a write operation and requires read_only=false."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name. Use list_applications to discover valid app names.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number. Use list_app_release_workflows to discover valid values.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number. Use list_app_release_stage_briefs to discover valid values.")),
+				mcp.WithString("execution", mcp.Required(), mcp.Description("JSON string with execution parameters: {appReleaseSn, params (object of key-value pairs)}.")),
+			),
+			Handler: handleExecuteAppReleaseStage,
+		},
 	}
 }

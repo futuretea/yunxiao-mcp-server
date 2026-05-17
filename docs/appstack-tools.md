@@ -1,8 +1,8 @@
 # Appstack Tools
 
-This document describes the 59 MCP tools in the appstack domain.
+This document describes the 60 MCP tools in the appstack domain.
 
-Access summary: 56 read-only, 3 write-capable.
+Access summary: 56 read-only, 4 write-capable.
 
 ## Enhanced Tools
 
@@ -89,6 +89,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `create_change_order` | Write-capable | Create an AppStack change order (deployment order). Change orders trigger application deployments to environments. This is a write operation and requires read_only=false. |
 | `execute_job_action` | Write-capable | Execute an action on an AppStack change order job. Use this to suspend, resume, rollback, or stop a deployment job. This is a write operation and requires read_only=false. |
 | `execute_system_release_stage` | Write-capable | Execute a system release stage. Triggers the deployment pipeline for a release stage. This is a write operation and requires read_only=false. |
+| `execute_app_release_stage` | Write-capable | Execute an application release stage. Triggers the deployment pipeline for an app-level release stage. This is a write operation and requires read_only=false. |
 
 ### search_app_templates
 
@@ -1062,5 +1063,21 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `systemName` | string | Yes | System name. Use list_systems to discover valid names. |
 | `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_system_release_workflows to discover valid values. |
 | `releaseStageSn` | string | Yes | Release stage serial number. Use list_system_release_workflows to discover valid values. |
+| `execution` | string | Yes | JSON string with execution parameters: {appReleaseSn, params (object of key-value pairs)}. |
+
+### execute_app_release_stage
+
+**Description**: Execute an application release stage. Triggers the deployment pipeline for an app-level release stage. This is a write operation and requires read_only=false.
+
+**Access**: Write-capable (requires `read_only=false`)
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `releaseWorkflowSn` | string | Yes | Release workflow serial number. Use list_app_release_workflows to discover valid values. |
+| `releaseStageSn` | string | Yes | Release stage serial number. Use list_app_release_stage_briefs to discover valid values. |
 | `execution` | string | Yes | JSON string with execution parameters: {appReleaseSn, params (object of key-value pairs)}. |
 
