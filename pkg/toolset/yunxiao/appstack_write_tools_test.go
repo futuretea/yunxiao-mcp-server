@@ -114,6 +114,19 @@ func TestHandleExecuteSystemReleaseStageBuildsPathAndBody(t *testing.T) {
 	}
 }
 
+func TestHandleExecuteJobActionReturnsAPIError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	_, err := handleExecuteJobAction(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "changeOrderSn": "co-1", "jobSn": "job-1",
+		"action": `{"actionType":"RESUME"}`,
+	})
+	if err == nil {
+		t.Fatal("expected API error")
+	}
+}
+
 func TestHandleExecuteAppReleaseStageBuildsPathAndBody(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.URL.Path, ":execute") {
