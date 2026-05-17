@@ -76,6 +76,18 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 			Handler: handleListFiles,
 		},
 		{
+			Tool: mcp.NewTool("get_file_blobs",
+				mcp.WithDescription("Get file content and metadata from a CodeUp repository. Use list_files to discover valid file paths."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("filePath", mcp.Required(), mcp.Description("File path within the repository.")),
+				mcp.WithString("ref", mcp.Required(), mcp.Description("Branch, tag, or commit SHA.")),
+				mcp.WithString("since", mcp.Description("ISO 8601 timestamp to retrieve the file as it existed at that time.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetFileBlobs,
+		},
+		{
 			Tool: mcp.NewTool("list_commits",
 				mcp.WithDescription("List commits in a CodeUp repository. Use this to review recent changes and commit history."),
 				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
