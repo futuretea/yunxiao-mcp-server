@@ -1,8 +1,8 @@
 # Codeup Tools
 
-This document describes the 32 MCP tools in the codeup domain.
+This document describes the 35 MCP tools in the codeup domain.
 
-Access summary: 26 read-only, 6 write-capable.
+Access summary: 29 read-only, 6 write-capable.
 
 ## Enhanced Tools
 
@@ -38,8 +38,10 @@ Tools marked in **bold** are enhanced aggregation tools.
 | **`get_branch_overview`** | Read-only | Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call. |
 | `list_group_members` | Read-only | List members of a CodeUp group (namespace). Use this to discover who has access to repositories within the group. |
 | `list_merge_requests` | Read-only | List legacy CodeUp merge requests across repositories in a Yunxiao organization. For change requests (new merge request format), use list_change_requests instead. |
+| `get_merge_request` | Read-only | Get a single legacy CodeUp merge request by ID. Use list_merge_requests to discover valid merge request IDs. For the new format, use get_change_request_overview instead. |
 | `list_template_repositories` | Read-only | List CodeUp template repositories in a Yunxiao organization. Templates are pre-configured repositories used as starting points for new projects. |
 | `list_namespaces` | Read-only | List CodeUp namespaces or groups in a Yunxiao organization. Namespaces organize repositories into hierarchical groups. |
+| `get_org_namespace` | Read-only | Get a CodeUp organization namespace by ID with nested sub-namespaces. Use list_namespaces to discover valid namespace IDs. |
 | `list_tags` | Read-only | List tags (version markers) in a CodeUp repository. Use this to discover release versions. |
 | `list_repository_members` | Read-only | List members who have access to a CodeUp repository. Use this to discover user IDs for assignment or review. |
 | `list_protected_branches` | Read-only | List protected branch rules in a CodeUp repository. Protected branches enforce review and CI requirements before merging. |
@@ -53,6 +55,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_change_requests` | Read-only | List CodeUp change requests (merge requests) across repositories in a Yunxiao organization. Use this to find pending reviews or track merged changes. |
 | `list_change_request_patch_sets` | Read-only | List patch sets (diff iterations) for a CodeUp merge request. Use this to review how a merge request evolved across multiple pushes. |
 | `list_change_request_comments` | Read-only | List comments on a CodeUp merge request. Use this to review feedback, inline discussions, and approval threads. |
+| `get_change_request_comment` | Read-only | Get a single comment on a CodeUp change request by ID. Use list_change_request_comments to discover valid comment IDs. |
 | `create_change_request` | Write-capable | Create a new Codeup change request. |
 | `add_change_request_comment` | Write-capable | Add a comment to a Codeup change request. |
 | `create_merge_request` | Write-capable | Create a new Codeup merge request. |
@@ -274,6 +277,20 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `createdBefore` | string | No | Created-before date in yyyy-MM-dd format. |
 | `targetBranch` | string | No | Target branch filter. |
 
+### get_merge_request
+
+**Description**: Get a single legacy CodeUp merge request by ID. Use list_merge_requests to discover valid merge request IDs. For the new format, use get_change_request_overview instead.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `mergeRequestId` | string | Yes | Merge request local ID. Use list_merge_requests to discover valid IDs. |
+
 ### list_template_repositories
 
 **Description**: List CodeUp template repositories in a Yunxiao organization. Templates are pre-configured repositories used as starting points for new projects.
@@ -310,6 +327,19 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `search` | string | No | Namespace search keyword. |
 | `orderBy` | string | No | Sort field: created_at or updated_at. |
 | `sort` | string | No | Sort direction: asc or desc. |
+
+### get_org_namespace
+
+**Description**: Get a CodeUp organization namespace by ID with nested sub-namespaces. Use list_namespaces to discover valid namespace IDs.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `namespaceId` | string | Yes | Namespace ID (string). Use list_namespaces to discover valid IDs. |
 
 ### list_tags
 
@@ -539,6 +569,21 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `state` | string | No | Comment state: OPENED or DRAFT. Defaults to OPENED. |
 | `resolved` | boolean | No | Whether to list resolved comments. Defaults to false. Set to true to see resolved threads. |
 | `filePath` | string | No | File path filter for inline comments. Use this to narrow comments to a specific file. |
+
+### get_change_request_comment
+
+**Description**: Get a single comment on a CodeUp change request by ID. Use list_change_request_comments to discover valid comment IDs.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `localId` | string | Yes | Change request local ID. Use list_change_requests to discover valid local IDs. |
+| `commentId` | string | Yes | Comment ID. Use list_change_request_comments to discover valid comment IDs. |
 
 ### create_change_request
 

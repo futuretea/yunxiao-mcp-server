@@ -184,5 +184,16 @@ func codeupChangeRequestCommentTools() []toolset.ServerTool {
 			),
 			Handler: handleListChangeRequestComments,
 		},
+		{
+			Tool: mcp.NewTool("get_change_request_comment",
+				mcp.WithDescription("Get a single comment on a CodeUp change request by ID. Use list_change_request_comments to discover valid comment IDs."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("localId", mcp.Required(), mcp.Description("Change request local ID. Use list_change_requests to discover valid local IDs.")),
+				mcp.WithString("commentId", mcp.Required(), mcp.Description("Comment ID. Use list_change_request_comments to discover valid comment IDs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetChangeRequestComment,
+		},
 	}
 }
