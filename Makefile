@@ -17,6 +17,7 @@ test:
 lint:
 	go vet ./...
 	test -z "$$(gofmt -l cmd internal pkg)"
+	@which golangci-lint >/dev/null 2>&1 && golangci-lint run ./... || echo "golangci-lint not installed, skipping"
 	@which gocyclo >/dev/null 2>&1 && gocyclo -over 15 $$(find cmd internal pkg -name '*.go' -not -name '*_test.go') || echo "gocyclo not installed, skipping complexity check"
 
 format:
