@@ -2,8 +2,46 @@ package yunxiao
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"net/url"
 )
+
+func handleExecuteSystemReleaseStage(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, systemName, err := requiredOrganizationAndSystem(params)
+	if err != nil {
+		return "", err
+	}
+	releaseWorkflowSn, err := requiredString(params, "releaseWorkflowSn")
+	if err != nil {
+		return "", err
+	}
+	releaseStageSn, err := requiredString(params, "releaseStageSn")
+	if err != nil {
+		return "", err
+	}
+	executionJSON, err := requiredString(params, "execution")
+	if err != nil {
+		return "", err
+	}
+	var execution any
+	if err := json.Unmarshal([]byte(executionJSON), &execution); err != nil {
+		return "", fmt.Errorf("invalid execution JSON: %w", err)
+	}
+
+	path := appstackSystemPath(organizationID, systemName) + "/releaseWorkflows/" + url.PathEscape(releaseWorkflowSn) + "/releaseStages/" + url.PathEscape(releaseStageSn) + ":execute"
+	resp, err := c.Request(ctx, http.MethodPost, path, nil, execution)
+	if err != nil {
+		return "", err
+	}
+	return prettyResponseJSON(resp), nil
+}
 
 func handleListSystemReleaseWorkflows(ctx context.Context, client any, params map[string]any) (string, error) {
 	organizationID, systemName, err := requiredOrganizationAndSystem(params)
