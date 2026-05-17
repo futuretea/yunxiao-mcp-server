@@ -40,7 +40,6 @@ var compactHiddenTools = map[string]struct{}{
 	"list_current_user_effort_records": {},
 	"list_estimated_efforts":           {},
 	"list_effort_records":              {},
-	"list_directories":                 {},
 	"list_test_plans":                  {},
 	"get_test_result_list":             {},
 
@@ -68,10 +67,8 @@ var compactHiddenTools = map[string]struct{}{
 	"get_commit":         {},
 	"get_change_request": {},
 	// CodeUp (B) — included in enhanced overviews
-	"list_commit_statuses":           {},
-	"list_check_runs":                {},
-	"list_change_request_patch_sets": {},
-	"list_change_request_comments":   {},
+	"list_commit_statuses": {},
+	"list_check_runs":      {},
 	// CodeUp (D) — specialized
 	"list_template_repositories": {},
 	"list_ssh_keys":              {},
