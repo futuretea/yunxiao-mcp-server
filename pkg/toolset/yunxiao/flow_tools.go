@@ -37,6 +37,15 @@ func flowPipelineTools() []toolset.ServerTool {
 			),
 			Handler: handleListPipelines,
 		},
+		{
+			Tool: mcp.NewTool("get_pipeline",
+				mcp.WithDescription("Get a single Flow pipeline by ID. Use list_pipelines to discover valid pipeline IDs. For a comprehensive view with latest run info, use get_pipeline_overview instead."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string). Use list_pipelines to discover valid IDs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipeline,
+		},
 	}
 }
 
@@ -61,6 +70,25 @@ func flowPipelineRunTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListPipelineRuns,
+		},
+		{
+			Tool: mcp.NewTool("get_latest_pipeline_run",
+				mcp.WithDescription("Get the latest execution run for a Flow pipeline. Use this for a quick status check without listing all historical runs."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string). Use list_pipelines to find the pipeline ID.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetLatestPipelineRun,
+		},
+		{
+			Tool: mcp.NewTool("get_pipeline_run",
+				mcp.WithDescription("Get a specific Flow pipeline run by ID. Use list_pipeline_runs to discover valid run IDs. For a comprehensive view with metadata, use get_pipeline_run_overview instead."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string). Use list_pipelines to find the pipeline ID.")),
+				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID. Use list_pipeline_runs to discover valid run IDs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipelineRun,
 		},
 	}
 }
@@ -89,6 +117,17 @@ func flowPipelineJobTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleListPipelineJobHistorys,
+		},
+		{
+			Tool: mcp.NewTool("get_pipeline_job_run_log",
+				mcp.WithDescription("Get the execution log for a specific job within a Flow pipeline run. Use this to debug pipeline failures by inspecting individual job output."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string). Use list_pipelines to find the pipeline ID.")),
+				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID. Use list_pipeline_runs to discover valid run IDs.")),
+				mcp.WithString("jobId", mcp.Required(), mcp.Description("Job ID within the pipeline run. Use list_pipeline_jobs_by_category to discover valid job IDs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipelineJobRunLog,
 		},
 	}
 }
