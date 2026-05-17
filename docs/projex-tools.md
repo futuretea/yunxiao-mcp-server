@@ -1,8 +1,8 @@
 # Projex Tools
 
-This document describes the 45 MCP tools in the projex domain.
+This document describes the 47 MCP tools in the projex domain.
 
-Access summary: 41 read-only, 4 write-capable.
+Access summary: 43 read-only, 4 write-capable.
 
 ## Enhanced Tools
 
@@ -52,7 +52,9 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_milestones` | Read-only | List milestones (planning checkpoints) in a Projex project. Milestones track progress against goals, distinct from sprints (time-boxed iterations) and versions (releases). |
 | `list_testcase_repositories` | Read-only | List Projex testcase repositories in a Yunxiao organization. A testcase repository is a container for organizing test cases. |
 | `list_directories` | Read-only | List directories (folders) within a Projex testcase repository. |
+| `get_testcase_field_config` | Read-only | Get the field configuration for test cases in a Projex testcase repository. Use this to understand available custom fields before creating or searching test cases. |
 | `search_testcases` | Read-only | Search test cases within a single Projex testcase repository. |
+| `get_testcase` | Read-only | Get a specific test case by ID from a Projex testcase repository. Use search_testcases to discover valid test case IDs. |
 | `list_test_plans` | Read-only | List test plans in a Yunxiao organization. A test plan groups test cases for execution tracking. |
 | `get_test_result_list` | Read-only | Get test execution result summaries for a specific directory within a test plan. |
 | `list_project_members` | Read-only | List members in a Projex project. Use this to discover user IDs for filtering work items or assigning tasks. |
@@ -479,6 +481,19 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 | `testRepoId` | string | Yes | Testcase repository ID (string). Use list_testcase_repositories to discover available repositories. |
 
+### get_testcase_field_config
+
+**Description**: Get the field configuration for test cases in a Projex testcase repository. Use this to understand available custom fields before creating or searching test cases.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `testRepoId` | string | Yes | Testcase repository ID (string). Use list_testcase_repositories to discover available repositories. |
+
 ### search_testcases
 
 **Description**: Search test cases within a single Projex testcase repository.
@@ -500,6 +515,20 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `sort` | string | No | Sort direction: asc or desc. |
 | `page` | number | No | Page number for pagination. Starts at 1. |
 | `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
+
+### get_testcase
+
+**Description**: Get a specific test case by ID from a Projex testcase repository. Use search_testcases to discover valid test case IDs.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `testRepoId` | string | Yes | Testcase repository ID (string). Use list_testcase_repositories to discover available repositories. |
+| `testcaseId` | string | Yes | Test case ID (string). Use search_testcases to discover valid IDs. |
 
 ### list_test_plans
 

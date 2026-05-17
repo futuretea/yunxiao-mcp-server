@@ -4,7 +4,7 @@
 
 Let your AI coding assistant talk directly to [Alibaba Yunxiao](https://www.aliyun.com/product/yunxiao) — browse projects, track iterations, review code, and monitor pipelines without leaving your IDE.
 
-**Read-only by default, safety first.** 166 of 178 tools are read-only queries. 12 write operations require explicit `read_only=false`.
+**Read-only by default, safety first.** 168 of 180 tools are read-only queries. 12 write operations require explicit `read_only=false`.
 
 ---
 
@@ -157,7 +157,7 @@ http://localhost:3000/sse?yunxiao_access_token=<token>
 
 ## Security
 
-- **Read-only by default**: 166 tools safe for exploration without write access.
+- **Read-only by default**: 168 tools safe for exploration without write access.
 - **Explicit write opt-in**: 12 write tools require manual `read_only=false`.
 - **Per-request token**: HTTP/SSE support request-level token override for multi-tenant use.
 - **No sensitive endpoints**: Admin audit logs, PAT queries, and other high-privilege endpoints are excluded.
