@@ -139,6 +139,45 @@ func handleGetAppReleaseStageOverview(ctx context.Context, client any, params ma
 	return marshalPretty(overview)
 }
 
+func handleGetAppReleaseWorkflowOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, appName, releaseWorkflowSn, err := requiredAppReleaseWorkflow(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	wfPath := appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn)
+
+	workflow, err := c.GetJSON(ctx, wfPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	overview := map[string]any{
+		"workflow": workflow,
+		"filters":  workflowOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeStageBriefs", true) {
+		briefs, err := c.GetJSON(ctx, wfPath+"/releaseStageBriefs", nil)
+		if err != nil {
+			return "", err
+		}
+		overview["stageBriefs"] = briefs
+	}
+
+	return marshalPretty(overview)
+}
+
+func workflowOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeStageBriefs": optionalBoolDefault(params, "includeStageBriefs", true),
+	}
+}
+
 func stageOverviewFilters(params map[string]any) map[string]any {
 	return map[string]any{
 		"includeStageInfo":   optionalBoolDefault(params, "includeStageInfo", true),
