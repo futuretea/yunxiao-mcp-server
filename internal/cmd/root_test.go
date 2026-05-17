@@ -11,6 +11,8 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func TestVersionCommandPrintsVersionInfo(t *testing.T) {
@@ -102,6 +104,15 @@ func TestRootCommandStartsAndShutsDownHTTPServer(t *testing.T) {
 	err = command.Execute()
 	if err != nil {
 		t.Fatalf("Execute() error = %v", err)
+	}
+}
+
+func TestBindFlagsReturnsErrorOnMissingFlag(t *testing.T) {
+	v := viper.New()
+	cmd := &cobra.Command{}
+	err := bindFlags(v, cmd)
+	if err == nil {
+		t.Fatal("bindFlags() expected error for command without flags")
 	}
 }
 
