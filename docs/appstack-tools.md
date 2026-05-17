@@ -39,7 +39,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_application_sources` | Read-only | List source repositories attached to an AppStack application. Use list_applications to discover valid application names. |
 | `get_machine_deploy_log` | Read-only | Get deployment log for a specific machine in an AppStack deployment. Machine logs capture the agent-side output of a deployment. |
 | `get_deploy_group` | Read-only | Get an AppStack deploy group by name within a resource pool. Deploy groups define subsets of machines for targeted deployments. |
-| `list_resource_instances` | Read-only | List AppStack resource instances in a resource pool. Use list_resource_pools to discover valid pool names. |
+| `list_resource_instances` | Read-only | List AppStack resource instances in a resource pool. Pool names are typically found in application environment resource configurations. |
 | `get_resource_instance` | Read-only | Get an AppStack resource instance by name within a resource pool. Resource instances represent individual machines or hosts. |
 | **`get_application_overview`** | Read-only | Get a comprehensive overview of an Appstack application including basic info, environments, and recent orchestrations in one read-only call. Use this after discovering applications via list_applications or list_attached_apps. |
 | **`get_environment_overview`** | Read-only | Get a comprehensive overview of an Appstack environment including basic info, variable groups, and latest orchestration in one read-only call. Use this after identifying an application and environment via get_application_overview. |
@@ -219,7 +219,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 
 ### list_resource_instances
 
-**Description**: List AppStack resource instances in a resource pool. Use list_resource_pools to discover valid pool names.
+**Description**: List AppStack resource instances in a resource pool. Pool names are typically found in application environment resource configurations.
 
 **Access**: Read-only
 
@@ -230,7 +230,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
-| `poolName` | string | Yes | Resource pool name. Use list_resource_pools to discover valid names. |
+| `poolName` | string | Yes | Resource pool name. Typically found in application environment resource configurations. |
 | `pagination` | string | No | Pagination mode. Valid value: keyset. |
 | `perPage` | number | No | Page size for pagination. Supports 1-100. Defaults to 100 when omitted. |
 | `orderBy` | string | No | Sort field. Valid values: id, gmtCreate. |
