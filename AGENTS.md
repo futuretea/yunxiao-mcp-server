@@ -56,7 +56,7 @@ pkg/toolset/yunxiao/       # All Yunxiao tool definitions and handlers
 
 | File | Purpose |
 |------|---------|
-| `pkg/toolset/yunxiao/toolset.go` | Toolset registration, `compactHiddenTools` map (28 superseded raw tools), write-tool gating |
+| `pkg/toolset/yunxiao/toolset.go` | Toolset registration, `compactHiddenTools` map (44 hidden tools across 4 categories), write-tool gating |
 | `pkg/toolset/yunxiao/*_tools.go` | 182 MCP tool schemas across 7 domains (170 read-only + 12 write-capable tools gated behind read_only=false) |
 | `pkg/toolset/yunxiao/projex_enhanced_*.go` | 8 enhanced aggregation tools |
 | `pkg/toolset/yunxiao/appstack_enhanced_*.go` | 5 AppStack enhanced overview tools |

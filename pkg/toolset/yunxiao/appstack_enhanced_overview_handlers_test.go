@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -121,6 +122,90 @@ func TestHandleGetChangeOrderOverviewWithoutJobs(t *testing.T) {
 	}
 	if _, ok := overview["jobs"]; ok {
 		t.Fatal("overview should not include jobs when includeJobLogs=false")
+	}
+}
+
+func TestHandleGetSystemOverviewWithoutApps(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		if callCount == 1 {
+			_, _ = w.Write([]byte(`{"name":"sys-1"}`))
+		} else if callCount == 2 {
+			if !strings.Contains(r.URL.Path, "/members") {
+				t.Fatalf("expected members path, got %s", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`[{"userId":"u1"}]`))
+		} else {
+			t.Fatalf("unexpected request %d", callCount)
+		}
+	})
+
+	result, err := handleGetSystemOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"systemName":     "sys-1",
+		"includeApps":    false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetSystemOverview() error = %v", err)
+	}
+	if callCount != 2 {
+		t.Fatalf("callCount = %d, want 2 (system+members, no apps)", callCount)
+	}
+
+	var overview map[string]any
+	if err := json.Unmarshal([]byte(result), &overview); err != nil {
+		t.Fatalf("unmarshal result: %v", err)
+	}
+	if _, ok := overview["apps"]; ok {
+		t.Fatal("overview should not include apps when includeApps=false")
+	}
+}
+
+func TestHandleGetSystemOverviewAPIErrorOnSystem(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := handleGetSystemOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"systemName":     "sys-1",
+	})
+	if err == nil {
+		t.Fatal("expected API error on system info")
+	}
+}
+
+func TestHandleGetChangeOrderOverviewAPIErrorOnChangeOrder(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := handleGetChangeOrderOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"changeOrderSn":  "co-1",
+	})
+	if err == nil {
+		t.Fatal("expected API error on change order")
+	}
+}
+
+func TestHandleGetChangeOrderOverviewRequiresAppName(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetChangeOrderOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	}); err == nil {
+		t.Fatal("expected missing appName error")
+	}
+	if _, err := handleGetChangeOrderOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+	}); err == nil {
+		t.Fatal("expected missing changeOrderSn error")
 	}
 }
 
