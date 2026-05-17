@@ -111,7 +111,8 @@ var writeToolNames = map[string]struct{}{
 	"pass_pipeline_validate":     {},
 	"refuse_pipeline_validate":   {},
 	"create_change_order":        {},
-	"execute_job_action":         {},
+	"execute_job_action":            {},
+	"execute_system_release_stage":  {},
 }
 
 // Toolset exposes Yunxiao OpenAPI tools.
