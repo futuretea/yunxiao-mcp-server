@@ -9,77 +9,51 @@ This document describes the enhanced aggregation tools in the Appstack (applicat
 | `get_application_overview` | Application dashboard with basic info, environments, and recent orchestrations | 1 + up to 2 |
 | `get_environment_overview` | Environment dashboard with basic info, variable groups, and latest orchestration | 1 + up to 2 |
 | `get_release_overview` | System release dashboard with members, products, and attached change requests | 1 + up to 3 |
-
-## Common Behaviors
-
-### Pagination
-
-Sub-sections use `page`/`perPage` parameters with a default page size of 5 (controlled by `envLimit` and `orchestrationLimit`). The raw upstream response is returned for each section; pagination metadata varies by endpoint.
+| `get_system_overview` | System dashboard with attached apps and members | 1 + up to 2 |
+| `get_change_order_overview` | Change order dashboard with basic info and job list | 1 + 1 |
+| `get_app_release_workflow_overview` | Release workflow dashboard with stage briefs | 1 + 1 |
+| `get_app_release_stage_overview` | Stage execution dashboard with pipeline run and integrated metadata | 1 + up to 2 |
 
 ## Tool Details
 
 ### get_application_overview
 
-**When to use**: You want a quick snapshot of an Appstack application — its basic info plus environments and recent orchestrations.
+**When to use**: Quick snapshot of an Appstack application — basic info plus environments and recent orchestrations.
 
-**Parameters**:
-- `organizationId`, `appName`: required
-- `includeEnvironments`: toggle environment list, default true
-- `includeOrchestrations`: toggle recent orchestrations, default true
-- `envLimit`: max environments returned, default 5
-- `orchestrationLimit`: max orchestrations returned, default 5
-
-**Example**:
-```json
-{
-  "appName": "my-app",
-  "includeEnvironments": true,
-  "includeOrchestrations": true,
-  "envLimit": 5,
-  "orchestrationLimit": 5
-}
-```
+**Parameters**: `organizationId`, `appName` (required), `includeEnvironments`, `includeOrchestrations`, `envLimit`, `orchestrationLimit`
 
 ### get_environment_overview
 
-**When to use**: You want a quick snapshot of an Appstack environment — its basic info plus variable groups and latest orchestration.
+**When to use**: Quick snapshot of an Appstack environment — basic info plus variable groups and latest orchestration.
 
-**Parameters**:
-- `organizationId`, `appName`, `envName`: required
-- `includeVariableGroups`: toggle variable groups, default true
-- `includeLatestOrchestration`: toggle latest orchestration, default true
-
-**Example**:
-```json
-{
-  "appName": "my-app",
-  "envName": "dev",
-  "includeVariableGroups": true,
-  "includeLatestOrchestration": true
-}
-```
+**Parameters**: `organizationId`, `appName`, `envName` (required), `includeVariableGroups`, `includeLatestOrchestration`
 
 ### get_release_overview
 
-**When to use**: You want a quick snapshot of an Appstack system release — its basic info plus members, products, and attached change requests.
+**When to use**: Quick snapshot of an Appstack system release — basic info plus members, products, and attached change requests.
 
-**Parameters**:
-- `organizationId`, `systemName`, `sn`: required
-- `includeMembers`: toggle members list, default true
-- `includeProducts`: toggle products list, default true
-- `includeChangeRequests`: toggle change requests list, default true
-- `changeRequestLimit`: max change requests returned, default 5
+**Parameters**: `organizationId`, `systemName`, `sn` (required), `includeMembers`, `includeProducts`, `includeChangeRequests`, `changeRequestLimit`
 
-**Example**:
-```json
-{
-  "systemName": "my-system",
-  "sn": "rel-1",
-  "includeMembers": true,
-  "includeProducts": true,
-  "includeChangeRequests": true,
-  "changeRequestLimit": 5
-}
-```
+### get_system_overview
 
-**Note**: Change requests use `current`/`pageSize` pagination.
+**When to use**: Quick snapshot of an Appstack system — basic info plus attached applications and members.
+
+**Parameters**: `organizationId`, `systemName` (required), `includeApps`, `includeMembers`, `appLimit`, `memberLimit`
+
+### get_change_order_overview
+
+**When to use**: Quick snapshot of an Appstack change order — basic info plus job list.
+
+**Parameters**: `organizationId`, `appName`, `changeOrderSn` (required), `includeJobLogs`
+
+### get_app_release_workflow_overview
+
+**When to use**: Quick snapshot of an AppStack application release workflow — basic info plus stage briefs for discovery.
+
+**Parameters**: `organizationId`, `appName`, `releaseWorkflowSn` (required), `includeStageBriefs`
+
+### get_app_release_stage_overview
+
+**When to use**: Debug a specific stage execution — stage info, pipeline run, and integrated metadata in one call.
+
+**Parameters**: `organizationId`, `appName`, `releaseWorkflowSn`, `releaseStageSn`, `executionNumber` (required), `includeStageInfo`, `includePipelineRun`, `includeMetadata`
