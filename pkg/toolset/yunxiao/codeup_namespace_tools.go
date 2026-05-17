@@ -45,5 +45,14 @@ func codeupNamespaceListTools() []toolset.ServerTool {
 			),
 			Handler: handleListNamespaces,
 		},
+		{
+			Tool: mcp.NewTool("get_org_namespace",
+				mcp.WithDescription("Get a CodeUp organization namespace by ID with nested sub-namespaces. Use list_namespaces to discover valid namespace IDs."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("namespaceId", mcp.Required(), mcp.Description("Namespace ID (string). Use list_namespaces to discover valid IDs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetOrgNamespace,
+		},
 	}
 }
