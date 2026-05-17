@@ -2,6 +2,9 @@ package yunxiao
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"net/url"
 )
 
@@ -81,6 +84,33 @@ func handleFindTaskOperationLog(ctx context.Context, client any, params map[stri
 
 	path := appstackChangeOrderPath(organizationID, appName, changeOrderSn) + "/jobs/" + url.PathEscape(jobSn) + "/stages/" + url.PathEscape(stageSn) + "/tasks/" + url.PathEscape(taskSn) + "/operationLog"
 	return c.GetJSON(ctx, path, nil)
+}
+
+func handleCreateChangeOrder(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, appName, err := requiredOrganizationAndApp(params)
+	if err != nil {
+		return "", err
+	}
+	changeOrderJSON, err := requiredString(params, "changeOrder")
+	if err != nil {
+		return "", err
+	}
+	var changeOrder any
+	if err := json.Unmarshal([]byte(changeOrderJSON), &changeOrder); err != nil {
+		return "", fmt.Errorf("invalid changeOrder JSON: %w", err)
+	}
+
+	path := appstackAppPath(organizationID, appName) + "/changeOrders"
+	resp, err := c.Request(ctx, http.MethodPost, path, nil, changeOrder)
+	if err != nil {
+		return "", err
+	}
+	return prettyResponseJSON(resp), nil
 }
 
 func handleListChangeOrdersByOrigin(ctx context.Context, client any, params map[string]any) (string, error) {

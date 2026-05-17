@@ -23,6 +23,7 @@ func appstackTools() []toolset.ServerTool {
 	tools = append(tools, appstackChangeRequestTools()...)
 	tools = append(tools, appstackChangeOrderTools()...)
 	tools = append(tools, appstackEnhancedTools()...)
+	tools = append(tools, appstackWriteTools()...)
 	return tools
 }
 
