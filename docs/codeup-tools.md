@@ -1,8 +1,8 @@
 # Codeup Tools
 
-This document describes the 30 MCP tools in the codeup domain.
+This document describes the 32 MCP tools in the codeup domain.
 
-Access summary: 24 read-only, 6 write-capable.
+Access summary: 26 read-only, 6 write-capable.
 
 ## Enhanced Tools
 
@@ -48,6 +48,8 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_branches` | Read-only | List branches in a CodeUp repository. Use this to discover available branches before checking out code or reviewing merge requests. |
 | `list_files` | Read-only | List files and directories in a CodeUp repository tree. Use this to explore repository structure. |
 | `list_commits` | Read-only | List commits in a CodeUp repository. Use this to review recent changes and commit history. |
+| `get_commit` | Read-only | Get a single CodeUp commit by SHA. Use list_commits to discover valid commit SHAs. For a comprehensive view with statuses and check runs, use get_commit_overview instead. |
+| `compare` | Read-only | Compare two commits, branches, or tags in a CodeUp repository. Returns the diff between the two refs. |
 | `list_change_requests` | Read-only | List CodeUp change requests (merge requests) across repositories in a Yunxiao organization. Use this to find pending reviews or track merged changes. |
 | `list_change_request_patch_sets` | Read-only | List patch sets (diff iterations) for a CodeUp merge request. Use this to review how a merge request evolved across multiple pushes. |
 | `list_change_request_comments` | Read-only | List comments on a CodeUp merge request. Use this to review feedback, inline discussions, and approval threads. |
@@ -447,6 +449,38 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `search` | string | No | Commit search keyword. |
 | `showSignature` | boolean | No | Whether to include commit signatures. |
 | `committerIds` | string | No | Comma-separated committer user IDs. |
+
+### get_commit
+
+**Description**: Get a single CodeUp commit by SHA. Use list_commits to discover valid commit SHAs. For a comprehensive view with statuses and check runs, use get_commit_overview instead.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `sha` | string | Yes | Commit SHA (full 40-character hash). Use list_commits to discover valid SHAs. |
+
+### compare
+
+**Description**: Compare two commits, branches, or tags in a CodeUp repository. Returns the diff between the two refs.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `from` | string | Yes | Source commit SHA, branch, or tag. |
+| `to` | string | Yes | Target commit SHA, branch, or tag. |
+| `sourceType` | string | No | Source ref type: branch, tag, or commit. |
+| `targetType` | string | No | Target ref type: branch, tag, or commit. |
+| `straight` | string | No | Whether to compare directly without merge base. |
 
 ### list_change_requests
 
