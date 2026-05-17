@@ -1,8 +1,8 @@
 # Codeup Tools
 
-This document describes the 35 MCP tools in the codeup domain.
+This document describes the 37 MCP tools in the codeup domain.
 
-Access summary: 29 read-only, 6 write-capable.
+Access summary: 31 read-only, 6 write-capable.
 
 ## Enhanced Tools
 
@@ -37,6 +37,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | **`get_commit_overview`** | Read-only | Get a comprehensive overview of a CodeUp commit including commit details, commit statuses, and check runs in one read-only call. |
 | **`get_branch_overview`** | Read-only | Get a comprehensive overview of a CodeUp branch including branch details, recent commits, and merge requests targeting the branch in one read-only call. |
 | `list_group_members` | Read-only | List members of a CodeUp group (namespace). Use this to discover who has access to repositories within the group. |
+| `get_member_https_clone_username` | Read-only | Get the HTTPS clone username for a CodeUp organization member. |
 | `list_merge_requests` | Read-only | List legacy CodeUp merge requests across repositories in a Yunxiao organization. For change requests (new merge request format), use list_change_requests instead. |
 | `get_merge_request` | Read-only | Get a single legacy CodeUp merge request by ID. Use list_merge_requests to discover valid merge request IDs. For the new format, use get_change_request_overview instead. |
 | `list_template_repositories` | Read-only | List CodeUp template repositories in a Yunxiao organization. Templates are pre-configured repositories used as starting points for new projects. |
@@ -49,6 +50,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_repositories` | Read-only | List CodeUp (Git) repositories in a Yunxiao organization. Use this to discover repositories and obtain their IDs before calling repository-scoped tools. For a comprehensive view of a single repository, use get_repository_overview instead. |
 | `list_branches` | Read-only | List branches in a CodeUp repository. Use this to discover available branches before checking out code or reviewing merge requests. |
 | `list_files` | Read-only | List files and directories in a CodeUp repository tree. Use this to explore repository structure. |
+| `get_file_blobs` | Read-only | Get file content and metadata from a CodeUp repository. Use list_files to discover valid file paths. |
 | `list_commits` | Read-only | List commits in a CodeUp repository. Use this to review recent changes and commit history. |
 | `get_commit` | Read-only | Get a single CodeUp commit by SHA. Use list_commits to discover valid commit SHAs. For a comprehensive view with statuses and check runs, use get_commit_overview instead. |
 | `compare` | Read-only | Compare two commits, branches, or tags in a CodeUp repository. Returns the diff between the two refs. |
@@ -250,6 +252,19 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 | `groupId` | string | Yes | Group ID or URL-encoded full path. Use list_namespaces to discover valid group IDs. |
 | `accessLevel` | number | No | Minimum access level: 20 viewer, 30 developer, 40 admin. Defaults to no filter. |
+
+### get_member_https_clone_username
+
+**Description**: Get the HTTPS clone username for a CodeUp organization member.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `userId` | string | Yes | User ID. Use list_organization_members to discover valid user IDs. |
 
 ### list_merge_requests
 
@@ -455,6 +470,22 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `path` | string | No | Directory path to query. |
 | `ref` | string | No | Branch, tag, or commit SHA. Defaults to the repository default branch when omitted. |
 | `type` | string | No | Tree mode: DIRECT, RECURSIVE, or FLATTEN. |
+
+### get_file_blobs
+
+**Description**: Get file content and metadata from a CodeUp repository. Use list_files to discover valid file paths.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `repositoryId` | string | Yes | Repository numeric ID or full path such as org/repo. |
+| `filePath` | string | Yes | File path within the repository. |
+| `ref` | string | Yes | Branch, tag, or commit SHA. |
+| `since` | string | No | ISO 8601 timestamp to retrieve the file as it existed at that time. |
 
 ### list_commits
 

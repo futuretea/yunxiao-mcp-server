@@ -18,5 +18,14 @@ func codeupGroupMemberTools() []toolset.ServerTool {
 			),
 			Handler: handleListGroupMembers,
 		},
+		{
+			Tool: mcp.NewTool("get_member_https_clone_username",
+				mcp.WithDescription("Get the HTTPS clone username for a CodeUp organization member."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("userId", mcp.Required(), mcp.Description("User ID. Use list_organization_members to discover valid user IDs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetMemberHTTPSCloneUsername,
+		},
 	}
 }
