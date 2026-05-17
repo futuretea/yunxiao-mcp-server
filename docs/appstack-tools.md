@@ -1,8 +1,8 @@
 # Appstack Tools
 
-This document describes the 56 MCP tools in the appstack domain.
+This document describes the 57 MCP tools in the appstack domain.
 
-Access summary: 56 read-only, 0 write-capable.
+Access summary: 56 read-only, 1 write-capable.
 
 ## Enhanced Tools
 
@@ -86,6 +86,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_change_orders_by_origin` | Read-only | List AppStack change orders by creation origin. Use this to trace deployments back to their source (e.g., a Flow pipeline). |
 | `list_change_order_job_logs` | Read-only | List logs for an AppStack change order job. Job logs capture deployment script output. |
 | `find_task_operation_log` | Read-only | Get an AppStack deployment task operation log. Operation logs record manual or automated actions taken during deployment. |
+| `create_change_order` | Write-capable | Create an AppStack change order (deployment order). Change orders trigger application deployments to environments. This is a write operation and requires read_only=false. |
 
 ### search_app_templates
 
@@ -1014,4 +1015,18 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `jobSn` | string | Yes | Change order job serial number. Typically returned in change order details. |
 | `stageSn` | string | Yes | Deployment stage serial number. Typically returned in change order job details. |
 | `taskSn` | string | Yes | Deployment task serial number. Typically returned in change order stage details. |
+
+### create_change_order
+
+**Description**: Create an AppStack change order (deployment order). Change orders trigger application deployments to environments. This is a write operation and requires read_only=false.
+
+**Access**: Write-capable (requires `read_only=false`)
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `changeOrder` | string | Yes | JSON string with change order details: {changeOrderName, type (Deploy|Scale|Rollback|Destroy), envs (object), orchestrationRevisionSha, description}. |
 
