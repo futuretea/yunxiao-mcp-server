@@ -47,6 +47,7 @@ See [`flow-enhanced-tools.md`](flow-enhanced-tools.md) for detailed parameters a
 | `get_environment_overview` | environment info + variable groups + latest orchestration | Environment snapshot |
 | `get_release_overview` | release info + members + products + change requests | Release snapshot |
 | `get_system_overview` | system info + attached apps + members | System snapshot |
+| `get_app_release_stage_overview` | stage info + pipeline run + integrated metadata | Stage execution debugging |
 | `get_change_order_overview` | change order info + jobs | Deployment order details |
 
 See [`appstack-enhanced-tools.md`](appstack-enhanced-tools.md) for detailed parameters and examples.
@@ -63,7 +64,7 @@ See [`platform-enhanced-tools.md`](platform-enhanced-tools.md) for detailed para
 
 ## Quick Reference
 
-**Total enhanced tools**: 24 across 5 domains.
+**Total enhanced tools**: 25 across 5 domains.
 
 Use `--compact` to hide the 28 raw tools superseded by these enhanced tools.
 
