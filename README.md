@@ -73,7 +73,7 @@ See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other
 | **Projex** | 47 | 43 read-only + 4 write | Projects, iterations, work items, milestones, test cases |
 | **Codeup** | 37 | 31 read-only + 6 write | Repositories, branches, commits, MR, CR, code review |
 | **Flow** | 18 | 16 read-only + 2 write | Pipelines, runs, build tasks, validation |
-| **Appstack** | 60 | 56 read-only + 4 write | Applications, environments, releases, change orders |
+| **Appstack** | 62 | 58 read-only + 4 write | Applications, environments, releases, change orders |
 | **Platform** | 18 | read-only | Organizations, departments, members, roles |
 | **Packages** | 3 | read-only | Artifact repositories and versions |
 | **Lingma** | 6 | read-only | Knowledge bases and usage |
