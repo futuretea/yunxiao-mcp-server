@@ -17,7 +17,7 @@ make coverage-check   # verify 98% threshold
 
 Run locally (HTTP mode):
 ```bash
-./bin/yunxiao-mcp-server --mode http --port 8080
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server --port 8080
 ```
 
 Health check:
@@ -27,9 +27,11 @@ curl http://localhost:8080/healthz
 
 ## Environment
 
-The server reads configuration from a `.env` file or environment variables:
-- `YUNXiao_ACCESS_TOKEN` — default Yunxiao personal access token
-- `YUNXiao_ORGANIZATION_ID` — default organization ID (auto-injected when omitted in tool calls)
+Primary environment variables:
+- `YUNXIAO_MCP_ACCESS_TOKEN` — Yunxiao personal access token
+- `YUNXIAO_MCP_BASE_URL` — API base URL (defaults to `https://openapi-rdc.aliyuncs.com`)
+
+Legacy aliases `YUNXIAO_ACCESS_TOKEN` and `YUNXIAO_API_BASE_URL` are also supported. See `config.example.yaml` for all options.
 
 To test tool calls interactively, use an MCP client (e.g., `mcpc`) pointed at the server.
 
