@@ -39,6 +39,10 @@ var compactHiddenTools = map[string]struct{}{
 	"list_all_project_roles":           {},
 	"list_current_user_effort_records": {},
 	"list_estimated_efforts":           {},
+	"list_effort_records":              {},
+	"list_directories":                 {},
+	"list_test_plans":                  {},
+	"get_test_result_list":             {},
 
 	// AppStack (A) — superseded by get_application_overview, get_environment_overview, etc.
 	"get_application":  {},
@@ -77,6 +81,9 @@ var compactHiddenTools = map[string]struct{}{
 	"list_webhooks":              {},
 	"list_protected_branches":    {},
 	"list_push_rules":            {},
+	"list_tags":                  {},
+	"list_namespaces":            {},
+	"list_group_members":         {},
 
 	// Flow (A) — superseded by get_pipeline_overview, get_pipeline_run_overview
 	"get_pipeline":     {},
@@ -84,6 +91,9 @@ var compactHiddenTools = map[string]struct{}{
 	// Flow (D) — specialized
 	"get_last_instance":              {},
 	"get_pipeline_emas_artifact_url": {},
+	"get_pipeline_artifact_url":      {},
+	"get_pipeline_scan_report_url":   {},
+	"list_pipeline_job_historys":     {},
 }
 
 // writeToolNames are tools that perform mutations and are excluded in read-only mode.
