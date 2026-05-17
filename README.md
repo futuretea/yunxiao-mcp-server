@@ -121,7 +121,7 @@ Legacy aliases: `YUNXIAO_ACCESS_TOKEN`, `YUNXIAO_API_BASE_URL`.
 | Flag | Default | Purpose |
 |------|---------|---------|
 | `--read-only` | `true` | Set `false` to enable write tools |
-| `--compact` | `false` | Hide raw tools with enhanced alternatives |
+| `--compact` | `true` | Hide raw tools with enhanced alternatives (set `false` to show all) |
 | `--enabled-tools` | — | Explicit tool allow-list |
 | `--disabled-tools` | — | Explicit tool deny-list |
 | `--enable-domains` | — | Domain allow-list |

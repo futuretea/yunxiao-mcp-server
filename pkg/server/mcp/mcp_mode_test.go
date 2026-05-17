@@ -144,6 +144,61 @@ func TestNewServerDisableDomainsBlacklist(t *testing.T) {
 	}
 }
 
+func TestNewServerDefaultCompactHidesRawTools(t *testing.T) {
+	// Default CompactMode=true means raw tools with enhanced alternatives are hidden
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		CompactMode:           true,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+	for _, name := range enabled {
+		if name == "get_application" {
+			t.Fatalf("default compact should hide get_application, got %v", enabled)
+		}
+		if name == "get_pipeline" {
+			t.Fatalf("default compact should hide get_pipeline, got %v", enabled)
+		}
+	}
+}
+
+func TestNewServerNoCompactShowsAllTools(t *testing.T) {
+	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		CompactMode:           false,
+	}})
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	enabled := s.GetEnabledTools()
+	hasGetApplication := false
+	hasGetPipeline := false
+	for _, name := range enabled {
+		if name == "get_application" {
+			hasGetApplication = true
+		}
+		if name == "get_pipeline" {
+			hasGetPipeline = true
+		}
+	}
+	if !hasGetApplication {
+		t.Fatal("compact=false should show get_application")
+	}
+	if !hasGetPipeline {
+		t.Fatal("compact=false should show get_pipeline")
+	}
+}
+
 func TestNewServerEnableDomainsWithCompact(t *testing.T) {
 	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
 		BaseURL:               config.DefaultBaseURL,

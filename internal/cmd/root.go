@@ -56,7 +56,7 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 	command.Flags().StringSlice("disabled-tools", []string{}, "comma-separated list of tool names to disable")
 	command.Flags().StringSlice("enable-domains", []string{}, "comma-separated list of tool domains to enable (e.g. platform,projex)")
 	command.Flags().StringSlice("disable-domains", []string{}, "comma-separated list of tool domains to disable (e.g. codeup,flow)")
-	command.Flags().Bool("compact", false, "hide raw API tools that have enhanced overview alternatives, reducing the visible tool surface")
+	command.Flags().Bool("compact", true, "hide raw API tools that have enhanced overview alternatives; set false to show all tools")
 	command.Flags().Int("request-timeout-seconds", 30, "Yunxiao API request timeout in seconds")
 
 	command.AddCommand(newVersionCommand(streams))
