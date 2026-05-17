@@ -4,7 +4,7 @@
 
 Let your AI coding assistant talk directly to [Alibaba Yunxiao](https://www.aliyun.com/product/yunxiao) — browse projects, track iterations, review code, and monitor pipelines without leaving your IDE.
 
-**Read-only by default, safety first.** 168 of 180 tools are read-only queries. 12 write operations require explicit `read_only=false`.
+**Read-only by default, safety first.** 170 of 182 tools are read-only queries. 12 write operations require explicit `read_only=false`.
 
 ---
 
@@ -70,13 +70,13 @@ See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other
 
 | Domain | Tools | Access | Description |
 |--------|-------|--------|-------------|
-| **Projex** | 45 | 41 read-only + 4 write | Projects, iterations, work items, milestones, test cases |
-| **Codeup** | 30 | 24 read-only + 6 write | Repositories, branches, commits, MR, CR, code review |
-| **Flow** | 10 | 8 read-only + 2 write | Pipelines, runs, build tasks, validation |
-| **Appstack** | 31 | read-only | Applications, environments, releases, change orders |
+| **Projex** | 47 | 43 read-only + 4 write | Projects, iterations, work items, milestones, test cases |
+| **Codeup** | 32 | 26 read-only + 6 write | Repositories, branches, commits, MR, CR, code review |
+| **Flow** | 16 | 14 read-only + 2 write | Pipelines, runs, build tasks, validation |
+| **Appstack** | 53 | read-only | Applications, environments, releases, change orders |
 | **Platform** | 18 | read-only | Organizations, departments, members, roles |
-| **Packages** | 2 | read-only | Artifact repositories and versions |
-| **Lingma** | 4 | read-only | Knowledge bases and usage |
+| **Packages** | 3 | read-only | Artifact repositories and versions |
+| **Lingma** | 6 | read-only | Knowledge bases and usage |
 | **API** | 1 | read-only | Generic API fallback |
 | **Meta** | 1 | read-only | Tool discovery |
 
@@ -121,8 +121,7 @@ Legacy aliases: `YUNXIAO_ACCESS_TOKEN`, `YUNXIAO_API_BASE_URL`.
 | Flag | Default | Purpose |
 |------|---------|---------|
 | `--read-only` | `true` | Set `false` to enable write tools |
-| `--project-focused` | `false` | Platform + Projex only |
-| `--minimal` | `false` | Minimal toolset (~14 core tools) |
+| `--compact` | `false` | Hide raw tools with enhanced alternatives |
 | `--enabled-tools` | — | Explicit tool allow-list |
 | `--disabled-tools` | — | Explicit tool deny-list |
 | `--enable-domains` | — | Domain allow-list |
@@ -157,7 +156,7 @@ http://localhost:3000/sse?yunxiao_access_token=<token>
 
 ## Security
 
-- **Read-only by default**: 168 tools safe for exploration without write access.
+- **Read-only by default**: 170 tools safe for exploration without write access.
 - **Explicit write opt-in**: 12 write tools require manual `read_only=false`.
 - **Per-request token**: HTTP/SSE support request-level token override for multi-tenant use.
 - **No sensitive endpoints**: Admin audit logs, PAT queries, and other high-privilege endpoints are excluded.

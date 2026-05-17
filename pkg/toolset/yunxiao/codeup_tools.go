@@ -93,6 +93,30 @@ func codeupFileAndCommitTools() []toolset.ServerTool {
 			),
 			Handler: handleListCommits,
 		},
+		{
+			Tool: mcp.NewTool("get_commit",
+				mcp.WithDescription("Get a single CodeUp commit by SHA. Use list_commits to discover valid commit SHAs. For a comprehensive view with statuses and check runs, use get_commit_overview instead."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("sha", mcp.Required(), mcp.Description("Commit SHA (full 40-character hash). Use list_commits to discover valid SHAs.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetCommit,
+		},
+		{
+			Tool: mcp.NewTool("compare",
+				mcp.WithDescription("Compare two commits, branches, or tags in a CodeUp repository. Returns the diff between the two refs."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("repositoryId", mcp.Required(), mcp.Description("Repository numeric ID or full path such as org/repo.")),
+				mcp.WithString("from", mcp.Required(), mcp.Description("Source commit SHA, branch, or tag.")),
+				mcp.WithString("to", mcp.Required(), mcp.Description("Target commit SHA, branch, or tag.")),
+				mcp.WithString("sourceType", mcp.Description("Source ref type: branch, tag, or commit.")),
+				mcp.WithString("targetType", mcp.Description("Target ref type: branch, tag, or commit.")),
+				mcp.WithString("straight", mcp.Description("Whether to compare directly without merge base.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleCompare,
+		},
 	}
 }
 
