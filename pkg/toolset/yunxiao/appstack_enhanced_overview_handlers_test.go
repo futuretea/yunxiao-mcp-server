@@ -226,3 +226,41 @@ func TestEnhancedOverviewHandlersRequireParams(t *testing.T) {
 		t.Fatal("expected getClient error")
 	}
 }
+
+func TestHandleGetAppReleaseWorkflowOverviewCombinesResponses(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		switch callCount {
+		case 1:
+			_, _ = w.Write([]byte(`{"name":"wf-1"}`))
+		case 2:
+			if !strings.Contains(r.URL.Path, "/releaseStageBriefs") {
+				t.Fatalf("path = %q", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`[{"sn":"stage-1"}]`))
+		default:
+			t.Fatalf("unexpected request %d", callCount)
+		}
+	})
+
+	result, err := handleGetAppReleaseWorkflowOverview(context.Background(), client, map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "wf-1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetAppReleaseWorkflowOverview() error = %v", err)
+	}
+
+	var overview map[string]any
+	if err := json.Unmarshal([]byte(result), &overview); err != nil {
+		t.Fatalf("unmarshal result: %v", err)
+	}
+	if _, ok := overview["workflow"]; !ok {
+		t.Fatal("overview missing workflow")
+	}
+	if _, ok := overview["stageBriefs"]; !ok {
+		t.Fatal("overview missing stageBriefs")
+	}
+}
