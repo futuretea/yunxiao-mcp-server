@@ -99,11 +99,10 @@ func TestHandleGetChangeOrderOverviewWithoutJobs(t *testing.T) {
 	callCount := 0
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		callCount++
-		if callCount == 1 {
-			_, _ = w.Write([]byte(`{"sn":"co-1"}`))
-		} else {
+		if callCount > 1 {
 			t.Fatalf("unexpected request %d", callCount)
 		}
+		_, _ = w.Write([]byte(`{"sn":"co-1"}`))
 	})
 
 	result, err := handleGetChangeOrderOverview(context.Background(), client, map[string]any{
@@ -129,7 +128,7 @@ func TestHandleGetSystemOverviewWithoutApps(t *testing.T) {
 	callCount := 0
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		callCount++
-		if callCount == 1 {
+		if callCount == 1 { //nolint:staticcheck
 			_, _ = w.Write([]byte(`{"name":"sys-1"}`))
 		} else if callCount == 2 {
 			if !strings.Contains(r.URL.Path, "/members") {
