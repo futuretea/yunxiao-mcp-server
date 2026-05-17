@@ -2,16 +2,21 @@ package yunxiao
 
 import "github.com/futuretea/yunxiao-mcp-server/pkg/toolset"
 
-// compactHiddenTools are raw tools superseded by enhanced overview alternatives.
-// The rule: if get_X_overview exists, hide get_X.
+// compactHiddenTools are tools hidden in compact mode (default on).
+// Categories: (A) raw getters with enhanced overview alternatives,
+// (B) list tools whose data is included in enhanced overviews,
+// (C) briefs that have full-detail alternatives,
+// (D) very specialized tools rarely needed by LLMs.
 var compactHiddenTools = map[string]struct{}{
-	// Platform — superseded by get_organization_overview, get_organization_department_overview, get_organization_group_overview
+	// Platform (A) — superseded by get_organization_overview, get_organization_department_overview, get_organization_group_overview
 	"get_organization":                      {},
 	"get_organization_department_info":      {},
 	"get_organization_department_ancestors": {},
 	"get_organization_group":                {},
+	// Platform (B) — included in enhanced overviews
+	"list_organization_group_members": {},
 
-	// Projex — superseded by get_project_overview, get_sprint_overview, get_project_workitem_detail, etc.
+	// Projex (A) — superseded by get_project_overview, get_sprint_overview, get_project_workitem_detail, etc.
 	"get_project":                     {},
 	"get_sprint":                      {},
 	"get_workitem":                    {},
@@ -26,21 +31,40 @@ var compactHiddenTools = map[string]struct{}{
 	"get_work_item_type_field_config": {},
 	"get_work_item_workflow":          {},
 
-	// AppStack — superseded by get_application_overview, get_environment_overview, etc.
+	// AppStack (A) — superseded by get_application_overview, get_environment_overview, etc.
 	"get_application":  {},
 	"get_environment":  {},
 	"get_change_order": {},
 	"get_release":      {},
+	// AppStack (B) — included in enhanced overviews
+	"list_environments":             {},
+	"list_application_members":      {},
+	"list_release_members":          {},
+	"list_release_products":         {},
+	"list_attached_change_requests": {},
+	"list_attached_apps":            {},
+	"list_system_members":           {},
+	// AppStack (C) — briefs with full-detail alternatives
+	"list_app_release_workflow_briefs": {},
+	"list_app_release_stage_briefs":    {},
+	// AppStack (D) — specialized metadata
+	"get_app_variable_groups_revision": {},
+	"list_application_sources":         {},
 
-	// CodeUp — superseded by get_repository_overview, get_branch_overview, etc.
+	// CodeUp (A) — superseded by get_repository_overview, get_branch_overview, get_commit_overview, get_change_request_overview
 	"get_repository":     {},
 	"get_branch":         {},
 	"get_commit":         {},
 	"get_change_request": {},
+	// CodeUp (D) — specialized
+	"list_template_repositories": {},
 
-	// Flow — superseded by get_pipeline_overview, get_pipeline_run_overview
+	// Flow (A) — superseded by get_pipeline_overview, get_pipeline_run_overview
 	"get_pipeline":     {},
 	"get_pipeline_run": {},
+	// Flow (D) — specialized
+	"get_last_instance":              {},
+	"get_pipeline_emas_artifact_url": {},
 }
 
 // writeToolNames are tools that perform mutations and are excluded in read-only mode.
