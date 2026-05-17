@@ -2,6 +2,9 @@ package yunxiao
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"net/url"
 )
 
@@ -130,6 +133,37 @@ func handleGetAppReleaseStagePipelineJobLog(ctx context.Context, client any, par
 
 	path := appstackReleaseStageExecutionPath(organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber) + ":pipelineJobLog"
 	return c.GetJSON(ctx, path, query)
+}
+
+func handleExecuteAppReleaseStage(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, appName, releaseWorkflowSn, err := requiredAppReleaseWorkflow(params)
+	if err != nil {
+		return "", err
+	}
+	releaseStageSn, err := requiredString(params, "releaseStageSn")
+	if err != nil {
+		return "", err
+	}
+	executionJSON, err := requiredString(params, "execution")
+	if err != nil {
+		return "", err
+	}
+	var execution any
+	if err := json.Unmarshal([]byte(executionJSON), &execution); err != nil {
+		return "", fmt.Errorf("invalid execution JSON: %w", err)
+	}
+
+	path := appstackReleaseWorkflowResourcePath(organizationID, appName, releaseWorkflowSn) + "/releaseStages/" + url.PathEscape(releaseStageSn) + ":execute"
+	resp, err := c.Request(ctx, http.MethodPost, path, nil, execution)
+	if err != nil {
+		return "", err
+	}
+	return prettyResponseJSON(resp), nil
 }
 
 func requiredAppReleaseWorkflow(params map[string]any) (string, string, string, error) {
