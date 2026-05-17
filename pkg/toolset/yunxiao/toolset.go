@@ -98,22 +98,22 @@ var compactHiddenTools = map[string]struct{}{
 
 // writeToolNames are tools that perform mutations and are excluded in read-only mode.
 var writeToolNames = map[string]struct{}{
-	"create_workitem":            {},
-	"update_workitem":            {},
-	"update_workitem_status":     {},
-	"add_workitem_comment":       {},
-	"create_change_request":      {},
-	"add_change_request_comment": {},
-	"create_merge_request":       {},
-	"close_change_request":       {},
-	"reopen_change_request":      {},
-	"merge_change_request":       {},
-	"pass_pipeline_validate":     {},
-	"refuse_pipeline_validate":   {},
-	"create_change_order":        {},
-	"execute_job_action":            {},
-	"execute_system_release_stage":  {},
-	"execute_app_release_stage":     {},
+	"create_workitem":              {},
+	"update_workitem":              {},
+	"update_workitem_status":       {},
+	"add_workitem_comment":         {},
+	"create_change_request":        {},
+	"add_change_request_comment":   {},
+	"create_merge_request":         {},
+	"close_change_request":         {},
+	"reopen_change_request":        {},
+	"merge_change_request":         {},
+	"pass_pipeline_validate":       {},
+	"refuse_pipeline_validate":     {},
+	"create_change_order":          {},
+	"execute_job_action":           {},
+	"execute_system_release_stage": {},
+	"execute_app_release_stage":    {},
 }
 
 // Toolset exposes Yunxiao OpenAPI tools.

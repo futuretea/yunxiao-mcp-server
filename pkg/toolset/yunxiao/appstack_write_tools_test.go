@@ -55,3 +55,81 @@ func TestHandleCreateChangeOrderRequiresParams(t *testing.T) {
 		t.Fatal("expected getClient error")
 	}
 }
+
+func TestHandleExecuteJobActionBuildsPathAndBody(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if !strings.Contains(r.URL.Path, ":execute") {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"sn":"co-1"}`))
+	})
+
+	result, err := handleExecuteJobAction(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "changeOrderSn": "co-1", "jobSn": "job-1",
+		"action": `{"actionType":"RESUME"}`,
+	})
+	if err != nil {
+		t.Fatalf("handleExecuteJobAction() error = %v", err)
+	}
+	if !strings.Contains(result, "co-1") {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleExecuteJobActionRequiresParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request")
+	})
+
+	if _, err := handleExecuteJobAction(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleExecuteJobAction(context.Background(), "invalid-client", map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "changeOrderSn": "co-1", "jobSn": "job-1", "action": `{}`,
+	}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestHandleExecuteSystemReleaseStageBuildsPathAndBody(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.URL.Path, ":execute") {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"pipelineRunId":123}`))
+	})
+
+	result, err := handleExecuteSystemReleaseStage(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "systemName": "sys-1", "releaseWorkflowSn": "wf-1", "releaseStageSn": "stage-1",
+		"execution": `{"params":{"key":"val"}}`,
+	})
+	if err != nil {
+		t.Fatalf("handleExecuteSystemReleaseStage() error = %v", err)
+	}
+	if !strings.Contains(result, "pipelineRunId") {
+		t.Fatalf("result = %q", result)
+	}
+}
+
+func TestHandleExecuteAppReleaseStageBuildsPathAndBody(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.URL.Path, ":execute") {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"pipelineRunId":456}`))
+	})
+
+	result, err := handleExecuteAppReleaseStage(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "wf-1", "releaseStageSn": "stage-1",
+		"execution": `{}`,
+	})
+	if err != nil {
+		t.Fatalf("handleExecuteAppReleaseStage() error = %v", err)
+	}
+	if !strings.Contains(result, "pipelineRunId") {
+		t.Fatalf("result = %q", result)
+	}
+}
