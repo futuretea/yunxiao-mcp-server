@@ -93,6 +93,60 @@ func systemOverviewFilters(params map[string]any) map[string]any {
 	}
 }
 
+func handleGetAppReleaseStageOverview(ctx context.Context, client any, params map[string]any) (string, error) {
+	organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber, err := requiredAppReleaseStageExecution(params)
+	if err != nil {
+		return "", err
+	}
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	execPath := appstackReleaseStageExecutionPath(organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber)
+
+	overview := map[string]any{
+		"filters": stageOverviewFilters(params),
+	}
+
+	if optionalBoolDefault(params, "includeStageInfo", true) {
+		stagePath := appstackReleaseStageResourcePath(organizationID, appName, releaseWorkflowSn, releaseStageSn)
+		stage, err := c.GetJSON(ctx, stagePath, nil)
+		if err != nil {
+			return "", err
+		}
+		overview["stage"] = stage
+	}
+
+	if optionalBoolDefault(params, "includePipelineRun", true) {
+		pipelineRun, err := c.GetJSON(ctx, execPath+":getPipelineRun", nil)
+		if err != nil {
+			overview["pipelineRunError"] = err.Error()
+		} else {
+			overview["pipelineRun"] = pipelineRun
+		}
+	}
+
+	if optionalBoolDefault(params, "includeMetadata", true) {
+		metadata, err := c.GetJSON(ctx, execPath+"/integratedMetadata", nil)
+		if err != nil {
+			overview["metadataError"] = err.Error()
+		} else {
+			overview["metadata"] = metadata
+		}
+	}
+
+	return marshalPretty(overview)
+}
+
+func stageOverviewFilters(params map[string]any) map[string]any {
+	return map[string]any{
+		"includeStageInfo":   optionalBoolDefault(params, "includeStageInfo", true),
+		"includePipelineRun": optionalBoolDefault(params, "includePipelineRun", true),
+		"includeMetadata":    optionalBoolDefault(params, "includeMetadata", true),
+	}
+}
+
 func changeOrderOverviewFilters(params map[string]any) map[string]any {
 	return map[string]any{
 		"includeJobLogs": optionalBoolDefault(params, "includeJobLogs", true),
