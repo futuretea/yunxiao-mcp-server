@@ -121,7 +121,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server
 | 参数 | 默认 | 作用 |
 |------|------|------|
 | `--read-only` | `true` | 只读模式。设为 `false` 开启写操作 |
-| `--compact` | `false` | 隐藏有增强替代的基础 API 工具 |
+| `--compact` | `true` | 隐藏有增强替代的基础 API 工具（设为 `false` 显示全部） |
 | `--enabled-tools` | — | 按名称白名单启用 |
 | `--disabled-tools` | — | 按名称黑名单禁用 |
 | `--enable-domains` | — | 按领域白名单启用 |

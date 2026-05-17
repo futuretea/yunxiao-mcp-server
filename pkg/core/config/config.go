@@ -76,7 +76,7 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	v.SetDefault("disabled_tools", []string{})
 	v.SetDefault("enabled_domains", []string{})
 	v.SetDefault("disabled_domains", []string{})
-	v.SetDefault("compact", false)
+	v.SetDefault("compact", true)
 	v.SetDefault("request_timeout_seconds", 30)
 
 	if configPath != "" {
