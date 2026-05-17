@@ -71,5 +71,20 @@ func appstackEnhancedTools() []toolset.ServerTool {
 			),
 			Handler: handleGetChangeOrderOverview,
 		},
+		{
+			Tool: mcp.NewTool("get_app_release_stage_overview",
+				mcp.WithDescription("Get a comprehensive overview of an AppStack application release stage execution including stage info, pipeline run, and integrated metadata in one read-only call. Use this after discovering executions via list_app_release_stage_runs."),
+				mcp.WithString("organizationId", mcp.Description("Yunxiao organization ID. When omitted, the server uses the user's default organization.")),
+				mcp.WithString("appName", mcp.Required(), mcp.Description("Application name. Use list_applications to discover valid app names.")),
+				mcp.WithString("releaseWorkflowSn", mcp.Required(), mcp.Description("Release workflow serial number. Use list_app_release_workflows to discover valid values.")),
+				mcp.WithString("releaseStageSn", mcp.Required(), mcp.Description("Release stage serial number. Use list_app_release_stage_runs to discover valid values.")),
+				mcp.WithString("executionNumber", mcp.Required(), mcp.Description("Release stage execution number. Use list_app_release_stage_runs to discover valid values.")),
+				mcp.WithBoolean("includeStageInfo", mcp.Description("Whether to include stage details. Defaults to true.")),
+				mcp.WithBoolean("includePipelineRun", mcp.Description("Whether to include pipeline run info. Defaults to true.")),
+				mcp.WithBoolean("includeMetadata", mcp.Description("Whether to include integrated metadata (linked work items, commits). Defaults to true.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetAppReleaseStageOverview,
+		},
 	}
 }
