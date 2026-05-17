@@ -1,8 +1,8 @@
 # Appstack Tools
 
-This document describes the 57 MCP tools in the appstack domain.
+This document describes the 58 MCP tools in the appstack domain.
 
-Access summary: 56 read-only, 1 write-capable.
+Access summary: 56 read-only, 2 write-capable.
 
 ## Enhanced Tools
 
@@ -87,6 +87,7 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_change_order_job_logs` | Read-only | List logs for an AppStack change order job. Job logs capture deployment script output. |
 | `find_task_operation_log` | Read-only | Get an AppStack deployment task operation log. Operation logs record manual or automated actions taken during deployment. |
 | `create_change_order` | Write-capable | Create an AppStack change order (deployment order). Change orders trigger application deployments to environments. This is a write operation and requires read_only=false. |
+| `execute_job_action` | Write-capable | Execute an action on an AppStack change order job. Use this to suspend, resume, rollback, or stop a deployment job. This is a write operation and requires read_only=false. |
 
 ### search_app_templates
 
@@ -1029,4 +1030,20 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
 | `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
 | `changeOrder` | string | Yes | JSON string with change order details: {changeOrderName, type (Deploy|Scale|Rollback|Destroy), envs (object), orchestrationRevisionSha, description}. |
+
+### execute_job_action
+
+**Description**: Execute an action on an AppStack change order job. Use this to suspend, resume, rollback, or stop a deployment job. This is a write operation and requires read_only=false.
+
+**Access**: Write-capable (requires `read_only=false`)
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | No | Yunxiao organization ID. When omitted, the server uses the user's default organization. |
+| `appName` | string | Yes | Application name. Use list_applications to discover valid app names. |
+| `changeOrderSn` | string | Yes | Change order serial number. Use list_change_order_versions to discover valid values. |
+| `jobSn` | string | Yes | Job serial number. Typically returned in change order job details. |
+| `action` | string | Yes | JSON string with job action: {actionType: SUSPEND|RESUME|ROLLBACK|STOP}. |
 

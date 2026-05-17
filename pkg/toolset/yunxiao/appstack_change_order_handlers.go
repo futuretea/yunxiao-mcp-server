@@ -113,6 +113,33 @@ func handleCreateChangeOrder(ctx context.Context, client any, params map[string]
 	return prettyResponseJSON(resp), nil
 }
 
+func handleExecuteJobAction(ctx context.Context, client any, params map[string]any) (string, error) {
+	c, err := getClient(client)
+	if err != nil {
+		return "", err
+	}
+
+	organizationID, appName, changeOrderSn, jobSn, err := requiredAppChangeOrderJob(params)
+	if err != nil {
+		return "", err
+	}
+	actionJSON, err := requiredString(params, "action")
+	if err != nil {
+		return "", err
+	}
+	var action any
+	if err := json.Unmarshal([]byte(actionJSON), &action); err != nil {
+		return "", fmt.Errorf("invalid action JSON: %w", err)
+	}
+
+	path := appstackChangeOrderPath(organizationID, appName, changeOrderSn) + "/jobs/" + url.PathEscape(jobSn) + ":execute"
+	resp, err := c.Request(ctx, http.MethodPut, path, nil, action)
+	if err != nil {
+		return "", err
+	}
+	return prettyResponseJSON(resp), nil
+}
+
 func handleListChangeOrdersByOrigin(ctx context.Context, client any, params map[string]any) (string, error) {
 	c, err := getClient(client)
 	if err != nil {
