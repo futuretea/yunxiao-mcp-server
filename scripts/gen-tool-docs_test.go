@@ -164,3 +164,30 @@ func TestWriteDomainDocSortsPaginationModes(t *testing.T) {
 		t.Fatalf("pagination modes not sorted, want sequence %q\n%s", want, content)
 	}
 }
+
+func TestExtractDomain(t *testing.T) {
+	tests := []struct {
+		filename string
+		want     string
+	}{
+		{"platform_tools.go", "platform"},
+		{"platform_enhanced_tools.go", "platform"},
+		{"codeup_write_tools.go", "codeup"},
+		{"flow_tools.go", "flow"},
+		{"flow_write_tools.go", "flow"},
+		{"appstack_tools.go", "appstack"},
+		{"projex_tools.go", "projex"},
+		{"packages_tools.go", "packages"},
+		{"lingma_tools.go", "lingma"},
+		{"capability_tools.go", ""},
+		{"unknown_domain_tools.go", ""},
+		{"not_a_tools_file.go", ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.filename, func(t *testing.T) {
+			if got := extractDomain(tt.filename); got != tt.want {
+				t.Fatalf("extractDomain(%q) = %q, want %q", tt.filename, got, tt.want)
+			}
+		})
+	}
+}
