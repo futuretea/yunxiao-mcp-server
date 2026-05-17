@@ -50,7 +50,6 @@ var compactHiddenTools = map[string]struct{}{
 	"get_change_order": {},
 	"get_release":      {},
 	// AppStack (B) — included in enhanced overviews
-	"list_environments":             {},
 	"list_application_members":      {},
 	"list_release_members":          {},
 	"list_release_products":         {},
@@ -59,7 +58,6 @@ var compactHiddenTools = map[string]struct{}{
 	"list_system_members":           {},
 	// AppStack (C) — briefs with full-detail alternatives
 	"list_app_release_workflow_briefs": {},
-	"list_app_release_stage_briefs":    {},
 	// AppStack (D) — specialized metadata
 	"get_app_variable_groups_revision": {},
 	"list_application_sources":         {},
@@ -82,7 +80,6 @@ var compactHiddenTools = map[string]struct{}{
 	"list_protected_branches":    {},
 	"list_push_rules":            {},
 	"list_tags":                  {},
-	"list_namespaces":            {},
 	"list_group_members":         {},
 
 	// Flow (A) — superseded by get_pipeline_overview, get_pipeline_run_overview
