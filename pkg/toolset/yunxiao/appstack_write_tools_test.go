@@ -133,3 +133,51 @@ func TestHandleExecuteAppReleaseStageBuildsPathAndBody(t *testing.T) {
 		t.Fatalf("result = %q", result)
 	}
 }
+
+func TestHandleExecuteSystemReleaseStageRequiresParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request")
+	})
+
+	if _, err := handleExecuteSystemReleaseStage(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleExecuteSystemReleaseStage(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "systemName": "sys-1", "releaseWorkflowSn": "wf-1", "releaseStageSn": "stage-1",
+	}); err == nil {
+		t.Fatal("expected missing execution error")
+	}
+	if _, err := handleExecuteSystemReleaseStage(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "systemName": "sys-1", "releaseWorkflowSn": "wf-1", "releaseStageSn": "stage-1",
+		"execution": "not-json",
+	}); err == nil {
+		t.Fatal("expected invalid JSON error")
+	}
+	if _, err := handleExecuteSystemReleaseStage(context.Background(), "invalid-client", map[string]any{
+		"organizationId": "org-1", "systemName": "sys-1", "releaseWorkflowSn": "wf-1", "releaseStageSn": "stage-1",
+		"execution": `{}`,
+	}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
+
+func TestHandleExecuteAppReleaseStageRequiresParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request")
+	})
+
+	if _, err := handleExecuteAppReleaseStage(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing params error")
+	}
+	if _, err := handleExecuteAppReleaseStage(context.Background(), client, map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "wf-1", "releaseStageSn": "stage-1",
+	}); err == nil {
+		t.Fatal("expected missing execution error")
+	}
+	if _, err := handleExecuteAppReleaseStage(context.Background(), "invalid-client", map[string]any{
+		"organizationId": "org-1", "appName": "app-1", "releaseWorkflowSn": "wf-1", "releaseStageSn": "stage-1",
+		"execution": `{}`,
+	}); err == nil {
+		t.Fatal("expected getClient error")
+	}
+}
