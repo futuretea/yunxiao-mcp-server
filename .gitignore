@@ -4,7 +4,8 @@ third-party-projects/
 .auto-runs/
 .qoder/
 /yunxiao-mcp-server
-bin/
+/bin/
+npm/yunxiao-mcp-server-*/bin/
 dist/
 coverage.out
 coverage.html
