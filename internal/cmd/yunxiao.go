@@ -130,6 +130,7 @@ func newYunxiaoTaskCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *
 		Short:   "work with Projex tasks",
 	}
 	command.AddCommand(newYunxiaoTaskListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTaskViewCommand(streams, cfgFile, v))
 	return command
 }
 
