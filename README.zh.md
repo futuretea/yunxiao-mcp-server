@@ -81,6 +81,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo branch list --repositor
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo branch view <branch-name> --repository-id <repository-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo change-request list --project-ids <repository-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo change-request view <local-id> --repository-id <repository-id>
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo mr list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo commit list --repository-id <repository-id> --ref <branch>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo commit view <sha> --repository-id <repository-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo compare <from> <to> --repository-id <repository-id>
