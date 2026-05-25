@@ -71,6 +71,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project role list --project-
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo branch list --repository-id <repository-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo commit list --repository-id <repository-id> --ref <branch>
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo commit view <sha> --repository-id <repository-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao sprint list --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao sprint view <sprint-id> --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task list --project-id <project-id>
