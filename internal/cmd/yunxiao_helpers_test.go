@@ -153,8 +153,17 @@ func TestTaskRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
 	}
 }
 
+func TestStringifyCLIValueFormatsBools(t *testing.T) {
+	if got := stringifyCLIValue(true); got != "true" {
+		t.Fatalf("stringifyCLIValue(true) = %q, want true", got)
+	}
+	if got := stringifyCLIValue(false); got != "false" {
+		t.Fatalf("stringifyCLIValue(false) = %q, want false", got)
+	}
+}
+
 func TestStringifyCLIValueReturnsEmptyForUnsupportedTypes(t *testing.T) {
-	if got := stringifyCLIValue(true); got != "" {
-		t.Fatalf("stringifyCLIValue(true) = %q, want empty string", got)
+	if got := stringifyCLIValue([]string{"unsupported"}); got != "" {
+		t.Fatalf("stringifyCLIValue(slice) = %q, want empty string", got)
 	}
 }

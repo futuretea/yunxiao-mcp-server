@@ -53,6 +53,8 @@ func stringifyCLIValue(value any) string {
 		return typed
 	case float64:
 		return fmt.Sprintf("%.0f", typed)
+	case bool:
+		return fmt.Sprintf("%t", typed)
 	case map[string]any:
 		return firstStringValue(typed, "name", "displayName", "nickName", "id", "identifier")
 	default:
