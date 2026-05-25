@@ -70,6 +70,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run list --pipeline
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run view <pipeline-run-id> --pipeline-id <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline view <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline job list --pipeline-id <pipeline-id> --category DEPLOY
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline job log --pipeline-id <pipeline-id> --run-id <run-id> --job-id <job-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member list --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project role list --project-id <project-id>
