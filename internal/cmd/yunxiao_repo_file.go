@@ -25,6 +25,7 @@ func newYunxiaoRepoFileCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 		Short:   "work with CodeUp repository files",
 	}
 	command.AddCommand(newYunxiaoRepoFileListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoRepoFileViewCommand(streams, cfgFile, v))
 	return command
 }
 

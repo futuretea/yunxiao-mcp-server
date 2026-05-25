@@ -151,6 +151,9 @@ func TestHandleGetFileBlobsEncodesFilePath(t *testing.T) {
 		if r.URL.Query().Get("ref") != "main" {
 			t.Fatalf("query = %q", r.URL.RawQuery)
 		}
+		if r.URL.Query().Get("since") != "2026-05-01T00:00:00Z" {
+			t.Fatalf("query = %q", r.URL.RawQuery)
+		}
 		_, _ = w.Write([]byte(`{"content":"package main"}`))
 	})
 
@@ -159,6 +162,7 @@ func TestHandleGetFileBlobsEncodesFilePath(t *testing.T) {
 		"repositoryId":   "group/repo",
 		"filePath":       "/src/main.go",
 		"ref":            "main",
+		"since":          "2026-05-01T00:00:00Z",
 	}); err != nil {
 		t.Fatalf("handleGetFileBlobs() error = %v", err)
 	}

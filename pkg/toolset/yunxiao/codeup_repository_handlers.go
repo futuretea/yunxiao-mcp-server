@@ -124,6 +124,7 @@ func handleGetFileBlobs(ctx context.Context, client any, params map[string]any) 
 
 	query := url.Values{}
 	query.Set("ref", ref)
+	setOptionalString(query, params, "since")
 
 	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/files/" + encodeFilePath(filePath)
 	return c.GetJSON(ctx, path, query)
