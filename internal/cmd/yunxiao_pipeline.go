@@ -28,6 +28,7 @@ func newYunxiaoPipelineCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 		Short:   "work with Flow pipelines",
 	}
 	command.AddCommand(newYunxiaoPipelineListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoPipelineViewCommand(streams, cfgFile, v))
 	return command
 }
 
