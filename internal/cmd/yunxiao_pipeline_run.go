@@ -51,7 +51,7 @@ func newYunxiaoPipelineRunListCommand(streams IOStreams, cfgFile *string, v *vip
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printPipelineRunList(streams.Out, result)

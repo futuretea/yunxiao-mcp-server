@@ -56,7 +56,7 @@ func newYunxiaoRepoCommitListCommand(streams IOStreams, cfgFile *string, v *vipe
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printRepoCommitList(streams.Out, result)

@@ -40,7 +40,7 @@ func newYunxiaoMemberListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printMemberList(streams.Out, result)

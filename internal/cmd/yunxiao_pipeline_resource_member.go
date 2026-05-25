@@ -45,7 +45,7 @@ func newYunxiaoPipelineResourceMemberListCommand(streams IOStreams, cfgFile *str
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printPipelineResourceMemberList(streams.Out, result)

@@ -155,7 +155,7 @@ func newYunxiaoTaskListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printTaskList(streams.Out, result)
@@ -224,7 +224,7 @@ func newYunxiaoToolsCallCommand(streams IOStreams, cfgFile *string, v *viper.Vip
 			if err != nil {
 				return err
 			}
-			_, _ = fmt.Fprintln(streams.Out, result)
+			printCLIJSON(streams.Out, result)
 			return nil
 		},
 	}
