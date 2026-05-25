@@ -28,6 +28,7 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 	}
 	command.AddCommand(newYunxiaoProjectListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectMemberCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectRoleCommand(streams, cfgFile, v))
 	return command
 }
 
