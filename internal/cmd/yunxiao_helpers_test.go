@@ -57,6 +57,22 @@ func TestParseToolParamsAcceptsEmptyInput(t *testing.T) {
 	}
 }
 
+func TestParseToolParamsReadsStdin(t *testing.T) {
+	params, err := parseToolParamsWithInput("{}", "-", strings.NewReader(`{"page":4}`))
+	if err != nil {
+		t.Fatalf("parseToolParamsWithInput() error = %v", err)
+	}
+	if got := params["page"]; got != float64(4) {
+		t.Fatalf("params[page] = %#v, want 4", got)
+	}
+}
+
+func TestParseToolParamsStdinRequiresInput(t *testing.T) {
+	if _, err := parseToolParamsWithInput("{}", "-", nil); err == nil {
+		t.Fatal("parseToolParamsWithInput() expected stdin input error")
+	}
+}
+
 func TestTaskListOptionsParamsIncludesFiltersAndPagination(t *testing.T) {
 	params, err := (taskListOptions{
 		OrganizationID: " org-1 ",

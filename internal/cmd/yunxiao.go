@@ -212,7 +212,7 @@ func newYunxiaoToolsCallCommand(streams IOStreams, cfgFile *string, v *viper.Vip
 			if err != nil {
 				return err
 			}
-			params, err := parseToolParams(rawParams, paramsFile)
+			params, err := parseToolParamsWithInput(rawParams, paramsFile, cmd.InOrStdin())
 			if err != nil {
 				return err
 			}
@@ -226,7 +226,7 @@ func newYunxiaoToolsCallCommand(streams IOStreams, cfgFile *string, v *viper.Vip
 		},
 	}
 	command.Flags().StringVar(&rawParams, "params", "{}", "tool parameters as a JSON object")
-	command.Flags().StringVar(&paramsFile, "params-file", "", "path to a JSON file containing tool parameters")
+	command.Flags().StringVar(&paramsFile, "params-file", "", "path to a JSON file containing tool parameters; use - to read stdin")
 	return command
 }
 
@@ -333,12 +333,27 @@ func printToolSummariesTable(out anyWriter, tools []toolset.ServerTool) error {
 }
 
 func parseToolParams(rawParams, paramsFile string) (map[string]any, error) {
+	return parseToolParamsWithInput(rawParams, paramsFile, nil)
+}
+
+func parseToolParamsWithInput(rawParams, paramsFile string, in io.Reader) (map[string]any, error) {
 	if strings.TrimSpace(paramsFile) != "" {
-		content, err := os.ReadFile(paramsFile)
-		if err != nil {
-			return nil, fmt.Errorf("read params file: %w", err)
+		if strings.TrimSpace(paramsFile) == "-" {
+			if in == nil {
+				return nil, fmt.Errorf("read params stdin: no input")
+			}
+			content, err := io.ReadAll(in)
+			if err != nil {
+				return nil, fmt.Errorf("read params stdin: %w", err)
+			}
+			rawParams = string(content)
+		} else {
+			content, err := os.ReadFile(paramsFile)
+			if err != nil {
+				return nil, fmt.Errorf("read params file: %w", err)
+			}
+			rawParams = string(content)
 		}
-		rawParams = string(content)
 	}
 	if strings.TrimSpace(rawParams) == "" {
 		return map[string]any{}, nil
