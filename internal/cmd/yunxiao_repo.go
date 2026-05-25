@@ -27,6 +27,7 @@ func newYunxiaoRepoCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *
 		Short:   "work with CodeUp repositories",
 	}
 	command.AddCommand(newYunxiaoRepoListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoRepoBranchCommand(streams, cfgFile, v))
 	return command
 }
 
