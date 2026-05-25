@@ -23,6 +23,7 @@ func newYunxiaoPipelineJobCommand(streams IOStreams, cfgFile *string, v *viper.V
 		Short:   "work with Flow pipeline jobs",
 	}
 	command.AddCommand(newYunxiaoPipelineJobListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoPipelineJobLogCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -94,6 +95,62 @@ type pipelineJobRow struct {
 	Name       string
 	Category   string
 	Status     string
+}
+
+type pipelineJobLogOptions struct {
+	OrganizationID string
+	PipelineID     string
+	PipelineRunID  string
+	JobID          string
+}
+
+func newYunxiaoPipelineJobLogCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options pipelineJobLogOptions
+	command := &cobra.Command{
+		Use:   "log",
+		Short: "get execution log for a pipeline job",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			params, err := options.params()
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_pipeline_job_run_log", params)
+			if err != nil {
+				return err
+			}
+			_, _ = fmt.Fprintln(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.PipelineID, "pipeline-id", "", "Flow pipeline ID")
+	flags.StringVar(&options.PipelineRunID, "run-id", "", "pipeline run ID")
+	flags.StringVar(&options.JobID, "job-id", "", "pipeline job ID")
+	return command
+}
+
+func (o pipelineJobLogOptions) params() (map[string]any, error) {
+	params := map[string]any{
+		"pipelineId":    strings.TrimSpace(o.PipelineID),
+		"pipelineRunId": strings.TrimSpace(o.PipelineRunID),
+		"jobId":         strings.TrimSpace(o.JobID),
+	}
+	if params["pipelineId"] == "" {
+		return nil, fmt.Errorf("pipeline-id is required")
+	}
+	if params["pipelineRunId"] == "" {
+		return nil, fmt.Errorf("run-id is required")
+	}
+	if params["jobId"] == "" {
+		return nil, fmt.Errorf("job-id is required")
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params, nil
 }
 
 func pipelineJobRowsFromJSON(raw string) []pipelineJobRow {
