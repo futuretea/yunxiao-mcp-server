@@ -349,7 +349,7 @@ func printToolSummariesJSON(out anyWriter, tools []toolset.ServerTool) error {
 
 func printToolSummariesTable(out anyWriter, tools []toolset.ServerTool) error {
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "NAME\tDOMAIN\tACCESS\tDESCRIPTION")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("NAME\tDOMAIN\tACCESS\tDESCRIPTION"))
 	for _, tool := range tools {
 		summary := newToolSummary(tool)
 		description := strings.ReplaceAll(summary.Description, "\n", " ")

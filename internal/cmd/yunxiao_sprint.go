@@ -102,7 +102,7 @@ func printSprintList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "ID\tNAME\tSTATUS")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tNAME\tSTATUS"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\n", row.ID, row.Name, row.Status)
 	}

@@ -103,7 +103,7 @@ func printRepoBranchList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "NAME\tDEFAULT\tPROTECTED\tLAST_COMMIT")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("NAME\tDEFAULT\tPROTECTED\tLAST_COMMIT"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.Name, row.Default, row.Protected, row.LastCommit)
 	}

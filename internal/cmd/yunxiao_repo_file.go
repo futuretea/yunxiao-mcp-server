@@ -95,7 +95,7 @@ func printRepoFileList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "PATH\tTYPE\tSIZE\tMODE")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("PATH\tTYPE\tSIZE\tMODE"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.Path, row.Type, row.Size, row.Mode)
 	}

@@ -230,8 +230,8 @@ func printToolDescription(out anyWriter, description toolDescription) error {
 	}
 	_, _ = fmt.Fprintf(writer, "REQUIRED\t%s\n", requiredText)
 	_, _ = fmt.Fprintln(writer)
-	_, _ = fmt.Fprintln(writer, "PARAMETERS")
-	_, _ = fmt.Fprintln(writer, "NAME\tTYPE\tREQUIRED\tDESCRIPTION")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("PARAMETERS"))
+	_, _ = fmt.Fprintln(writer, boldTableHeader("NAME\tTYPE\tREQUIRED\tDESCRIPTION"))
 	for _, parameter := range description.Parameters {
 		_, _ = fmt.Fprintf(
 			writer,

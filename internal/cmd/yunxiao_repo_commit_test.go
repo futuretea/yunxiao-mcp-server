@@ -221,7 +221,7 @@ func TestPrintRepoCommitListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printRepoCommitList(&out, `{"data":[]}`); err != nil {
 		t.Fatalf("printRepoCommitList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "SHA  SHORT_ID  TITLE  AUTHOR  DATE" {
+	if strings.TrimSpace(out.String()) != "[1mSHA  SHORT_ID  TITLE  AUTHOR  DATE[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

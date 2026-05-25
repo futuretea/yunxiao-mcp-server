@@ -88,7 +88,7 @@ func printPipelineJobList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "IDENTIFIER\tNAME\tCATEGORY\tSTATUS")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("IDENTIFIER\tNAME\tCATEGORY\tSTATUS"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.Identifier, row.Name, row.Category, row.Status)
 	}

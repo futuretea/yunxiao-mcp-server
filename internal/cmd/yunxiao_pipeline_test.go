@@ -166,7 +166,7 @@ func TestPrintPipelineListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printPipelineList(&out, `{"data":[]}`); err != nil {
 		t.Fatalf("printPipelineList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "ID  NAME  STATUS  LAST_RUN" {
+	if strings.TrimSpace(out.String()) != "[1mID  NAME  STATUS  LAST_RUN[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

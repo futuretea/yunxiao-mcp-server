@@ -124,7 +124,7 @@ func printRepoCommitList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "SHA\tSHORT_ID\tTITLE\tAUTHOR\tDATE")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("SHA\tSHORT_ID\tTITLE\tAUTHOR\tDATE"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t%s\n", row.SHA, row.ShortID, row.Title, row.Author, row.Date)
 	}

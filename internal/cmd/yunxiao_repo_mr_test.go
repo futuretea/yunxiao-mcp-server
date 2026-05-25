@@ -166,7 +166,7 @@ func TestPrintMRListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printMRList(&out, `{"data":[]}`); err != nil {
 		t.Fatalf("printMRList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "ID  IID  TITLE  STATE  AUTHOR  TARGET" {
+	if strings.TrimSpace(out.String()) != "\033[1mID  IID  TITLE  STATE  AUTHOR  TARGET\033[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

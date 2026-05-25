@@ -109,7 +109,7 @@ func printRepoList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "ID\tNAME\tPATH\tARCHIVED\tLAST_ACTIVITY")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tNAME\tPATH\tARCHIVED\tLAST_ACTIVITY"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t%s\n", row.ID, row.Name, row.Path, row.Archived, row.LastActivity)
 	}

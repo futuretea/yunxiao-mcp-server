@@ -173,7 +173,7 @@ func TestPrintPipelineJobListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printPipelineJobList(&out, `[]`); err != nil {
 		t.Fatalf("printPipelineJobList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "IDENTIFIER  NAME  CATEGORY  STATUS" {
+	if strings.TrimSpace(out.String()) != "[1mIDENTIFIER  NAME  CATEGORY  STATUS[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

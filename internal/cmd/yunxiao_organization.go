@@ -77,7 +77,7 @@ func printOrganizationList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "ID\tNAME")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tNAME"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\n", row.ID, row.Name)
 	}

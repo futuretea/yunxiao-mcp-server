@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+const ansiBold = "\033[1m"
+const ansiReset = "\033[0m"
+
+func boldTableHeader(line string) string {
+	return ansiBold + line + ansiReset
+}
+
 func setCLIStringParam(params map[string]any, key, value string) {
 	if value = strings.TrimSpace(value); value != "" {
 		params[key] = value
