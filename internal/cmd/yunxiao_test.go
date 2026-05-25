@@ -421,6 +421,39 @@ func TestYunxiaoCLIToolsCallReadsParamsFile(t *testing.T) {
 	}
 }
 
+func TestYunxiaoCLIToolsCallReadsParamsStdin(t *testing.T) {
+	var gotQuery string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/oapi/v1/platform/organizations":
+			_, _ = w.Write([]byte(`[{"id":"org-1"}]`))
+		case "/oapi/v1/platform/organizations/org-1/members":
+			gotQuery = r.URL.RawQuery
+			_, _ = w.Write([]byte(`[]`))
+		default:
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetIn(strings.NewReader(`{"page":3}`))
+	command.SetArgs([]string{
+		"--base-url", server.URL,
+		"--access-token", "token-1",
+		"--enabled-tools", "list_organization_members",
+		"tools", "call", "list_organization_members",
+		"--params-file", "-",
+	})
+
+	if err := command.Execute(); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if gotQuery != "page=3" {
+		t.Fatalf("query = %q, want page=3", gotQuery)
+	}
+}
+
 func TestYunxiaoCLIToolsCallRejectsReadOnlyWriteTool(t *testing.T) {
 	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
 	command.SetArgs([]string{
