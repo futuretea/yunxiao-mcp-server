@@ -40,7 +40,7 @@ func newYunxiaoRepoChangeRequestViewCommand(streams IOStreams, cfgFile *string, 
 			if err != nil {
 				return err
 			}
-			_, _ = fmt.Fprintln(streams.Out, result)
+			printCLIJSON(streams.Out, result)
 			return nil
 		},
 	}

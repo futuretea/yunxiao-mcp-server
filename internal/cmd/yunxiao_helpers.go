@@ -52,6 +52,20 @@ func firstStringValue(m map[string]any, keys ...string) string {
 	return ""
 }
 
+func printCLIJSON(out anyWriter, raw string) {
+	var obj any
+	if err := json.Unmarshal([]byte(raw), &obj); err != nil {
+		_, _ = fmt.Fprintln(out, raw)
+		return
+	}
+	pretty, err := json.MarshalIndent(obj, "", "  ")
+	if err != nil {
+		_, _ = fmt.Fprintln(out, raw)
+		return
+	}
+	_, _ = fmt.Fprintln(out, string(pretty))
+}
+
 func stringifyCLIValue(value any) string {
 	switch typed := value.(type) {
 	case string:

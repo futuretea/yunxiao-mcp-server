@@ -37,7 +37,7 @@ func newYunxiaoPipelineRunViewCommand(streams IOStreams, cfgFile *string, v *vip
 			if err != nil {
 				return err
 			}
-			_, _ = fmt.Fprintln(streams.Out, result)
+			printCLIJSON(streams.Out, result)
 			return nil
 		},
 	}

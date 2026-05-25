@@ -52,7 +52,7 @@ func newYunxiaoRepoChangeRequestListCommand(streams IOStreams, cfgFile *string, 
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printRepoChangeRequestList(streams.Out, result)
@@ -157,7 +157,7 @@ func newYunxiaoRepoCRPatchSetListCommand(streams IOStreams, cfgFile *string, v *
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printCRPatchSetList(streams.Out, result)

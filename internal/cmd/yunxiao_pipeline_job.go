@@ -46,7 +46,7 @@ func newYunxiaoPipelineJobListCommand(streams IOStreams, cfgFile *string, v *vip
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printPipelineJobList(streams.Out, result)
@@ -122,7 +122,7 @@ func newYunxiaoPipelineJobLogCommand(streams IOStreams, cfgFile *string, v *vipe
 			if err != nil {
 				return err
 			}
-			_, _ = fmt.Fprintln(streams.Out, result)
+			printCLIJSON(streams.Out, result)
 			return nil
 		},
 	}

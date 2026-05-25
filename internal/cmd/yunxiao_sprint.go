@@ -49,7 +49,7 @@ func newYunxiaoSprintListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 				return err
 			}
 			if options.JSONOutput {
-				_, _ = fmt.Fprintln(streams.Out, result)
+				printCLIJSON(streams.Out, result)
 				return nil
 			}
 			return printSprintList(streams.Out, result)
