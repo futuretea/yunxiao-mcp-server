@@ -43,6 +43,7 @@ func NewYunxiaoCLI(streams IOStreams) *cobra.Command {
 	command.AddCommand(newYunxiaoOrganizationCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoMemberCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoProjectCommand(streams, &cfgFile, v))
+	command.AddCommand(newYunxiaoSprintCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoTaskCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoToolsCommand(streams, &cfgFile, v))
 	return command
