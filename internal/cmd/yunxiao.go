@@ -262,7 +262,7 @@ func callYunxiaoTool(cmd *cobra.Command, cfg *config.StaticConfig, toolName stri
 	}
 	tool, ok := yunxiaoTools.FindTool(tools, toolName)
 	if !ok {
-		return "", fmt.Errorf("unknown Yunxiao tool %q", toolName)
+		return "", fmt.Errorf("unknown Yunxiao tool %q; run 'yunxiao tools list' to see available tools", toolName)
 	}
 	if err := yunxiaoTools.ValidateToolRequiredParams(tool, params, "organizationId"); err != nil {
 		return "", yunxiaoSDK.WrapError(err)
