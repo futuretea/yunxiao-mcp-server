@@ -26,6 +26,7 @@ func newYunxiaoSprintCommand(streams IOStreams, cfgFile *string, v *viper.Viper)
 		Short:   "work with Projex sprints",
 	}
 	command.AddCommand(newYunxiaoSprintListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoSprintViewCommand(streams, cfgFile, v))
 	return command
 }
 
