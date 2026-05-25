@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-BIN="${BIN:-./bin/yunxiao-mcp-server}"
+BIN="${BIN:-./bin/yunxiao}"
 PORT="${PORT:-39393}"
 HEALTH_URL="http://127.0.0.1:${PORT}/healthz"
 LOG_FILE="${TMPDIR:-/tmp}/yunxiao-mcp-server-smoke.$$.log"
@@ -20,10 +20,10 @@ if nc -z 127.0.0.1 "${PORT}" >/dev/null 2>&1; then
 	exit 1
 fi
 
-"${BIN}" version | grep "yunxiao-mcp-server version=" >/dev/null
+"${BIN}" version | grep "yunxiao version=" >/dev/null
 "${BIN}" --help >/dev/null
 
-"${BIN}" --port "${PORT}" --access-token smoke-token --log-level disabled >"${LOG_FILE}" 2>&1 &
+"${BIN}" mcp --port "${PORT}" --access-token smoke-token --log-level disabled >"${LOG_FILE}" 2>&1 &
 SERVER_PID=$!
 
 cleanup() {

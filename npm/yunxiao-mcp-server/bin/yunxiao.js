@@ -11,17 +11,16 @@ const BINARY_MAP = {
   win32_arm64: {name: 'yunxiao-mcp-server-windows-arm64', suffix: '.exe'},
 };
 
-// Resolving will fail if the optionalDependency was not installed or the platform/arch is not supported
 const resolveBinaryPath = () => {
   try {
     const binary = BINARY_MAP[`${process.platform}_${process.arch}`];
     return require.resolve(`@futuretea/${binary.name}/bin/yunxiao${binary.suffix}`);
   } catch (e) {
-    throw new Error(`Could not resolve binary path for platform/arch: ${process.platform}/${process.arch}`);
+    throw new Error(`Could not resolve yunxiao binary path for platform/arch: ${process.platform}/${process.arch}`);
   }
 };
 
-const child = childProcess.spawn(resolveBinaryPath(), ['mcp', ...process.argv.slice(2)], {
+const child = childProcess.spawn(resolveBinaryPath(), process.argv.slice(2), {
   stdio: 'inherit',
 });
 

@@ -4,7 +4,7 @@
 
 Let your AI coding assistant talk directly to [Alibaba Yunxiao](https://www.aliyun.com/product/yunxiao) — browse projects, track iterations, review code, and monitor pipelines without leaving your IDE.
 
-**Read-only by default, safety first.** 170 of 182 tools are read-only queries. 12 write operations require explicit `read_only=false`.
+**Read-only by default, safety first.** 177 of 193 tools are read-only queries. 16 write operations require explicit `read_only=false`.
 
 ---
 
@@ -39,14 +39,14 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> npx -y @futuretea/yunxiao-mcp-server
 
 ### Docker
 
-**Stdio mode (default):**
+**Stdio MCP mode (default Docker entrypoint):**
 
 ```bash
 docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
   ghcr.io/futuretea/yunxiao-mcp-server:latest
 ```
 
-**HTTP mode:**
+**HTTP MCP mode:**
 
 ```bash
 docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
@@ -57,7 +57,14 @@ docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
 
 ```bash
 make build
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao mcp
+```
+
+The same `yunxiao` binary also provides human-facing CLI commands:
+
+```bash
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task list --project-id <project-id>
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao tools call get_current_user --params '{}'
 ```
 
 ### IDE Setup
@@ -130,7 +137,7 @@ Legacy aliases: `YUNXIAO_ACCESS_TOKEN`, `YUNXIAO_API_BASE_URL`.
 ### Config File
 
 ```bash
-./bin/yunxiao-mcp-server --config config.example.yaml
+./bin/yunxiao mcp --config config.example.yaml
 ```
 
 ### Per-Request Token (HTTP/SSE)
@@ -156,8 +163,8 @@ http://localhost:3000/sse?yunxiao_access_token=<token>
 
 ## Security
 
-- **Read-only by default**: 170 tools safe for exploration without write access.
-- **Explicit write opt-in**: 12 write tools require manual `read_only=false`.
+- **Read-only by default**: 177 tools safe for exploration without write access.
+- **Explicit write opt-in**: 16 write tools require manual `read_only=false`.
 - **Per-request token**: HTTP/SSE support request-level token override for multi-tenant use.
 - **No sensitive endpoints**: Admin audit logs, PAT queries, and other high-privilege endpoints are excluded.
 
@@ -170,10 +177,12 @@ make fmt      # gofmt
 make tidy     # go mod tidy
 make lint     # go vet + gofmt
 make test     # go test ./...
-make build    # build binary
+make build    # build the yunxiao binary
 make smoke    # smoke test
 make ci       # full CI
 ```
+
+The shared Yunxiao SDK lives in `pkg/yunxiao`; MCP mode and the CLI commands both use it for authenticated OpenAPI requests, path encoding, response metadata, and error classification.
 
 Coverage threshold: 98%. Run `make coverage-check`.
 

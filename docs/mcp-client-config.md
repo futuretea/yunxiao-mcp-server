@@ -46,7 +46,8 @@ If you built from source or downloaded a release binary:
 {
   "mcpServers": {
     "yunxiao": {
-      "command": "/path/to/yunxiao-mcp-server",
+      "command": "/path/to/yunxiao",
+      "args": ["mcp"],
       "env": {
         "YUNXIAO_MCP_ACCESS_TOKEN": "<your-token>"
       }
@@ -84,7 +85,7 @@ For stdio clients, keep stdin open with `-i`:
 Start the server in HTTP mode:
 
 ```bash
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> yunxiao-mcp-server --port 3000
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> yunxiao mcp --port 3000
 ```
 
 Or with Docker:

@@ -6,7 +6,8 @@ import (
 	"strconv"
 )
 
-func prettyJSON(raw json.RawMessage) string {
+// PrettyJSON returns an indented JSON string, or the raw body when it is not valid JSON.
+func PrettyJSON(raw json.RawMessage) string {
 	var data any
 	if err := json.Unmarshal(raw, &data); err != nil {
 		return string(raw)
@@ -18,7 +19,12 @@ func prettyJSON(raw json.RawMessage) string {
 	return string(formatted)
 }
 
-func prettyResponseJSON(resp *Response) string {
+func prettyJSON(raw json.RawMessage) string {
+	return PrettyJSON(raw)
+}
+
+// PrettyResponseJSON returns an indented JSON payload that includes response metadata.
+func PrettyResponseJSON(resp *Response) string {
 	var data any
 	if err := json.Unmarshal(resp.Body, &data); err != nil {
 		data = string(resp.Body)
@@ -36,9 +42,13 @@ func prettyResponseJSON(resp *Response) string {
 	}
 	formatted, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
-		return prettyJSON(resp.Body)
+		return PrettyJSON(resp.Body)
 	}
 	return string(formatted)
+}
+
+func prettyResponseJSON(resp *Response) string {
+	return PrettyResponseJSON(resp)
 }
 
 func parsePagination(header http.Header) *Pagination {

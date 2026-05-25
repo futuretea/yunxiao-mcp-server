@@ -14,36 +14,36 @@ import (
 func (c *Client) GetJSON(ctx context.Context, path string, query url.Values) (string, error) {
 	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
 	if err != nil {
-		return "", WrapError(friendlyAPIError(err))
+		return "", WrapError(FriendlyAPIError(err))
 	}
-	return prettyJSON(resp.Body), nil
+	return PrettyJSON(resp.Body), nil
 }
 
 // GetJSONWithMetadata sends a GET request and includes pagination metadata in the response.
 func (c *Client) GetJSONWithMetadata(ctx context.Context, path string, query url.Values) (string, error) {
 	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
 	if err != nil {
-		return "", WrapError(friendlyAPIError(err))
+		return "", WrapError(FriendlyAPIError(err))
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 // PostJSONWithMetadata sends a POST request and includes pagination metadata in the response.
 func (c *Client) PostJSONWithMetadata(ctx context.Context, path string, body any) (string, error) {
 	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
 	if err != nil {
-		return "", WrapError(friendlyAPIError(err))
+		return "", WrapError(FriendlyAPIError(err))
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 // PutJSONWithMetadata sends a PUT request and includes pagination metadata in the response.
 func (c *Client) PutJSONWithMetadata(ctx context.Context, path string, body any) (string, error) {
 	resp, err := c.Request(ctx, http.MethodPut, path, nil, body)
 	if err != nil {
-		return "", WrapError(friendlyAPIError(err))
+		return "", WrapError(FriendlyAPIError(err))
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 // Request sends an authenticated Yunxiao OpenAPI request.

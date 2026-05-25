@@ -4,7 +4,7 @@
 
 让 AI 编码助手直接对话 [阿里云·云效](https://www.aliyun.com/product/yunxiao) —— 查项目、管迭代、审代码、看流水线，无需离开 IDE。
 
-**默认只读，安全第一。** 182 个工具中 170 个为只读查询，12 个写操作需显式开启 `read_only=false`。
+**默认只读，安全第一。** 193 个工具中 177 个为只读查询，16 个写操作需显式开启 `read_only=false`。
 
 ---
 
@@ -39,14 +39,14 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> npx -y @futuretea/yunxiao-mcp-server
 
 ### Docker
 
-**Stdio 模式（默认）：**
+**Stdio MCP 模式（Docker 默认入口）：**
 
 ```bash
 docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
   ghcr.io/futuretea/yunxiao-mcp-server:latest
 ```
 
-**HTTP 模式：**
+**HTTP MCP 模式：**
 
 ```bash
 docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
@@ -57,7 +57,14 @@ docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
 
 ```bash
 make build
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao mcp
+```
+
+同一个 `yunxiao` 二进制也提供面向人的 CLI 命令。
+
+```bash
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task list --project-id <project-id>
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao tools call get_current_user --params '{}'
 ```
 
 ### 接入 IDE
@@ -130,7 +137,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server
 ### 配置文件
 
 ```bash
-./bin/yunxiao-mcp-server --config config.example.yaml
+./bin/yunxiao mcp --config config.example.yaml
 ```
 
 ### 按请求切换 Token（HTTP/SSE）
@@ -156,8 +163,8 @@ http://localhost:3000/sse?yunxiao_access_token=<token>
 
 ## 安全
 
-- **默认只读**：170 个工具无需写权限，可安全探索。
-- **显式开启写入**：12 个写工具需手动设置 `read_only=false`。
+- **默认只读**：177 个工具无需写权限，可安全探索。
+- **显式开启写入**：16 个写工具需手动设置 `read_only=false`。
 - **请求级 Token**：HTTP/SSE 模式下支持按请求覆盖 token，多用户场景互不干扰。
 - **不暴露敏感端点**：管理员审计日志、个人令牌查询等高权限端点不在目录中。
 
@@ -170,10 +177,12 @@ make fmt      # 格式化
 make tidy     # 整理依赖
 make lint     # 静态检查
 make test     # 运行测试
-make build    # 构建
+make build    # 构建 yunxiao 二进制
 make smoke    # 冒烟测试
 make ci       # CI 全量检查
 ```
+
+公共 Yunxiao SDK 位于 `pkg/yunxiao`；MCP 模式和 CLI 命令都复用它发起认证 OpenAPI 请求、处理路径编码、响应元数据和错误分类。
 
 覆盖率要求 98%，`make coverage-check` 验证。
 

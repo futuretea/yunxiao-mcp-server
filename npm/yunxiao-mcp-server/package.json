@@ -4,7 +4,8 @@
   "description": "Model Context Protocol (MCP) server for Alibaba Yunxiao DevOps platform",
   "main": "./bin/index.js",
   "bin": {
-    "yunxiao-mcp-server": "bin/index.js"
+    "yunxiao-mcp-server": "bin/index.js",
+    "yunxiao": "bin/yunxiao.js"
   },
   "optionalDependencies": {
     "@futuretea/yunxiao-mcp-server-darwin-amd64": "0.0.0",

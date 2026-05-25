@@ -32,6 +32,7 @@ func joinEscapedPath(basePath, path string) string {
 	return basePath + "/" + path
 }
 
+// EncodeRepositoryID encodes a CodeUp repository ID or full path for path usage.
 func EncodeRepositoryID(repositoryID string) string {
 	repositoryID = strings.TrimSpace(repositoryID)
 	if repositoryID == "" {
@@ -48,7 +49,8 @@ func EncodeRepositoryID(repositoryID string) string {
 	return url.PathEscape(parts[0]) + "%2F" + url.PathEscape(parts[1])
 }
 
-func encodePathValue(value string) string {
+// EncodePathValue escapes a single Yunxiao path value while preserving existing %2F separators.
+func EncodePathValue(value string) string {
 	value = strings.TrimSpace(value)
 	if value == "" {
 		return ""
@@ -59,6 +61,11 @@ func encodePathValue(value string) string {
 	return url.PathEscape(value)
 }
 
-func encodeFilePath(filePath string) string {
-	return encodePathValue(strings.TrimPrefix(strings.TrimSpace(filePath), "/"))
+func encodePathValue(value string) string {
+	return EncodePathValue(value)
+}
+
+// EncodeFilePath escapes a repository file path for CodeUp file endpoints.
+func EncodeFilePath(filePath string) string {
+	return EncodePathValue(strings.TrimPrefix(strings.TrimSpace(filePath), "/"))
 }

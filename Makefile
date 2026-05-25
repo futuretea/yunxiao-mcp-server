@@ -1,4 +1,4 @@
-BINARY_NAME ?= yunxiao-mcp-server
+BINARY_NAME ?= yunxiao
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
 DATE ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -9,7 +9,7 @@ LDFLAGS := -X github.com/futuretea/yunxiao-mcp-server/pkg/core/version.Version=$
 .PHONY: build test lint format tidy ci smoke clean coverage docs build-all-platforms npm-copy-binaries npm-publish
 
 build:
-	go build -ldflags "$(LDFLAGS)" -o bin/$(BINARY_NAME) ./cmd/yunxiao-mcp-server
+	go build -ldflags "$(LDFLAGS)" -o bin/$(BINARY_NAME) ./cmd/yunxiao
 
 test:
 	go test ./...
@@ -34,7 +34,7 @@ ci: lint
 smoke: build
 	./scripts/smoke.sh
 
-COVERAGE_PKGS := $(shell go list ./... | grep -v -E '/scripts$$|/cmd/yunxiao-mcp-server$$')
+COVERAGE_PKGS := $(shell go list ./... | grep -v -E '/scripts$$|/cmd/yunxiao$$')
 
 coverage:
 	go test -coverprofile=coverage.out $(COVERAGE_PKGS)
@@ -54,19 +54,20 @@ NPM_VERSION ?= $(shell echo $(shell git describe --tags --always) | sed 's/^v//'
 NPM_PUBLISH_FLAGS ?= --access=public
 
 CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),bin/$(BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,)))
-CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),./npm/$(BINARY_NAME)-$(os)-$(arch)/bin/))
-CLEAN_TARGETS += ./npm/$(BINARY_NAME)/.npmrc ./npm/$(BINARY_NAME)/LICENSE ./npm/$(BINARY_NAME)/README.md
-CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),./npm/$(BINARY_NAME)-$(os)-$(arch)/.npmrc))
+CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),./npm/yunxiao-mcp-server-$(os)-$(arch)/bin/))
+CLEAN_TARGETS += ./npm/yunxiao-mcp-server/.npmrc ./npm/yunxiao-mcp-server/LICENSE ./npm/yunxiao-mcp-server/README.md
+CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),./npm/yunxiao-mcp-server-$(os)-$(arch)/.npmrc))
 
 build-all-platforms:
 	$(foreach os,$(OSES),$(foreach arch,$(ARCHS), \
-		GOOS=$(os) GOARCH=$(arch) go build -ldflags "-s -w $(LDFLAGS)" -o bin/$(BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,) ./cmd/yunxiao-mcp-server; \
+		GOOS=$(os) GOARCH=$(arch) go build -ldflags "-s -w $(LDFLAGS)" -o bin/$(BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,) ./cmd/yunxiao; \
 	))
 
 npm-copy-binaries: build-all-platforms
 	$(foreach os,$(OSES),$(foreach arch,$(ARCHS), \
-		mkdir -p npm/$(BINARY_NAME)-$(os)-$(arch)/bin; \
-		cp bin/$(BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,) npm/$(BINARY_NAME)-$(os)-$(arch)/bin/; \
+		rm -rf npm/yunxiao-mcp-server-$(os)-$(arch)/bin; \
+		mkdir -p npm/yunxiao-mcp-server-$(os)-$(arch)/bin; \
+		cp bin/$(BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,) npm/yunxiao-mcp-server-$(os)-$(arch)/bin/$(BINARY_NAME)$(if $(findstring windows,$(os)),.exe,); \
 	))
 
 npm-publish: npm-copy-binaries
@@ -74,7 +75,7 @@ npm-publish: npm-copy-binaries
 	test -f LICENSE
 	@test -n "$$NPM_TOKEN" || (echo "NPM_TOKEN is required"; exit 1)
 	@set -e; $(foreach os,$(OSES),$(foreach arch,$(ARCHS), \
-		DIRNAME="$(BINARY_NAME)-$(os)-$(arch)"; \
+		DIRNAME="yunxiao-mcp-server-$(os)-$(arch)"; \
 		cd npm/$$DIRNAME; \
 		printf '%s\n' "//registry.npmjs.org/:_authToken=$$NPM_TOKEN" >> .npmrc; \
 		jq '.version = "$(NPM_VERSION)"' package.json > tmp.json; \
@@ -82,11 +83,11 @@ npm-publish: npm-copy-binaries
 		npm publish $(NPM_PUBLISH_FLAGS); \
 		cd ../..; \
 	))
-	cp README.md LICENSE ./npm/$(BINARY_NAME)/
-	@printf '%s\n' "//registry.npmjs.org/:_authToken=$$NPM_TOKEN" >> ./npm/$(BINARY_NAME)/.npmrc
-	jq '.version = "$(NPM_VERSION)"' ./npm/$(BINARY_NAME)/package.json > tmp.json && mv tmp.json ./npm/$(BINARY_NAME)/package.json
-	jq '.optionalDependencies |= with_entries(.value = "$(NPM_VERSION)")' ./npm/$(BINARY_NAME)/package.json > tmp.json && mv tmp.json ./npm/$(BINARY_NAME)/package.json
-	cd npm/$(BINARY_NAME) && npm publish $(NPM_PUBLISH_FLAGS)
+	cp README.md LICENSE ./npm/yunxiao-mcp-server/
+	@printf '%s\n' "//registry.npmjs.org/:_authToken=$$NPM_TOKEN" >> ./npm/yunxiao-mcp-server/.npmrc
+	jq '.version = "$(NPM_VERSION)"' ./npm/yunxiao-mcp-server/package.json > tmp.json && mv tmp.json ./npm/yunxiao-mcp-server/package.json
+	jq '.optionalDependencies |= with_entries(.value = "$(NPM_VERSION)")' ./npm/yunxiao-mcp-server/package.json > tmp.json && mv tmp.json ./npm/yunxiao-mcp-server/package.json
+	cd npm/yunxiao-mcp-server && npm publish $(NPM_PUBLISH_FLAGS)
 
 clean:
 	rm -rf bin coverage.out $(CLEAN_TARGETS)
