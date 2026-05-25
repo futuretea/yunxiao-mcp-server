@@ -193,6 +193,98 @@ func TestMRRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 	}
 }
 
+func TestYunxiaoCLIRepoMrViewPrintsJSONWithDefaultOrganization(t *testing.T) {
+	var gotPath string
+	requests := map[string]int{}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests[r.URL.Path]++
+		switch r.URL.Path {
+		case "/oapi/v1/platform/organizations":
+			_, _ = w.Write([]byte(`[{"id":"org-1"}]`))
+		case "/oapi/v1/codeup/organizations/org-1/repositories/group/repo/mergeRequests/42":
+			gotPath = r.URL.Path
+			_, _ = w.Write([]byte(`{"iid":42,"title":"Fix bug","state":"merged"}`))
+		default:
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	var out bytes.Buffer
+	command := NewYunxiaoCLI(IOStreams{Out: &out, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{
+		"--base-url", server.URL,
+		"--access-token", "token-1",
+		"repo", "mr", "view", "42",
+		"--repository-id", "group/repo",
+	})
+
+	if err := command.Execute(); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if !strings.Contains(out.String(), `"iid":`) {
+		t.Fatalf("stdout = %q", out.String())
+	}
+	if gotPath != "/oapi/v1/codeup/organizations/org-1/repositories/group/repo/mergeRequests/42" {
+		t.Fatalf("path = %q", gotPath)
+	}
+	if requests["/oapi/v1/platform/organizations"] != 1 || requests["/oapi/v1/codeup/organizations/org-1/repositories/group/repo/mergeRequests/42"] != 1 {
+		t.Fatalf("requests = %#v", requests)
+	}
+}
+
+func TestYunxiaoCLIRepoMrViewRequiresRepositoryID(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"repo", "mr", "view", "42"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected repository-id error")
+	}
+	if !strings.Contains(err.Error(), "repository-id is required") {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestYunxiaoCLIRepoMrViewReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "codeup", "repo", "mr", "view", "42", "--repository-id", "group/repo"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected tool error")
+	}
+	if !strings.Contains(err.Error(), `unknown Yunxiao tool "get_merge_request"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestMRViewOptionsParamsIncludesBothKeys(t *testing.T) {
+	params, err := (mrViewOptions{
+		OrganizationID: " org-1 ",
+		RepositoryID:   " group/repo ",
+		MergeRequestID: " 42 ",
+	}).params()
+	if err != nil {
+		t.Fatalf("params() error = %v", err)
+	}
+	if params["mergeRequestId"] != "42" {
+		t.Fatalf("mergeRequestId = %q", params["mergeRequestId"])
+	}
+	if params["iid"] != "42" {
+		t.Fatalf("iid = %q", params["iid"])
+	}
+	if params["repositoryId"] != "group/repo" {
+		t.Fatalf("repositoryId = %q", params["repositoryId"])
+	}
+}
+
+func TestMRViewOptionsParamsRequiresRepositoryID(t *testing.T) {
+	if _, err := (mrViewOptions{MergeRequestID: "42"}).params(); err == nil {
+		t.Fatal("params() expected repository-id error")
+	}
+}
+
 func TestMRRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
 	if rows := mrRowsFromJSON(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
