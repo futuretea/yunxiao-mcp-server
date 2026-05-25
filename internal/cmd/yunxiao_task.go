@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -77,12 +76,7 @@ type taskRow struct {
 }
 
 func taskRowsFromJSON(raw string) []taskRow {
-	var payload any
-	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
-		return nil
-	}
-
-	items := firstJSONArray(payload)
+	items := rowsFromJSON(raw)
 	rows := make([]taskRow, 0, len(items))
 	for _, item := range items {
 		m, ok := item.(map[string]any)

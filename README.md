@@ -63,6 +63,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao mcp
 The same `yunxiao` binary also provides human-facing CLI commands:
 
 ```bash
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task list --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao tools call get_current_user --params '{}'
 ```

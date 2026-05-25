@@ -132,8 +132,8 @@ func TestTaskRowsFromJSONExtractsNestedAndTypedValues(t *testing.T) {
 }
 
 func TestTaskRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := taskRowsFromJSON(`not-json`); rows != nil {
-		t.Fatalf("rows = %#v, want nil", rows)
+	if rows := taskRowsFromJSON(`not-json`); len(rows) != 0 {
+		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }
 
