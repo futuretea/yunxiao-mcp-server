@@ -27,6 +27,7 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 		Short:   "work with Projex projects",
 	}
 	command.AddCommand(newYunxiaoProjectListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectMemberCommand(streams, cfgFile, v))
 	return command
 }
 
