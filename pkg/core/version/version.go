@@ -2,7 +2,7 @@ package version
 
 import "fmt"
 
-const BinaryName = "yunxiao-mcp-server"
+const BinaryName = "yunxiao"
 
 var (
 	Version = "dev"
@@ -12,5 +12,10 @@ var (
 
 // GetVersionInfo returns human-readable build metadata.
 func GetVersionInfo() string {
-	return fmt.Sprintf("%s version=%s commit=%s date=%s", BinaryName, Version, Commit, Date)
+	return GetVersionInfoFor(BinaryName)
+}
+
+// GetVersionInfoFor returns human-readable build metadata for the named binary.
+func GetVersionInfoFor(binaryName string) string {
+	return fmt.Sprintf("%s version=%s commit=%s date=%s", binaryName, Version, Commit, Date)
 }

@@ -1,7 +1,10 @@
 {
   "name": "@futuretea/yunxiao-mcp-server-darwin-amd64",
   "version": "0.0.0",
-  "description": "Yunxiao MCP Server binary for darwin/amd64",
+  "description": "Yunxiao CLI binary for darwin/amd64",
+  "files": [
+    "bin/yunxiao"
+  ],
   "os": [
     "darwin"
   ],

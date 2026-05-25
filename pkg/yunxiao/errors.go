@@ -96,9 +96,9 @@ func WrapError(err error) error {
 	return &taggedError{err: err, category: cat}
 }
 
-// friendlyAPIError wraps an APIError with actionable guidance for LLM consumers.
+// FriendlyAPIError wraps an APIError with actionable guidance for CLI and MCP consumers.
 // Non-API errors are returned unchanged.
-func friendlyAPIError(err error) error {
+func FriendlyAPIError(err error) error {
 	var apiErr *APIError
 	if !errors.As(err, &apiErr) {
 		return err
@@ -123,4 +123,8 @@ func friendlyAPIError(err error) error {
 	}
 
 	return fmt.Errorf("%w\n\nSuggestion: %s", apiErr, suggestion)
+}
+
+func friendlyAPIError(err error) error {
+	return FriendlyAPIError(err)
 }

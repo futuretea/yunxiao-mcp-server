@@ -1,7 +1,10 @@
 {
   "name": "@futuretea/yunxiao-mcp-server-linux-amd64",
   "version": "0.0.0",
-  "description": "Yunxiao MCP Server binary for linux/amd64",
+  "description": "Yunxiao CLI binary for linux/amd64",
+  "files": [
+    "bin/yunxiao"
+  ],
   "os": [
     "linux"
   ],

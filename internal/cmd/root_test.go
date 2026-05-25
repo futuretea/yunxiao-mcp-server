@@ -23,7 +23,7 @@ func TestVersionCommandPrintsVersionInfo(t *testing.T) {
 	if err := command.Execute(); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
-	if !strings.Contains(out.String(), "yunxiao-mcp-server version=") {
+	if !strings.Contains(out.String(), "yunxiao version=") {
 		t.Fatalf("stdout = %q", out.String())
 	}
 	if errOut.Len() != 0 {

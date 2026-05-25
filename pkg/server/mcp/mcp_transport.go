@@ -12,6 +12,7 @@ import (
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/version"
 	"github.com/futuretea/yunxiao-mcp-server/pkg/toolset"
 	yunxiaoToolset "github.com/futuretea/yunxiao-mcp-server/pkg/toolset/yunxiao"
+	yunxiaoSDK "github.com/futuretea/yunxiao-mcp-server/pkg/yunxiao"
 )
 
 func (s *Server) registerTool(tool toolset.ServerTool) {
@@ -21,14 +22,8 @@ func (s *Server) registerTool(tool toolset.ServerTool) {
 			params = map[string]any{}
 		}
 
-		if orgID, ok := params["organizationId"].(string); !ok || strings.TrimSpace(orgID) == "" {
-			if s.client.DefaultOrgID != "" {
-				params["organizationId"] = s.client.DefaultOrgID
-			}
-		}
-
-		result, err := tool.Handler(ctx, s.client, params)
-		return NewTextResult(result, yunxiaoToolset.WrapError(err)), nil
+		result, err := yunxiaoToolset.InvokeTool(ctx, s.client, tool, params)
+		return NewTextResult(result, err), nil
 	})
 
 	s.server.AddTool(tool.Tool, handler)
@@ -64,7 +59,7 @@ func (s *Server) ServeStreamableHTTP(httpServer *http.Server) *server.Streamable
 }
 
 // NewTestServer creates a server with explicit fields for testing.
-func NewTestServer(client *yunxiaoToolset.Client, enabledTools []string) *Server {
+func NewTestServer(client *yunxiaoSDK.Client, enabledTools []string) *Server {
 	return &Server{
 		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
 		client:        client,
@@ -74,17 +69,17 @@ func NewTestServer(client *yunxiaoToolset.Client, enabledTools []string) *Server
 }
 
 func withRequestAccessToken(ctx context.Context, r *http.Request) context.Context {
-	return yunxiaoToolset.WithAccessToken(ctx, requestAccessToken(r))
+	return yunxiaoSDK.WithAccessToken(ctx, requestAccessToken(r))
 }
 
 func requestAccessToken(r *http.Request) string {
 	if r == nil {
 		return ""
 	}
-	if accessToken := strings.TrimSpace(r.Header.Get(yunxiaoToolset.AccessTokenHeader)); accessToken != "" {
+	if accessToken := strings.TrimSpace(r.Header.Get(yunxiaoSDK.AccessTokenHeader)); accessToken != "" {
 		return accessToken
 	}
-	return strings.TrimSpace(r.URL.Query().Get(yunxiaoToolset.AccessTokenQueryParam))
+	return strings.TrimSpace(r.URL.Query().Get(yunxiaoSDK.AccessTokenQueryParam))
 }
 
 // NewTextResult creates a standard MCP text result.

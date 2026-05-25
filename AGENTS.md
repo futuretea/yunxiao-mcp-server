@@ -17,7 +17,7 @@ make coverage-check   # verify 98% threshold
 
 Run locally (HTTP mode):
 ```bash
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao-mcp-server --port 8080
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao mcp --port 8080
 ```
 
 Health check:
@@ -38,18 +38,18 @@ To test tool calls interactively, use an MCP client (e.g., `mcpc`) pointed at th
 ## Project Structure
 
 ```
-cmd/yunxiao-mcp-server/    # Entry point
-internal/cmd/              # CLI commands (root, serve flags)
+cmd/yunxiao/               # Entry point
+internal/cmd/              # CLI commands (mcp mode, task commands, tool fallback)
 pkg/server/http/           # HTTP/SSE transport
 pkg/server/mcp/            # MCP server construction, stdio/HTTP/SSE
 pkg/toolset/yunxiao/       # All Yunxiao tool definitions and handlers
   *_tools.go               # Tool schema definitions (mcp.NewTool)
   *_handlers.go            # Handler implementations
   *_test.go                # Handler and helper tests
-  client.go                # Yunxiao OpenAPI HTTP client
   conditions.go            # Conditions JSON builders
   helpers.go               # Common handler helpers
   toolset.go               # Toolset registration and filtering
+pkg/yunxiao/               # Shared Yunxiao OpenAPI SDK
 ```
 
 ## Key Files
@@ -62,7 +62,7 @@ pkg/toolset/yunxiao/       # All Yunxiao tool definitions and handlers
 | `pkg/toolset/yunxiao/appstack_enhanced_*.go` | 5 AppStack enhanced overview tools |
 | `pkg/toolset/yunxiao/codeup_write_*.go` | 6 Codeup write tools |
 | `pkg/toolset/yunxiao/flow_write_*.go` | 2 Flow write tools |
-| `pkg/toolset/yunxiao/client.go` | HTTP client with auth, pagination, and error handling |
+| `pkg/yunxiao/client.go` | HTTP client with auth, pagination, and error handling |
 | `docs/ga-readiness.md` | Release gate checklist and deferred endpoints |
 | `docs/quickstart.md` | Common AI conversation patterns |
 | `docs/conditions-cookbook.md` | Conditions JSON examples |

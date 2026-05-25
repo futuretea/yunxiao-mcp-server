@@ -40,7 +40,7 @@ jobs:
           make_latest: true
           files: |
             LICENSE
-            bin/yunxiao-mcp-server-*
+            bin/yunxiao-*
 
       - name: Publish npm
         run: make npm-publish

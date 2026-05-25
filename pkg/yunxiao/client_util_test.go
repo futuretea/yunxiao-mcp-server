@@ -187,6 +187,32 @@ func TestClientPostJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
 	}
 }
 
+func TestClientPostJSONWithMetadataReturnsResponse(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("method = %s, want POST", r.Method)
+		}
+		w.Header().Set("x-request-id", "request-1")
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	result, err := client.PostJSONWithMetadata(context.Background(), "/platform/users:search", map[string]any{"query": "alice"})
+	if err != nil {
+		t.Fatalf("PostJSONWithMetadata() error = %v", err)
+	}
+	for _, want := range []string{`"ok": true`, `"requestId": "request-1"`} {
+		if !strings.Contains(result, want) {
+			t.Fatalf("result = %q, missing %s", result, want)
+		}
+	}
+}
+
 func TestClientPutJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
 	client, err := NewClient("https://example.com", "token-1", time.Millisecond)
 	if err != nil {
@@ -196,5 +222,28 @@ func TestClientPutJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
 	_, err = client.PutJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": "value"})
 	if err == nil {
 		t.Fatal("PutJSONWithMetadata() expected request error")
+	}
+}
+
+func TestClientPutJSONWithMetadataReturnsResponse(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Fatalf("method = %s, want PUT", r.Method)
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	result, err := client.PutJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": "value"})
+	if err != nil {
+		t.Fatalf("PutJSONWithMetadata() error = %v", err)
+	}
+	if !strings.Contains(result, `"ok": true`) {
+		t.Fatalf("result = %q", result)
 	}
 }

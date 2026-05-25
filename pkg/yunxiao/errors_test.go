@@ -89,6 +89,38 @@ func TestFriendlyAPIErrorReturnsUncategorizedOnNonStandardStatus(t *testing.T) {
 	}
 }
 
+func TestFriendlyAPIErrorAddsSuggestions(t *testing.T) {
+	tests := []struct {
+		name     string
+		status   int
+		contains string
+	}{
+		{"auth", http.StatusUnauthorized, "Authentication failed"},
+		{"permission", http.StatusForbidden, "Access denied"},
+		{"not found", http.StatusNotFound, "Resource not found"},
+		{"bad request", http.StatusBadRequest, "Invalid request parameters"},
+		{"rate limit", http.StatusTooManyRequests, "Rate limit exceeded"},
+		{"server", http.StatusServiceUnavailable, "temporarily unavailable"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := FriendlyAPIError(&APIError{StatusCode: tt.status})
+			if !strings.Contains(got.Error(), tt.contains) {
+				t.Fatalf("FriendlyAPIError() = %q, want %q", got.Error(), tt.contains)
+			}
+		})
+	}
+}
+
+func TestTaggedErrorUnwrap(t *testing.T) {
+	err := &ValidationError{Msg: "name is required"}
+	wrapped := WrapError(err)
+	if !errors.Is(wrapped, err) {
+		t.Fatalf("WrapError() should unwrap to original error")
+	}
+}
+
 func TestWrapErrorAddsCategoryPrefix(t *testing.T) {
 	tests := []struct {
 		name     string

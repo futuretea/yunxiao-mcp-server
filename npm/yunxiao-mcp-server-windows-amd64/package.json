@@ -1,7 +1,10 @@
 {
   "name": "@futuretea/yunxiao-mcp-server-windows-amd64",
   "version": "0.0.0",
-  "description": "Yunxiao MCP Server binary for windows/amd64",
+  "description": "Yunxiao CLI binary for windows/amd64",
+  "files": [
+    "bin/yunxiao.exe"
+  ],
   "os": [
     "win32"
   ],

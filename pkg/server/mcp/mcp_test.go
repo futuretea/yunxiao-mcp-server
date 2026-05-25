@@ -9,8 +9,8 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
-	"github.com/futuretea/yunxiao-mcp-server/pkg/toolset"
 	yunxiaoToolset "github.com/futuretea/yunxiao-mcp-server/pkg/toolset/yunxiao"
+	yunxiaoSDK "github.com/futuretea/yunxiao-mcp-server/pkg/yunxiao"
 )
 
 func newTestServer(enabledTools, disabledTools []string) *Server {
@@ -25,26 +25,45 @@ func newTestServer(enabledTools, disabledTools []string) *Server {
 }
 
 func TestShouldEnableToolAllEnabledByDefault(t *testing.T) {
-	s := newTestServer(nil, nil)
-	if !s.shouldEnableTool("get_current_user") {
+	tools, err := yunxiaoToolset.BuildToolCatalog(nil, yunxiaoToolset.ToolCatalogOptions{ReadOnly: true})
+	if err != nil {
+		t.Fatalf("BuildToolCatalog() error = %v", err)
+	}
+	if _, ok := yunxiaoToolset.FindTool(tools, "get_current_user"); !ok {
 		t.Fatal("tool should be enabled by default")
 	}
 }
 
 func TestShouldEnableToolUsesAllowList(t *testing.T) {
-	s := newTestServer([]string{"get_current_user"}, nil)
-	if !s.shouldEnableTool("get_current_user") {
+	tools, err := yunxiaoToolset.BuildToolCatalog(nil, yunxiaoToolset.ToolCatalogOptions{
+		ReadOnly:     true,
+		EnabledTools: []string{"get_current_user"},
+	})
+	if err != nil {
+		t.Fatalf("BuildToolCatalog() error = %v", err)
+	}
+	if _, ok := yunxiaoToolset.FindTool(tools, "get_current_user"); !ok {
 		t.Fatal("get_current_user should be enabled")
 	}
-	if s.shouldEnableTool("list_organizations") {
+	if _, ok := yunxiaoToolset.FindTool(tools, "list_organizations"); ok {
 		t.Fatal("list_organizations should not be enabled")
 	}
 }
 
 func TestShouldEnableToolDisabledTakesPriority(t *testing.T) {
-	s := newTestServer([]string{"get_current_user"}, []string{"get_current_user"})
-	if s.shouldEnableTool("get_current_user") {
-		t.Fatal("disabled tool should not be enabled")
+	tools, err := yunxiaoToolset.BuildToolCatalog(nil, yunxiaoToolset.ToolCatalogOptions{
+		ReadOnly:      true,
+		EnabledTools:  []string{"get_current_user", "list_organizations"},
+		DisabledTools: []string{"get_current_user"},
+	})
+	if err != nil {
+		t.Fatalf("BuildToolCatalog() error = %v", err)
+	}
+	if _, ok := yunxiaoToolset.FindTool(tools, "get_current_user"); ok {
+		t.Fatal("disabled tool should not be present")
+	}
+	if _, ok := yunxiaoToolset.FindTool(tools, "list_organizations"); !ok {
+		t.Fatal("non-disabled allow-listed tool should be present")
 	}
 }
 
@@ -97,6 +116,30 @@ func TestNewServerRejectsUnknownEnabledTool(t *testing.T) {
 	}
 }
 
+func TestNewServerRejectsUnknownEnabledToolBeforeDefaultOrgRequest(t *testing.T) {
+	requests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		http.Error(w, "unexpected request", http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
+		BaseURL:               server.URL,
+		AccessToken:           "token-1",
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+		EnabledTools:          []string{"get_user_organizations_typo"},
+	}})
+	if err == nil {
+		t.Fatal("NewServer() expected unknown enabled tool error")
+	}
+	if requests != 0 {
+		t.Fatalf("requests = %d, want 0", requests)
+	}
+}
+
 func TestNewServerRejectsUnknownDisabledTool(t *testing.T) {
 	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
 		BaseURL:               config.DefaultBaseURL,
@@ -126,11 +169,11 @@ func TestNewServerRejectsZeroEnabledTools(t *testing.T) {
 
 func TestRequestAccessTokenPrefersHeader(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/message?yunxiao_access_token=query-token", nil)
-	req.Header.Set(yunxiaoToolset.AccessTokenHeader, "header-token")
+	req.Header.Set(yunxiaoSDK.AccessTokenHeader, "header-token")
 
 	ctx := withRequestAccessToken(t.Context(), req)
 
-	if got := yunxiaoToolset.AccessTokenFromContext(ctx); got != "header-token" {
+	if got := yunxiaoSDK.AccessTokenFromContext(ctx); got != "header-token" {
 		t.Fatalf("access token = %q", got)
 	}
 }
@@ -140,19 +183,8 @@ func TestRequestAccessTokenUsesQueryParam(t *testing.T) {
 
 	ctx := withRequestAccessToken(t.Context(), req)
 
-	if got := yunxiaoToolset.AccessTokenFromContext(ctx); got != "query-token" {
+	if got := yunxiaoSDK.AccessTokenFromContext(ctx); got != "query-token" {
 		t.Fatalf("access token = %q", got)
-	}
-}
-
-func TestFilterToolsByDomainsNoFilterReturnsAll(t *testing.T) {
-	tools := []toolset.ServerTool{
-		{Tool: mcp.NewTool("a"), Domain: "platform"},
-		{Tool: mcp.NewTool("b"), Domain: "projex"},
-	}
-	got := filterToolsByDomains(tools, nil, nil)
-	if len(got) != 2 {
-		t.Fatalf("len = %d, want 2", len(got))
 	}
 }
 
@@ -174,6 +206,7 @@ func TestIsHealthy(t *testing.T) {
 	if !s.IsHealthy() {
 		t.Fatal("server with client and tools should be healthy")
 	}
+	s.Close()
 }
 
 func TestNewTextResultReturnsContent(t *testing.T) {
@@ -213,15 +246,5 @@ func TestNewTextResultReturnsError(t *testing.T) {
 func TestRequestAccessTokenHandlesNilRequest(t *testing.T) {
 	if got := requestAccessToken(nil); got != "" {
 		t.Fatalf("requestAccessToken(nil) = %q, want empty", got)
-	}
-}
-
-func TestValidateToolFiltersDetectsDuplicate(t *testing.T) {
-	tools := []toolset.ServerTool{
-		{Tool: mcp.NewTool("dup_tool")},
-		{Tool: mcp.NewTool("dup_tool")},
-	}
-	if err := validateToolFilters(tools, nil, nil); err == nil {
-		t.Fatal("validateToolFilters expected duplicate error")
 	}
 }

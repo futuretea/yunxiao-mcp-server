@@ -9,8 +9,8 @@ builds:
   - id: default
     env:
       - CGO_ENABLED=0
-    binary: yunxiao-mcp-server
-    main: ./cmd/yunxiao-mcp-server
+    binary: yunxiao
+    main: ./cmd/yunxiao
     goarch:
       - amd64
       - arm64

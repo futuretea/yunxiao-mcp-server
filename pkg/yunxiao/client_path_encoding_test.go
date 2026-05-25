@@ -72,6 +72,12 @@ func TestEncodePathValue(t *testing.T) {
 	}
 }
 
+func TestEncodeFilePath(t *testing.T) {
+	if got := EncodeFilePath(" /src/main.go "); got != "src%2Fmain.go" {
+		t.Fatalf("EncodeFilePath() = %q, want src%%2Fmain.go", got)
+	}
+}
+
 func TestParseHeaderInt(t *testing.T) {
 	tests := []struct {
 		name  string

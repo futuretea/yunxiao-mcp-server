@@ -88,6 +88,42 @@ func bindFlags(v *viper.Viper, cmd *cobra.Command) error {
 	return nil
 }
 
+func newYunxiaoMCPCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	command := &cobra.Command{
+		Use:   "mcp",
+		Short: "start the Yunxiao MCP server",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := bindYunxiaoCLIFlags(v, cmd); err != nil {
+				return err
+			}
+			if err := bindYunxiaoMCPFlags(v, cmd); err != nil {
+				return err
+			}
+			return runServer(cmd.Context(), *cfgFile, streams, v)
+		},
+	}
+
+	command.Flags().Int("port", 0, "port for HTTP mode; 0 runs stdio mode")
+	command.Flags().String("sse-base-url", "", "public base URL for SSE message endpoints")
+	command.Flags().String("log-level", "info", "log level: trace, debug, info, warn, error, fatal, panic, disabled")
+	return command
+}
+
+func bindYunxiaoMCPFlags(v *viper.Viper, cmd *cobra.Command) error {
+	bindings := map[string]string{
+		"port":         "port",
+		"sse_base_url": "sse-base-url",
+		"log_level":    "log-level",
+	}
+
+	for key, flag := range bindings {
+		if err := v.BindPFlag(key, cmd.Flags().Lookup(flag)); err != nil {
+			return fmt.Errorf("bind flag %s: %w", flag, err)
+		}
+	}
+	return nil
+}
+
 func runServer(ctx context.Context, cfgFile string, streams IOStreams, v *viper.Viper) error {
 	cfg, err := config.LoadConfig(cfgFile, v)
 	if err != nil {
