@@ -186,7 +186,7 @@ func TestPrintPipelineRunListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printPipelineRunList(&out, `{"data":[]}`); err != nil {
 		t.Fatalf("printPipelineRunList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "ID  STATUS  RESULT  START  END  TRIGGER" {
+	if strings.TrimSpace(out.String()) != "[1mID  STATUS  RESULT  START  END  TRIGGER[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

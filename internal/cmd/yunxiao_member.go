@@ -83,7 +83,7 @@ func printMemberList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "MEMBER_ID\tUSER_ID\tNAME\tEMAIL")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("MEMBER_ID\tUSER_ID\tNAME\tEMAIL"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.MemberID, row.UserID, row.Name, row.Email)
 	}

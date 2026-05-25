@@ -111,7 +111,7 @@ func printPipelineRunList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "ID\tSTATUS\tRESULT\tSTART\tEND\tTRIGGER")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tSTATUS\tRESULT\tSTART\tEND\tTRIGGER"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t%s\t%s\n", row.ID, row.Status, row.Result, row.Start, row.End, row.Trigger)
 	}

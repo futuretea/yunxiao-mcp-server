@@ -113,7 +113,7 @@ func printRepoChangeRequestList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "LOCAL_ID\tREPOSITORY\tTITLE\tSTATE\tAUTHOR\tSOURCE\tTARGET")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("LOCAL_ID\tREPOSITORY\tTITLE\tSTATE\tAUTHOR\tSOURCE\tTARGET"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", row.LocalID, row.Repository, row.Title, row.State, row.Author, row.SourceBranch, row.TargetBranch)
 	}
@@ -205,7 +205,7 @@ func printCRPatchSetList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "ID\tCOMMIT\tDATE\tMESSAGE")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tCOMMIT\tDATE\tMESSAGE"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.ID, row.Commit, row.Date, row.Message)
 	}

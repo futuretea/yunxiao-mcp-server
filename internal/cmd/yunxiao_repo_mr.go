@@ -116,7 +116,7 @@ func printMRList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "ID\tIID\tTITLE\tSTATE\tAUTHOR\tTARGET")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tIID\tTITLE\tSTATE\tAUTHOR\tTARGET"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t%s\t%s\n", row.ID, row.IID, row.Title, row.State, row.Author, row.Target)
 	}

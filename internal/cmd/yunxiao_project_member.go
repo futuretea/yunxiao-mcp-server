@@ -88,7 +88,7 @@ func printProjectMemberList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "USER_ID\tNAME\tROLE_ID\tROLE")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("USER_ID\tNAME\tROLE_ID\tROLE"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.UserID, row.Name, row.RoleID, row.RoleName)
 	}

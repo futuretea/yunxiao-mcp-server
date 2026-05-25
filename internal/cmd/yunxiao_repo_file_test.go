@@ -147,7 +147,7 @@ func TestPrintRepoFileListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printRepoFileList(&out, `{"data":[]}`); err != nil {
 		t.Fatalf("printRepoFileList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "PATH  TYPE  SIZE  MODE" {
+	if strings.TrimSpace(out.String()) != "\033[1mPATH  TYPE  SIZE  MODE\033[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

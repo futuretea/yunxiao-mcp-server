@@ -55,7 +55,7 @@ func printTaskList(out anyWriter, raw string) error {
 	}
 
 	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(writer, "ID\tSUBJECT\tSTATUS\tASSIGNEE")
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tSUBJECT\tSTATUS\tASSIGNEE"))
 	for _, row := range rows {
 		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.ID, row.Subject, row.Status, row.Assignee)
 	}
