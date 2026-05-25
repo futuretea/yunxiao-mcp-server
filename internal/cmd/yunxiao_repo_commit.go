@@ -32,6 +32,7 @@ func newYunxiaoRepoCommitCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 		Short:   "work with CodeUp repository commits",
 	}
 	command.AddCommand(newYunxiaoRepoCommitListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoRepoCommitViewCommand(streams, cfgFile, v))
 	return command
 }
 
