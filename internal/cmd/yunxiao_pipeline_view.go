@@ -22,6 +22,8 @@ func newYunxiaoPipelineViewCommand(streams IOStreams, cfgFile *string, v *viper.
 		Use:     "view <pipeline-id>",
 		Aliases: []string{"overview"},
 		Short:   "view a Flow pipeline overview as JSON",
+		Example: `  # View pipeline overview
+  yunxiao pipeline view pipeline-123`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

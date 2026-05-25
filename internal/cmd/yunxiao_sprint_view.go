@@ -26,6 +26,11 @@ func newYunxiaoSprintViewCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 		Use:     "view <sprint-id>",
 		Aliases: []string{"overview"},
 		Short:   "view a Projex sprint overview as JSON",
+		Example: `  # View sprint overview
+  yunxiao sprint view sprint-456 --project-id 123
+
+  # View with specific categories
+  yunxiao sprint view sprint-456 --project-id 123 --categories "Task,Bug"`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

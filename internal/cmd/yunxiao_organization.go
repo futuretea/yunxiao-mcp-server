@@ -29,6 +29,11 @@ func newYunxiaoOrganizationListCommand(streams IOStreams, cfgFile *string, v *vi
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Yunxiao organizations visible to the current user",
+		Example: `  # List all organizations
+  yunxiao organization list
+
+  # Output as JSON
+  yunxiao organization list --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

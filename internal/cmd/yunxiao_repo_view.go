@@ -30,6 +30,11 @@ func newYunxiaoRepoViewCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 		Use:     "view <repository-id>",
 		Aliases: []string{"overview"},
 		Short:   "view a CodeUp repository overview as JSON",
+		Example: `  # View repository by full path
+  yunxiao repo view group/repo
+
+  # View with explicit organization
+  yunxiao repo view group/repo --organization-id org-abc`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

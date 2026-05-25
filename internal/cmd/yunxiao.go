@@ -141,6 +141,14 @@ func newYunxiaoTaskListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Projex tasks in a project",
+		Example: `  # List tasks in a project
+  yunxiao task list --project-id 123
+
+  # Filter by status and assignee
+  yunxiao task list --project-id 123 --status "处理中" --assigned-to user1
+
+  # Output as JSON
+  yunxiao task list --project-id 123 --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
@@ -183,6 +191,11 @@ func newYunxiaoToolsListCommand(streams IOStreams, cfgFile *string, v *viper.Vip
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list enabled Yunxiao tools",
+		Example: `  # List all enabled tools
+  yunxiao tools list
+
+  # Output as JSON
+  yunxiao tools list --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
@@ -209,6 +222,14 @@ func newYunxiaoToolsCallCommand(streams IOStreams, cfgFile *string, v *viper.Vip
 	command := &cobra.Command{
 		Use:   "call <tool-name>",
 		Short: "call an enabled Yunxiao tool with JSON parameters",
+		Example: `  # Call a tool with inline JSON
+  yunxiao tools call search_projects --params '{"name":"demo"}'
+
+  # Call a tool with params from stdin
+  echo '{"name":"demo"}' | yunxiao tools call search_projects --params-file -
+
+  # Call a tool with params from a file
+  yunxiao tools call search_projects --params-file query.json`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

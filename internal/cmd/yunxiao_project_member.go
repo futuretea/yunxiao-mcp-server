@@ -32,6 +32,14 @@ func newYunxiaoProjectMemberListCommand(streams IOStreams, cfgFile *string, v *v
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Projex project members",
+		Example: `  # List project members
+  yunxiao project member list --project-id 123
+
+  # Filter by name
+  yunxiao project member list --project-id 123 --name alice
+
+  # Output as JSON
+  yunxiao project member list --project-id 123 --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

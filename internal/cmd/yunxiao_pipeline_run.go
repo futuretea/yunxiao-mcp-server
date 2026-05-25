@@ -37,6 +37,11 @@ func newYunxiaoPipelineRunListCommand(streams IOStreams, cfgFile *string, v *vip
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Flow pipeline runs",
+		Example: `  # List pipeline runs
+  yunxiao pipeline run list --pipeline-id pipeline-123
+
+  # Output as JSON
+  yunxiao pipeline run list --pipeline-id pipeline-123 --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

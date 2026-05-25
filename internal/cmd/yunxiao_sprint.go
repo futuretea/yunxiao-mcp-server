@@ -35,6 +35,14 @@ func newYunxiaoSprintListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Projex sprints in a project",
+		Example: `  # List active sprints
+  yunxiao sprint list --project-id 123
+
+  # List all sprints including archived
+  yunxiao sprint list --project-id 123 --status "TODO,DOING,ARCHIVED"
+
+  # Output as JSON
+  yunxiao sprint list --project-id 123 --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

@@ -42,6 +42,14 @@ func newYunxiaoRepoChangeRequestListCommand(streams IOStreams, cfgFile *string, 
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list CodeUp change requests",
+		Example: `  # List change requests
+  yunxiao repo change-request list --project-ids group/repo
+
+  # Filter by state and author
+  yunxiao repo change-request list --project-ids group/repo --state opened --author-ids user1
+
+  # Output as JSON
+  yunxiao repo change-request list --project-ids group/repo --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
@@ -143,6 +151,8 @@ func newYunxiaoRepoCRPatchSetListCommand(streams IOStreams, cfgFile *string, v *
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list patch sets (diff iterations) for a change request",
+		Example: `  # List patch sets for a CR
+  yunxiao repo cr patches list --repository-id group/repo --local-id 42`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

@@ -31,6 +31,11 @@ func newYunxiaoPipelineResourceMemberListCommand(streams IOStreams, cfgFile *str
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list members with access to a Flow pipeline resource",
+		Example: `  # List resource members
+  yunxiao pipeline resource-member list --pipeline-id pipeline-123
+
+  # Output as JSON
+  yunxiao pipeline resource-member list --pipeline-id pipeline-123 --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

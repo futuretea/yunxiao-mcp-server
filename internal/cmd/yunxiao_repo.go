@@ -42,6 +42,17 @@ func newYunxiaoRepoListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list CodeUp repositories",
+		Example: `  # List repositories
+  yunxiao repo list
+
+  # Search by path keyword
+  yunxiao repo list --search demo
+
+  # Show only non-archived repos
+  yunxiao repo list --archived=false
+
+  # Output as JSON
+  yunxiao repo list --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

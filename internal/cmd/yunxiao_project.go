@@ -37,6 +37,14 @@ func newYunxiaoProjectListCommand(streams IOStreams, cfgFile *string, v *viper.V
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Projex projects",
+		Example: `  # List all projects
+  yunxiao project list
+
+  # Search by name keyword
+  yunxiao project list --name demo
+
+  # Output as JSON
+  yunxiao project list --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

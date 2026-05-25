@@ -41,6 +41,14 @@ func newYunxiaoRepoCommitListCommand(streams IOStreams, cfgFile *string, v *vipe
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list CodeUp repository commits",
+		Example: `  # List commits
+  yunxiao repo commit list --repository-id group/repo
+
+  # List commits on a specific branch
+  yunxiao repo commit list --repository-id group/repo --ref-name main
+
+  # Output as JSON
+  yunxiao repo commit list --repository-id group/repo --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
