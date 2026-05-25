@@ -67,6 +67,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao member list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run list --pipeline-id <pipeline-id>
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run view <pipeline-run-id> --pipeline-id <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline view <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member list --project-id <project-id>
@@ -122,6 +123,7 @@ printf '{"page":1}' | YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao tools 
 | `get_repository_overview` | 仓库信息 + 默认分支 + 最近提交 + 最近 MR |
 | `get_change_request_overview` | CR 详情 + Patch Sets + 评论 |
 | `get_pipeline_overview` | 流水线信息 + 最近运行 + 历史 |
+| `get_pipeline_run_overview` | 流水线运行信息 + 分类任务 |
 
 完整列表见 [Enhanced Tools Index](docs/enhanced-tools-index.md)。
 
