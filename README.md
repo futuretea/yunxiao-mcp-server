@@ -67,6 +67,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao member list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run list --pipeline-id <pipeline-id>
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run view <pipeline-run-id> --pipeline-id <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline view <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member list --project-id <project-id>
@@ -122,6 +123,7 @@ Enhanced tools aggregate multiple API calls into single operations, reducing AI 
 | `get_repository_overview` | Repository + default branch + recent commits + recent MRs |
 | `get_change_request_overview` | CR detail + patch sets + comments |
 | `get_pipeline_overview` | Pipeline info + latest run + history |
+| `get_pipeline_run_overview` | Pipeline run info + jobs by category |
 
 Full list: [Enhanced Tools Index](docs/enhanced-tools-index.md)
 
