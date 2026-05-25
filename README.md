@@ -66,6 +66,7 @@ The same `yunxiao` binary also provides human-facing CLI commands:
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao member list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline list
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run list --pipeline-id <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline view <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member list --project-id <project-id>
