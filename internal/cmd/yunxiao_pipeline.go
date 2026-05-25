@@ -30,6 +30,7 @@ func newYunxiaoPipelineCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	command.AddCommand(newYunxiaoPipelineListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoPipelineRunCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoPipelineJobCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoPipelineResourceMemberCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoPipelineViewCommand(streams, cfgFile, v))
 	return command
 }
