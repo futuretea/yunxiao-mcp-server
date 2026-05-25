@@ -118,6 +118,7 @@ func newYunxiaoToolsCommand(streams IOStreams, cfgFile *string, v *viper.Viper) 
 		Short:   "list and call Yunxiao tools",
 	}
 	command.AddCommand(newYunxiaoToolsListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoToolsDescribeCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoToolsCallCommand(streams, cfgFile, v))
 	return command
 }
