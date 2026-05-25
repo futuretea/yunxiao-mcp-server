@@ -28,6 +28,7 @@ func newYunxiaoRepoCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *
 	}
 	command.AddCommand(newYunxiaoRepoListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoRepoBranchCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoRepoCommitCommand(streams, cfgFile, v))
 	return command
 }
 

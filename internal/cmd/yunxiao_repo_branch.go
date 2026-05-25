@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -111,11 +110,7 @@ func repoBranchRowsFromJSON(raw string) []repoBranchRow {
 }
 
 func repoBranchRowsFromJSONForPrint(raw string) ([]repoBranchRow, bool) {
-	var payload any
-	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
-		return nil, false
-	}
-	items, ok := firstJSONArrayForRepoBranches(payload)
+	items, ok := rowsFromJSONWithPresence(raw)
 	if !ok {
 		return nil, false
 	}
@@ -133,22 +128,6 @@ func repoBranchRowsFromJSONForPrint(raw string) ([]repoBranchRow, bool) {
 		})
 	}
 	return rows, true
-}
-
-func firstJSONArrayForRepoBranches(value any) ([]any, bool) {
-	switch typed := value.(type) {
-	case []any:
-		return typed, true
-	case map[string]any:
-		for _, key := range []string{"data", "result", "items", "workitems", "workItems", "list", "records", "content"} {
-			if nested, ok := typed[key]; ok {
-				if items, ok := firstJSONArrayForRepoBranches(nested); ok {
-					return items, true
-				}
-			}
-		}
-	}
-	return nil, false
 }
 
 func repoBranchLastCommitValue(m map[string]any) string {
