@@ -67,6 +67,7 @@ func newYunxiaoPipelineRunListCommand(streams IOStreams, cfgFile *string, v *vip
 	flags.StringVar(&options.PipelineID, "pipeline-id", "", "Flow pipeline ID")
 	flags.IntVar(&options.Page, "page", 0, "page number")
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.Int64Var(&options.StartTime, "start-time", 0, "run start time as Unix milliseconds")
 	flags.Int64Var(&options.EndTime, "end-time", 0, "run end time as Unix milliseconds")
 	flags.StringVar(&options.Status, "status", "", "run status, e.g. FAIL, SUCCESS, or RUNNING")

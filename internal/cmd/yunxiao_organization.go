@@ -53,6 +53,7 @@ func newYunxiaoOrganizationListCommand(streams IOStreams, cfgFile *string, v *vi
 	flags := command.Flags()
 	flags.IntVar(&options.Page, "page", 0, "page number")
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
 	return command
 }
