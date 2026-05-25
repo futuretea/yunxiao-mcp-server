@@ -37,6 +37,11 @@ func newYunxiaoToolsDescribeCommand(streams IOStreams, cfgFile *string, v *viper
 		Use:     "describe <tool-name>",
 		Aliases: []string{"schema"},
 		Short:   "describe an enabled Yunxiao tool schema",
+		Example: `  # Describe a tool
+  yunxiao tools describe search_projects
+
+  # Describe with tool name and sub-command
+  yunxiao tools schema search_projects`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

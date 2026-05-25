@@ -31,6 +31,11 @@ func newYunxiaoTaskViewCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 		Use:     "view <workitem-id>",
 		Aliases: []string{"detail"},
 		Short:   "view a Projex task detail as JSON",
+		Example: `  # View a task by ID
+  yunxiao task view wi-12345
+
+  # View a task from a specific organization
+  yunxiao task view wi-12345 --organization-id org-abc`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

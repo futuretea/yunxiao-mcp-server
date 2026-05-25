@@ -35,6 +35,17 @@ func newYunxiaoRepoBranchListCommand(streams IOStreams, cfgFile *string, v *vipe
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list CodeUp repository branches",
+		Example: `  # List branches
+  yunxiao repo branch list --repository-id group/repo
+
+  # Search for a branch
+  yunxiao repo branch list --repository-id group/repo --search feature
+
+  # Sort by update time descending
+  yunxiao repo branch list --repository-id group/repo --sort updated_desc
+
+  # Output as JSON
+  yunxiao repo branch list --repository-id group/repo --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

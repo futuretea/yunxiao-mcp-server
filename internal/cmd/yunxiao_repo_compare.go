@@ -22,6 +22,11 @@ func newYunxiaoRepoCompareCommand(streams IOStreams, cfgFile *string, v *viper.V
 		Use:     "compare <from> <to>",
 		Aliases: []string{"diff"},
 		Short:   "compare CodeUp repository refs as JSON",
+		Example: `  # Compare two branches
+  yunxiao repo compare main..feature --repository-id group/repo
+
+  # Compare two commits
+  yunxiao repo compare abc123 def456 --repository-id group/repo`,
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

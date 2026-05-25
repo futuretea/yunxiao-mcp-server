@@ -30,6 +30,14 @@ func newYunxiaoMemberListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Yunxiao organization members",
+		Example: `  # List members (uses default organization)
+  yunxiao member list
+
+  # List members from a specific organization
+  yunxiao member list --organization-id org-abc
+
+  # Search by name or email
+  yunxiao member list --organization-id org-abc --query alice`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

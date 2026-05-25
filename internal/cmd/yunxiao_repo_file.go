@@ -34,6 +34,17 @@ func newYunxiaoRepoFileListCommand(streams IOStreams, cfgFile *string, v *viper.
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list CodeUp repository files",
+		Example: `  # List files in root
+  yunxiao repo file list --repository-id group/repo
+
+  # List files in a subdirectory
+  yunxiao repo file list --repository-id group/repo --path src/
+
+  # List files on a specific branch
+  yunxiao repo file list --repository-id group/repo --ref-name develop
+
+  # Output as JSON
+  yunxiao repo file list --repository-id group/repo --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

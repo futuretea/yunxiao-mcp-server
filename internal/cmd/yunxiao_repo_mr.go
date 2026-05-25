@@ -40,6 +40,17 @@ func newYunxiaoRepoMrListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list legacy CodeUp merge requests",
+		Example: `  # List merge requests
+  yunxiao repo mr list
+
+  # Filter by state
+  yunxiao repo mr list --state opened
+
+  # Filter by author
+  yunxiao repo mr list --author user1
+
+  # Output as JSON
+  yunxiao repo mr list --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
@@ -159,6 +170,8 @@ func newYunxiaoRepoMrViewCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 	command := &cobra.Command{
 		Use:   "view <mr-id>",
 		Short: "view a legacy CodeUp merge request as JSON",
+		Example: `  # View merge request by ID
+  yunxiao repo mr view 12345 --repository-id group/repo`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)

@@ -32,6 +32,11 @@ func newYunxiaoPipelineJobListCommand(streams IOStreams, cfgFile *string, v *vip
 	command := &cobra.Command{
 		Use:   "list",
 		Short: "list Flow pipeline jobs by category",
+		Example: `  # List deploy jobs
+  yunxiao pipeline job list --pipeline-id pipeline-123 --category DEPLOY
+
+  # Output as JSON
+  yunxiao pipeline job list --pipeline-id pipeline-123 --category DEPLOY --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
@@ -109,6 +114,8 @@ func newYunxiaoPipelineJobLogCommand(streams IOStreams, cfgFile *string, v *vipe
 	command := &cobra.Command{
 		Use:   "log",
 		Short: "get execution log for a pipeline job",
+		Example: `  # Get job log
+  yunxiao pipeline job log --pipeline-id pipeline-123 --run-id run-456 --job-id job-789`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
