@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"text/tabwriter"
 
@@ -120,12 +119,4 @@ func projectRowsFromJSON(raw string) []projectRow {
 		})
 	}
 	return rows
-}
-
-func rowsFromJSON(raw string) []any {
-	var payload any
-	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
-		return nil
-	}
-	return firstJSONArray(payload)
 }
