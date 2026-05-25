@@ -31,6 +31,7 @@ func newYunxiaoRepoMrCommand(streams IOStreams, cfgFile *string, v *viper.Viper)
 		Short:   "work with legacy CodeUp merge requests",
 	}
 	command.AddCommand(newYunxiaoRepoMrListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoRepoMrViewCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -145,6 +146,58 @@ func mrRowsFromJSONForPrint(raw string) ([]mrRow, bool) {
 		})
 	}
 	return rows, true
+}
+
+type mrViewOptions struct {
+	OrganizationID string
+	RepositoryID   string
+	MergeRequestID string
+}
+
+func newYunxiaoRepoMrViewCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options mrViewOptions
+	command := &cobra.Command{
+		Use:   "view <mr-id>",
+		Short: "view a legacy CodeUp merge request as JSON",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.MergeRequestID = args[0]
+			params, err := options.params()
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_merge_request", params)
+			if err != nil {
+				return err
+			}
+			_, _ = fmt.Fprintln(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.RepositoryID, "repository-id", "", "repository numeric ID or full path, e.g. org/repo")
+	return command
+}
+
+func (o mrViewOptions) params() (map[string]any, error) {
+	params := map[string]any{
+		"mergeRequestId": strings.TrimSpace(o.MergeRequestID),
+		"iid":            strings.TrimSpace(o.MergeRequestID),
+		"repositoryId":   strings.TrimSpace(o.RepositoryID),
+	}
+	if params["mergeRequestId"] == "" {
+		return nil, fmt.Errorf("merge request ID argument is required")
+	}
+	if params["repositoryId"] == "" {
+		return nil, fmt.Errorf("repository-id is required")
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params, nil
 }
 
 func mrAuthorValue(m map[string]any) string {
