@@ -175,14 +175,14 @@ func TestRepoChangeRequestListOptionsParamsIncludesFilters(t *testing.T) {
 	}
 }
 
-func TestPrintRepoChangeRequestListFallsBackToRawJSON(t *testing.T) {
+func TestPrintRepoChangeRequestListShowsNoResultsWhenRowsEmpty(t *testing.T) {
 	var out bytes.Buffer
-	raw := `{"data":{"total":0}}`
+	raw := "No results found."
 	if err := printRepoChangeRequestList(&out, raw); err != nil {
 		t.Fatalf("printRepoChangeRequestList() error = %v", err)
 	}
 	if strings.TrimSpace(out.String()) != raw {
-		t.Fatalf("stdout = %q, want raw JSON", out.String())
+		t.Fatalf("stdout = %q, want \"No results found.\"", out.String())
 	}
 }
 
@@ -286,13 +286,13 @@ func TestCRPatchSetListOptionsParams(t *testing.T) {
 	}
 }
 
-func TestPrintCRPatchSetListFallsBackToRawJSON(t *testing.T) {
+func TestPrintCRPatchSetListShowsNoResultsWhenRowsEmpty(t *testing.T) {
 	var out bytes.Buffer
 	if err := printCRPatchSetList(&out, `{"data":{"total":0}}`); err != nil {
 		t.Fatalf("printCRPatchSetList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != `{"data":{"total":0}}` {
-		t.Fatalf("stdout = %q", out.String())
+	if strings.TrimSpace(out.String()) != "No results found." {
+		t.Fatalf("stdout = %q, want \"No results found.\"", out.String())
 	}
 }
 

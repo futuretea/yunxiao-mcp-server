@@ -191,14 +191,14 @@ func TestRepoListOptionsParamsOmitsAbsentArchived(t *testing.T) {
 	}
 }
 
-func TestPrintRepoListFallsBackToRawJSON(t *testing.T) {
+func TestPrintRepoListShowsNoResultsWhenRowsEmpty(t *testing.T) {
 	var out bytes.Buffer
-	raw := `{"data":{"total":0}}`
+	raw := "No results found."
 	if err := printRepoList(&out, raw); err != nil {
 		t.Fatalf("printRepoList() error = %v", err)
 	}
 	if strings.TrimSpace(out.String()) != raw {
-		t.Fatalf("stdout = %q, want raw JSON", out.String())
+		t.Fatalf("stdout = %q, want \"No results found.\"", out.String())
 	}
 }
 

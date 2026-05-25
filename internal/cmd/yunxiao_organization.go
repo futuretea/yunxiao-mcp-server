@@ -66,7 +66,7 @@ func (o organizationListOptions) params() map[string]any {
 func printOrganizationList(out anyWriter, raw string) error {
 	rows := organizationRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

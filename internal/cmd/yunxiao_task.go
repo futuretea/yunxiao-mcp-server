@@ -50,7 +50,7 @@ func (o taskListOptions) params() (map[string]any, error) {
 func printTaskList(out anyWriter, raw string) error {
 	rows := taskRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

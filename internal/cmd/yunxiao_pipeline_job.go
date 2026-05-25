@@ -78,7 +78,7 @@ func (o pipelineJobListOptions) params() (map[string]any, error) {
 func printPipelineJobList(out anyWriter, raw string) error {
 	rows, ok := pipelineJobRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

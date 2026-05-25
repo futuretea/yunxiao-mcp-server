@@ -99,7 +99,7 @@ func (o mrListOptions) params() map[string]any {
 func printMRList(out anyWriter, raw string) error {
 	rows, ok := mrRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

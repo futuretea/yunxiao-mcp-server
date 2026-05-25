@@ -99,7 +99,7 @@ func (o pipelineListOptions) params() map[string]any {
 func printPipelineList(out anyWriter, raw string) error {
 	rows, ok := pipelineRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

@@ -69,7 +69,7 @@ func (o projectRoleListOptions) params() (map[string]any, error) {
 func printProjectRoleList(out anyWriter, raw string) error {
 	rows := projectRoleRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

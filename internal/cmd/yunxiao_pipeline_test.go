@@ -150,14 +150,14 @@ func TestPipelineListOptionsParamsIncludesFilters(t *testing.T) {
 	}
 }
 
-func TestPrintPipelineListFallsBackToRawJSON(t *testing.T) {
+func TestPrintPipelineListShowsNoResultsWhenRowsEmpty(t *testing.T) {
 	var out bytes.Buffer
-	raw := `{"data":{"total":0}}`
+	raw := "No results found."
 	if err := printPipelineList(&out, raw); err != nil {
 		t.Fatalf("printPipelineList() error = %v", err)
 	}
 	if strings.TrimSpace(out.String()) != raw {
-		t.Fatalf("stdout = %q, want raw JSON", out.String())
+		t.Fatalf("stdout = %q, want \"No results found.\"", out.String())
 	}
 }
 

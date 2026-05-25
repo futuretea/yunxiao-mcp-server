@@ -110,7 +110,7 @@ func (o repoCommitListOptions) params() (map[string]any, error) {
 func printRepoCommitList(out anyWriter, raw string) error {
 	rows, ok := repoCommitRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 
