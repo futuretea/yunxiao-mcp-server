@@ -204,3 +204,132 @@ func TestRepoChangeRequestRowsFromJSONExtractsAlternateFields(t *testing.T) {
 		t.Fatalf("row = %#v, want %#v", rows[0], want)
 	}
 }
+
+func TestYunxiaoCLICRPatchesListPrintsTable(t *testing.T) {
+	var gotPath string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/oapi/v1/codeup/organizations/org-1/repositories/group/repo/changeRequests/42/diffs/patches":
+			gotPath = r.URL.Path
+			_, _ = w.Write([]byte(`[{"id":"ps-1","commitId":"abc123","createdAt":"2026-01-01","commitMessage":"Fix bug"}]`))
+		default:
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	var out bytes.Buffer
+	command := NewYunxiaoCLI(IOStreams{Out: &out, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{
+		"--base-url", server.URL,
+		"--access-token", "token-1",
+		"repo", "cr", "patches", "list",
+		"--organization-id", "org-1",
+		"--repository-id", "group/repo",
+		"--local-id", "42",
+	})
+
+	if err := command.Execute(); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	for _, want := range []string{"ID", "COMMIT", "DATE", "MESSAGE", "ps-1", "abc123", "Fix bug"} {
+		if !strings.Contains(out.String(), want) {
+			t.Fatalf("stdout = %q, missing %q", out.String(), want)
+		}
+	}
+	if gotPath != "/oapi/v1/codeup/organizations/org-1/repositories/group/repo/changeRequests/42/diffs/patches" {
+		t.Fatalf("path = %q", gotPath)
+	}
+}
+
+func TestYunxiaoCLICRPatchSetListRequiresRepositoryID(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"repo", "change-request", "patch-set", "list", "--local-id", "42"})
+	err := command.Execute()
+	if err == nil || !strings.Contains(err.Error(), "repository-id is required") {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestYunxiaoCLICRPatchSetListRequiresLocalID(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"repo", "change-request", "patch-set", "list", "--repository-id", "group/repo"})
+	err := command.Execute()
+	if err == nil || !strings.Contains(err.Error(), "local-id is required") {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestYunxiaoCLICRPatchSetListReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "codeup", "repo", "cr", "patches", "list", "--repository-id", "g/r", "--local-id", "42"})
+	err := command.Execute()
+	if err == nil || !strings.Contains(err.Error(), `unknown Yunxiao tool "list_change_request_patch_sets"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestCRPatchSetListOptionsParams(t *testing.T) {
+	params, err := (crPatchSetListOptions{
+		OrganizationID: " org-1 ",
+		RepositoryID:   " group/repo ",
+		LocalID:        " 42 ",
+	}).params()
+	if err != nil {
+		t.Fatalf("params() error = %v", err)
+	}
+	wants := map[string]any{"organizationId": "org-1", "repositoryId": "group/repo", "localId": "42"}
+	for key, want := range wants {
+		if params[key] != want {
+			t.Fatalf("params[%q] = %#v, want %#v", key, params[key], want)
+		}
+	}
+}
+
+func TestPrintCRPatchSetListFallsBackToRawJSON(t *testing.T) {
+	var out bytes.Buffer
+	if err := printCRPatchSetList(&out, `{"data":{"total":0}}`); err != nil {
+		t.Fatalf("printCRPatchSetList() error = %v", err)
+	}
+	if strings.TrimSpace(out.String()) != `{"data":{"total":0}}` {
+		t.Fatalf("stdout = %q", out.String())
+	}
+}
+
+func TestPrintCRPatchSetListPrintsHeaderForEmptyList(t *testing.T) {
+	var out bytes.Buffer
+	if err := printCRPatchSetList(&out, `[]`); err != nil {
+		t.Fatalf("printCRPatchSetList() error = %v", err)
+	}
+	if strings.TrimSpace(out.String()) != "ID  COMMIT  DATE  MESSAGE" {
+		t.Fatalf("stdout = %q", out.String())
+	}
+}
+
+func TestCRPatchSetRowsFromJSONExtractsAlternateFields(t *testing.T) {
+	rows := crPatchSetRowsFromJSON(`{"result":{"items":[{"patchSetBizId":"ps-2","sha":"def456","gmtCreated":"2026-02-01","commitInfo":"Update docs"}]}}`)
+	if len(rows) != 1 {
+		t.Fatalf("rows = %#v", rows)
+	}
+	want := crPatchSetRow{ID: "ps-2", Commit: "def456", Date: "2026-02-01", Message: "Update docs"}
+	if rows[0] != want {
+		t.Fatalf("row = %#v, want %#v", rows[0], want)
+	}
+}
+
+func TestCRPatchSetRowsFromJSONSkipsNonObjectRows(t *testing.T) {
+	rows := crPatchSetRowsFromJSON(`{"data":["skip",{"patchSetId":"ps-3","commitSha":"ghi789","createdDate":"2026-03-01","description":"Refactor"}]}`)
+	if len(rows) != 1 {
+		t.Fatalf("rows = %#v", rows)
+	}
+	want := crPatchSetRow{ID: "ps-3", Commit: "ghi789", Date: "2026-03-01", Message: "Refactor"}
+	if rows[0] != want {
+		t.Fatalf("row = %#v, want %#v", rows[0], want)
+	}
+}
+
+func TestCRPatchSetRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
+	if rows := crPatchSetRowsFromJSON("not-json"); len(rows) != 0 {
+		t.Fatalf("rows = %#v, want empty", rows)
+	}
+}
