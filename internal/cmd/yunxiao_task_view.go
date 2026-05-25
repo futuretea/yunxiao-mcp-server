@@ -63,6 +63,7 @@ func newYunxiaoTaskViewCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	flags.BoolVar(&options.IncludeComments, "include-comments", true, "include task comments")
 	flags.IntVar(&options.Page, "page", 0, "comments page number")
 	flags.IntVar(&options.PerPage, "per-page", 0, "comments page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	return command
 }
 

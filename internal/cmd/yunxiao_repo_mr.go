@@ -79,6 +79,7 @@ func newYunxiaoRepoMrListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 	flags.StringVar(&options.CreatedBefore, "created-before", "", "created-before date in yyyy-MM-dd format")
 	flags.IntVar(&options.Page, "page", 0, "page number")
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
 	return command
 }

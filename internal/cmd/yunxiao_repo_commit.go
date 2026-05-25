@@ -78,6 +78,7 @@ func newYunxiaoRepoCommitListCommand(streams IOStreams, cfgFile *string, v *vipe
 	flags.StringVar(&options.Until, "until", "", "end time in ISO 8601 format")
 	flags.IntVar(&options.Page, "page", 0, "page number")
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.StringVar(&options.Path, "path", "", "filter commits touching this path")
 	flags.StringVar(&options.Search, "search", "", "commit search keyword")
 	flags.BoolVar(&options.ShowSignature, "show-signature", false, "include commit signatures; use --show-signature=false to exclude explicitly")

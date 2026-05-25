@@ -71,6 +71,7 @@ func newYunxiaoRepoBranchListCommand(streams IOStreams, cfgFile *string, v *vipe
 	flags.StringVar(&options.RepositoryID, "repository-id", "", "CodeUp repository ID or full path")
 	flags.IntVar(&options.Page, "page", 0, "page number")
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.StringVar(&options.Sort, "sort", "", "sort mode, e.g. name_asc, name_desc, updated_asc, updated_desc")
 	flags.StringVar(&options.Search, "search", "", "branch search keyword")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")

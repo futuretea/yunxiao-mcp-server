@@ -74,6 +74,7 @@ func newYunxiaoRepoListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
 	flags.IntVar(&options.Page, "page", 0, "page number")
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.StringVar(&options.OrderBy, "order-by", "", "sort field, e.g. created_at, name, path, last_activity_at")
 	flags.StringVar(&options.Sort, "sort", "", "sort direction, e.g. asc or desc")
 	flags.StringVar(&options.Search, "search", "", "repository path search keyword")
