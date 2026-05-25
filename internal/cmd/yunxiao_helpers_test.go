@@ -153,6 +153,20 @@ func TestTaskRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
 	}
 }
 
+func TestRowsFromJSONWithPresenceDistinguishesEmptyLists(t *testing.T) {
+	rows, ok := rowsFromJSONWithPresence(`{"data":[]}`)
+	if !ok {
+		t.Fatal("rowsFromJSONWithPresence() ok = false, want true")
+	}
+	if len(rows) != 0 {
+		t.Fatalf("rows = %#v, want empty", rows)
+	}
+
+	if _, ok := rowsFromJSONWithPresence(`{"data":{"total":0}}`); ok {
+		t.Fatal("rowsFromJSONWithPresence() ok = true, want false for non-list payload")
+	}
+}
+
 func TestStringifyCLIValueFormatsBools(t *testing.T) {
 	if got := stringifyCLIValue(true); got != "true" {
 		t.Fatalf("stringifyCLIValue(true) = %q, want true", got)

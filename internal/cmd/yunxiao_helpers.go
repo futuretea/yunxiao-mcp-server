@@ -13,27 +13,32 @@ func setCLIStringParam(params map[string]any, key, value string) {
 }
 
 func rowsFromJSON(raw string) []any {
-	var payload any
-	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
-		return nil
-	}
-	return firstJSONArray(payload)
+	items, _ := rowsFromJSONWithPresence(raw)
+	return items
 }
 
-func firstJSONArray(value any) []any {
+func rowsFromJSONWithPresence(raw string) ([]any, bool) {
+	var payload any
+	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
+		return nil, false
+	}
+	return firstJSONArrayWithPresence(payload)
+}
+
+func firstJSONArrayWithPresence(value any) ([]any, bool) {
 	switch typed := value.(type) {
 	case []any:
-		return typed
+		return typed, true
 	case map[string]any:
 		for _, key := range []string{"data", "result", "items", "workitems", "workItems", "list", "records", "content"} {
 			if nested, ok := typed[key]; ok {
-				if items := firstJSONArray(nested); len(items) > 0 {
-					return items
+				if items, ok := firstJSONArrayWithPresence(nested); ok {
+					return items, true
 				}
 			}
 		}
 	}
-	return nil
+	return nil, false
 }
 
 func firstStringValue(m map[string]any, keys ...string) string {
