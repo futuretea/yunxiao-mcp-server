@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
@@ -32,6 +33,7 @@ func newYunxiaoRepoChangeRequestCommand(streams IOStreams, cfgFile *string, v *v
 	}
 	command.AddCommand(newYunxiaoRepoChangeRequestListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoRepoChangeRequestViewCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoRepoCRPatchSetCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -117,6 +119,119 @@ type repoChangeRequestRow struct {
 	Author       string
 	SourceBranch string
 	TargetBranch string
+}
+
+type crPatchSetListOptions struct {
+	OrganizationID string
+	RepositoryID   string
+	LocalID        string
+	JSONOutput     bool
+}
+
+func newYunxiaoRepoCRPatchSetCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	command := &cobra.Command{
+		Use:     "patch-set",
+		Aliases: []string{"patch-sets", "patches"},
+		Short:   "list patch sets for a change request",
+	}
+	command.AddCommand(newYunxiaoRepoCRPatchSetListCommand(streams, cfgFile, v))
+	return command
+}
+
+func newYunxiaoRepoCRPatchSetListCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options crPatchSetListOptions
+	command := &cobra.Command{
+		Use:   "list",
+		Short: "list patch sets (diff iterations) for a change request",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			params, err := options.params()
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "list_change_request_patch_sets", params)
+			if err != nil {
+				return err
+			}
+			if options.JSONOutput {
+				_, _ = fmt.Fprintln(streams.Out, result)
+				return nil
+			}
+			return printCRPatchSetList(streams.Out, result)
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.RepositoryID, "repository-id", "", "repository numeric ID or full path, e.g. org/repo")
+	flags.StringVar(&options.LocalID, "local-id", "", "change request local ID")
+	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	return command
+}
+
+func (o crPatchSetListOptions) params() (map[string]any, error) {
+	params := map[string]any{
+		"repositoryId": strings.TrimSpace(o.RepositoryID),
+		"localId":      strings.TrimSpace(o.LocalID),
+	}
+	if params["repositoryId"] == "" {
+		return nil, fmt.Errorf("repository-id is required")
+	}
+	if params["localId"] == "" {
+		return nil, fmt.Errorf("local-id is required")
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params, nil
+}
+
+func printCRPatchSetList(out anyWriter, raw string) error {
+	rows, ok := crPatchSetRowsFromJSONForPrint(raw)
+	if !ok {
+		_, _ = fmt.Fprintln(out, raw)
+		return nil
+	}
+
+	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
+	_, _ = fmt.Fprintln(writer, "ID\tCOMMIT\tDATE\tMESSAGE")
+	for _, row := range rows {
+		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", row.ID, row.Commit, row.Date, row.Message)
+	}
+	return writer.Flush()
+}
+
+type crPatchSetRow struct {
+	ID      string
+	Commit  string
+	Date    string
+	Message string
+}
+
+func crPatchSetRowsFromJSON(raw string) []crPatchSetRow {
+	rows, _ := crPatchSetRowsFromJSONForPrint(raw)
+	return rows
+}
+
+func crPatchSetRowsFromJSONForPrint(raw string) ([]crPatchSetRow, bool) {
+	items, ok := rowsFromJSONWithPresence(raw)
+	if !ok {
+		return nil, false
+	}
+	rows := make([]crPatchSetRow, 0, len(items))
+	for _, item := range items {
+		m, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		rows = append(rows, crPatchSetRow{
+			ID:      firstStringValue(m, "id", "patchSetId", "patchSetBizId"),
+			Commit:  firstStringValue(m, "commitId", "commitSha", "commit", "sha"),
+			Date:    firstStringValue(m, "createdAt", "gmtCreated", "createdDate", "date"),
+			Message: firstStringValue(m, "commitMessage", "message", "commitInfo", "description"),
+		})
+	}
+	return rows, true
 }
 
 func repoChangeRequestRowsFromJSON(raw string) []repoChangeRequestRow {
