@@ -31,6 +31,7 @@ func newYunxiaoRepoChangeRequestCommand(streams IOStreams, cfgFile *string, v *v
 		Short:   "work with CodeUp change requests",
 	}
 	command.AddCommand(newYunxiaoRepoChangeRequestListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoRepoChangeRequestViewCommand(streams, cfgFile, v))
 	return command
 }
 
