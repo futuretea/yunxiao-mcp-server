@@ -48,6 +48,7 @@ func NewYunxiaoCLI(streams IOStreams) *cobra.Command {
 	command.AddCommand(newYunxiaoSprintCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoTaskCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoToolsCommand(streams, &cfgFile, v))
+	command.AddCommand(newYunxiaoCompletionCommand(streams))
 	return command
 }
 
@@ -404,4 +405,42 @@ func parseToolParamsWithInput(rawParams, paramsFile string, in io.Reader) (map[s
 
 type anyWriter interface {
 	Write([]byte) (int, error)
+}
+
+func newYunxiaoCompletionCommand(streams IOStreams) *cobra.Command {
+	command := &cobra.Command{
+		Use:   "completion [bash|zsh|fish|powershell]",
+		Short: "generate shell completion script",
+		Long: `To load completions:
+
+  Bash:
+    source <(yunxiao completion bash)
+
+  Zsh:
+    source <(yunxiao completion zsh)
+
+  Fish:
+    yunxiao completion fish | source
+
+  PowerShell:
+    yunxiao completion powershell | Out-String | Invoke-Expression`,
+		DisableFlagsInUseLine: true,
+		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
+		Args:                  cobra.ExactValidArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			switch args[0] {
+			case "bash":
+				cmd.Root().GenBashCompletion(streams.Out)
+			case "zsh":
+				cmd.Root().GenZshCompletion(streams.Out)
+			case "fish":
+				cmd.Root().GenFishCompletion(streams.Out, true)
+			case "powershell":
+				cmd.Root().GenPowerShellCompletionWithDesc(streams.Out)
+			}
+		},
+	}
+	command.SetOut(streams.Out)
+	command.SetErr(streams.ErrOut)
+	return command
 }
