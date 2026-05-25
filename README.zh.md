@@ -68,6 +68,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao member list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member list --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao sprint list --project-id <project-id>
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao sprint view <sprint-id> --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task list --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task view <workitem-id>
 ./bin/yunxiao tools describe search_projects
