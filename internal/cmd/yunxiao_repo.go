@@ -92,7 +92,7 @@ func (o repoListOptions) params() map[string]any {
 func printRepoList(out anyWriter, raw string) error {
 	rows := repoRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

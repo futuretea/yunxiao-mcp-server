@@ -88,7 +88,7 @@ func (o sprintListOptions) params() (map[string]any, error) {
 func printSprintList(out anyWriter, raw string) error {
 	rows := sprintRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

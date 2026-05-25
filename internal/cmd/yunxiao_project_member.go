@@ -75,7 +75,7 @@ func (o projectMemberListOptions) params() (map[string]any, error) {
 func printProjectMemberList(out anyWriter, raw string) error {
 	rows := projectMemberRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

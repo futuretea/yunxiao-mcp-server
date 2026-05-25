@@ -77,7 +77,7 @@ func (o pipelineResourceMemberListOptions) params() (map[string]any, error) {
 func printPipelineResourceMemberList(out anyWriter, raw string) error {
 	rows, ok := pipelineResourceMemberRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

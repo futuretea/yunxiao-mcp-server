@@ -69,7 +69,7 @@ func (o memberListOptions) params() map[string]any {
 func printMemberList(out anyWriter, raw string) error {
 	rows := memberRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

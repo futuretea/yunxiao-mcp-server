@@ -79,7 +79,7 @@ func (o repoFileListOptions) params() (map[string]any, error) {
 func printRepoFileList(out anyWriter, raw string) error {
 	rows, ok := repoFileRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

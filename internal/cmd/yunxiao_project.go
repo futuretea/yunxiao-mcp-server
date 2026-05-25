@@ -86,7 +86,7 @@ func (o projectListOptions) params() map[string]any {
 func printProjectList(out anyWriter, raw string) error {
 	rows := projectRowsFromJSON(raw)
 	if len(rows) == 0 {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 

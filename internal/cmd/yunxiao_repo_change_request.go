@@ -99,7 +99,7 @@ func (o repoChangeRequestListOptions) params() map[string]any {
 func printRepoChangeRequestList(out anyWriter, raw string) error {
 	rows, ok := repoChangeRequestRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 
@@ -189,7 +189,7 @@ func (o crPatchSetListOptions) params() (map[string]any, error) {
 func printCRPatchSetList(out anyWriter, raw string) error {
 	rows, ok := crPatchSetRowsFromJSONForPrint(raw)
 	if !ok {
-		_, _ = fmt.Fprintln(out, raw)
+		_, _ = fmt.Fprintln(out, "No results found.")
 		return nil
 	}
 
