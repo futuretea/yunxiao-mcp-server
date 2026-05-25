@@ -40,6 +40,7 @@ func NewYunxiaoCLI(streams IOStreams) *cobra.Command {
 	addYunxiaoCommonFlags(command, &cfgFile)
 	command.AddCommand(newYunxiaoMCPCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoVersionCommand(streams))
+	command.AddCommand(newYunxiaoOrganizationCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoProjectCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoTaskCommand(streams, &cfgFile, v))
 	command.AddCommand(newYunxiaoToolsCommand(streams, &cfgFile, v))
