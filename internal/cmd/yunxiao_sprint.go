@@ -27,6 +27,7 @@ func newYunxiaoSprintCommand(streams IOStreams, cfgFile *string, v *viper.Viper)
 	}
 	command.AddCommand(newYunxiaoSprintListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoSprintViewCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoSprintVelocityCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -130,4 +131,57 @@ func sprintRowsFromJSON(raw string) []sprintRow {
 		})
 	}
 	return rows
+}
+
+type sprintVelocityOptions struct {
+	OrganizationID string
+	ProjectID      string
+	Categories     string
+	SprintCount    int
+	SprintStatus   string
+}
+
+func newYunxiaoSprintVelocityCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options sprintVelocityOptions
+	command := &cobra.Command{
+		Use:     "velocity <project-id>",
+		Aliases: []string{"metrics"},
+		Short:   "show sprint velocity metrics as JSON",
+		Example: `  # View velocity for last 5 sprints
+  yunxiao sprint velocity 123
+
+  # View velocity for last 10 sprints
+  yunxiao sprint velocity 123 --sprint-count 10`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_sprint_velocity", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Task,Bug")
+	flags.IntVar(&options.SprintCount, "sprint-count", 0, "number of recent sprints to analyze; defaults to 5, max 20")
+	flags.StringVar(&options.SprintStatus, "sprint-status", "", "comma-separated sprint statuses; defaults to ARCHIVED,DONE")
+	return command
+}
+
+func (o sprintVelocityOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "categories", o.Categories)
+	setCLIStringParam(params, "sprintStatus", o.SprintStatus)
+	if o.SprintCount > 0 {
+		params["sprintCount"] = o.SprintCount
+	}
+	return params
 }

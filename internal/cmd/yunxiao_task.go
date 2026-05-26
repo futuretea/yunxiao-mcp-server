@@ -193,3 +193,46 @@ func taskTypeRowsFromJSONForPrint(raw string) ([]taskTypeRow, bool) {
 	}
 	return rows, true
 }
+
+type taskTimelineOptions struct {
+	OrganizationID   string
+	IncludeWorkitem  bool
+}
+
+func newYunxiaoTaskTimelineCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	options := taskTimelineOptions{IncludeWorkitem: true}
+	command := &cobra.Command{
+		Use:     "timeline <workitem-id>",
+		Aliases: []string{"history"},
+		Short:   "show status change timeline for a work item as JSON",
+		Example: `  # View task timeline
+  yunxiao task timeline wi-12345`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			params := options.params(args[0])
+			result, err := callYunxiaoTool(cmd, cfg, "get_workitem_status_timeline", params)
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.BoolVar(&options.IncludeWorkitem, "include-workitem", true, "include basic work item info")
+	return command
+}
+
+func (o taskTimelineOptions) params(workitemID string) map[string]any {
+	params := map[string]any{
+		"workitemId":       workitemID,
+		"includeWorkitem":  o.IncludeWorkitem,
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params
+}
