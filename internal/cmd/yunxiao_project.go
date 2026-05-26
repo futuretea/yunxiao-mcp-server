@@ -30,6 +30,7 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 	command.AddCommand(newYunxiaoProjectMemberCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectRoleCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectViewCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectSummaryCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -211,6 +212,77 @@ func (o projectViewOptions) params() map[string]any {
 	}
 	if o.PerPage > 0 {
 		params["perPage"] = o.PerPage
+	}
+	return params
+}
+
+type projectSummaryOptions struct {
+	OrganizationID string
+	ProjectID      string
+	Categories     string
+	Subject        string
+	Status         string
+	AssignedTo     string
+	Creator        string
+	Tag            string
+	OrderBy        string
+	Sort           string
+	SampleLimit    int
+}
+
+func newYunxiaoProjectSummaryCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectSummaryOptions
+	command := &cobra.Command{
+		Use:     "summary <project-id>",
+		Aliases: []string{"stats"},
+		Short:   "summarize work items by category for a project as JSON",
+		Example: `  # Summarize work items
+  yunxiao project summary 123
+
+  # Filter by specific categories
+  yunxiao project summary 123 --categories "Task,Bug"`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_project_workitem_summary", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Req,Task,Bug,Risk")
+	flags.StringVar(&options.Subject, "subject", "", "subject/title keyword")
+	flags.StringVar(&options.Status, "status", "", "comma-separated status IDs")
+	flags.StringVar(&options.AssignedTo, "assigned-to", "", "comma-separated assignee user IDs")
+	flags.StringVar(&options.Creator, "creator", "", "comma-separated creator user IDs")
+	flags.StringVar(&options.Tag, "tag", "", "comma-separated tag IDs")
+	flags.StringVar(&options.OrderBy, "order-by", "", "sort field")
+	flags.StringVar(&options.Sort, "sort", "", "sort direction, e.g. asc or desc")
+	flags.IntVar(&options.SampleLimit, "sample-limit", 0, "samples returned per category")
+	return command
+}
+
+func (o projectSummaryOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "categories", o.Categories)
+	setCLIStringParam(params, "subject", o.Subject)
+	setCLIStringParam(params, "status", o.Status)
+	setCLIStringParam(params, "assignedTo", o.AssignedTo)
+	setCLIStringParam(params, "creator", o.Creator)
+	setCLIStringParam(params, "tag", o.Tag)
+	setCLIStringParam(params, "orderBy", o.OrderBy)
+	setCLIStringParam(params, "sort", o.Sort)
+	if o.SampleLimit > 0 {
+		params["sampleLimit"] = o.SampleLimit
 	}
 	return params
 }

@@ -212,3 +212,16 @@ func TestProjectViewOptionsParamsIncludesFlags(t *testing.T) {
 		}
 	}
 }
+
+func TestYunxiaoCLIProjectSummaryReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "projex", "project", "summary", "123"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected tool error")
+	}
+	if !strings.Contains(err.Error(), `unknown Yunxiao tool "get_project_workitem_summary"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
