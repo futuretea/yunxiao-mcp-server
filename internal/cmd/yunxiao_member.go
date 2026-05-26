@@ -22,6 +22,7 @@ func newYunxiaoMemberCommand(streams IOStreams, cfgFile *string, v *viper.Viper)
 		Short:   "work with Yunxiao organization members",
 	}
 	command.AddCommand(newYunxiaoMemberListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoMemberSearchCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -113,4 +114,81 @@ func memberRowsFromJSON(raw string) []memberRow {
 		})
 	}
 	return rows
+}
+
+type memberSearchOptions struct {
+	OrganizationID  string
+	Query           string
+	DeptIDs         string
+	RoleIDs         string
+	Statuses        string
+	IncludeChildren bool
+	Page            int
+	PerPage         int
+	JSONOutput      bool
+}
+
+func newYunxiaoMemberSearchCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options memberSearchOptions
+	command := &cobra.Command{
+		Use:   "search",
+		Short: "search Yunxiao organization members",
+		Example: `  # Search by name
+  yunxiao member search --query alice
+
+  # Search with department filter
+  yunxiao member search --query alice --dept-ids "dept-1,dept-2"
+
+  # Include child departments
+  yunxiao member search --query alice --include-children
+
+  # Output as JSON
+  yunxiao member search --query alice --json`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "search_organization_members", options.params())
+			if err != nil {
+				return err
+			}
+			if options.JSONOutput {
+				printCLIJSON(streams.Out, result)
+				return nil
+			}
+			return printMemberList(streams.Out, result)
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Query, "query", "", "search keyword for username, display name, or email")
+	flags.StringVar(&options.DeptIDs, "dept-ids", "", "comma-separated department IDs")
+	flags.StringVar(&options.RoleIDs, "role-ids", "", "comma-separated role IDs")
+	flags.StringVar(&options.Statuses, "statuses", "", "comma-separated member statuses, e.g. enabled,disabled")
+	flags.BoolVar(&options.IncludeChildren, "include-children", false, "include members from child departments")
+	flags.IntVar(&options.Page, "page", 0, "page number")
+	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
+	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	return command
+}
+
+func (o memberSearchOptions) params() map[string]any {
+	params := map[string]any{}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "query", o.Query)
+	setCLIStringParam(params, "deptIds", o.DeptIDs)
+	setCLIStringParam(params, "roleIds", o.RoleIDs)
+	setCLIStringParam(params, "statuses", o.Statuses)
+	if o.IncludeChildren {
+		params["includeChildren"] = true
+	}
+	if o.Page > 0 {
+		params["page"] = o.Page
+	}
+	if o.PerPage > 0 {
+		params["perPage"] = o.PerPage
+	}
+	return params
 }

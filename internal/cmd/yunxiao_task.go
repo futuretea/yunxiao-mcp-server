@@ -236,3 +236,62 @@ func (o taskTimelineOptions) params(workitemID string) map[string]any {
 	setCLIStringParam(params, "organizationId", o.OrganizationID)
 	return params
 }
+
+type taskMyOptions struct {
+	OrganizationID string
+	ProjectID      string
+	Relation       string
+	Status         string
+	Categories     string
+	SampleLimit    int
+}
+
+func newYunxiaoTaskMyCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options taskMyOptions
+	command := &cobra.Command{
+		Use:     "my <project-id>",
+		Aliases: []string{"mine"},
+		Short:   "show my work items in a project as JSON",
+		Example: `  # Show my assigned tasks
+  yunxiao task my 123
+
+  # Show tasks I created
+  yunxiao task my 123 --relation created
+
+  # Filter by status
+  yunxiao task my 123 --status "处理中"`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_my_project_workitems", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Relation, "relation", "", "filter relation: assigned or created; defaults to assigned")
+	flags.StringVar(&options.Status, "status", "", "comma-separated status IDs")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Task,Bug")
+	flags.IntVar(&options.SampleLimit, "sample-limit", 0, "samples per category")
+	return command
+}
+
+func (o taskMyOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "relation", o.Relation)
+	setCLIStringParam(params, "status", o.Status)
+	setCLIStringParam(params, "categories", o.Categories)
+	if o.SampleLimit > 0 {
+		params["sampleLimit"] = o.SampleLimit
+	}
+	return params
+}

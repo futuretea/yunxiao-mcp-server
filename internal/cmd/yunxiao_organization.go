@@ -22,6 +22,7 @@ func newYunxiaoOrganizationCommand(streams IOStreams, cfgFile *string, v *viper.
 	}
 	command.AddCommand(newYunxiaoOrganizationListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoOrganizationViewCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoOrganizationInfoCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -179,4 +180,26 @@ func (o orgViewOptions) params() map[string]any {
 		params["groupLimit"] = o.GroupLimit
 	}
 	return params
+}
+
+func newYunxiaoOrganizationInfoCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	command := &cobra.Command{
+		Use:   "info",
+		Short: "show current default organization info as JSON",
+		Example: `  # Show default organization
+  yunxiao organization info`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_current_organization_info", map[string]any{})
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	return command
 }
