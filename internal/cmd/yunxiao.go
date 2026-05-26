@@ -136,6 +136,7 @@ func newYunxiaoTaskCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *
 	}
 	command.AddCommand(newYunxiaoTaskListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTaskViewCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTaskTypeListCommand(streams, cfgFile, v))
 	return command
 }
 
