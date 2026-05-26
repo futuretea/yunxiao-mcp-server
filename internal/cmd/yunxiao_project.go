@@ -31,6 +31,7 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 	command.AddCommand(newYunxiaoProjectRoleCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectViewCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectSummaryCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectContextCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -285,4 +286,88 @@ func (o projectSummaryOptions) params() map[string]any {
 		params["sampleLimit"] = o.SampleLimit
 	}
 	return params
+}
+
+type projectContextOptions struct {
+	OrganizationID  string
+	ProjectID       string
+	Category        string
+	WorkItemTypeID  string
+	IncludeMembers  bool
+	IncludeLabels   bool
+	IncludeFields   bool
+	IncludeWorkflow bool
+	Page            int
+	PerPage         int
+}
+
+func newYunxiaoProjectContextCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	options := projectContextOptions{
+		IncludeMembers:  true,
+		IncludeLabels:   true,
+		IncludeFields:   true,
+		IncludeWorkflow: true,
+	}
+	command := &cobra.Command{
+		Use:     "context <project-id>",
+		Aliases: []string{"ctx", "meta"},
+		Short:   "get project work item metadata context as JSON",
+		Example: `  # Get context for tasks
+  yunxiao project context 123 --category Task
+
+  # Get context for a specific work item type
+  yunxiao project ctx 123 --category Task --work-item-type-id 456`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			params, err := options.params()
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_project_workitem_context", params)
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Category, "category", "", "work item category, e.g. Task, Bug, Req, Risk")
+	flags.StringVar(&options.WorkItemTypeID, "work-item-type-id", "", "optional work item type ID for field/workflow metadata")
+	flags.BoolVar(&options.IncludeMembers, "include-members", true, "include project members")
+	flags.BoolVar(&options.IncludeLabels, "include-labels", true, "include project labels")
+	flags.BoolVar(&options.IncludeFields, "include-fields", true, "include field configuration when type is set")
+	flags.BoolVar(&options.IncludeWorkflow, "include-workflow", true, "include workflow metadata when type is set")
+	flags.IntVar(&options.Page, "page", 0, "labels page number")
+	flags.IntVar(&options.PerPage, "per-page", 0, "labels page size")
+	return command
+}
+
+func (o projectContextOptions) params() (map[string]any, error) {
+	params := map[string]any{
+		"projectId":        o.ProjectID,
+		"category":         o.Category,
+		"includeMembers":   o.IncludeMembers,
+		"includeLabels":    o.IncludeLabels,
+		"includeFields":    o.IncludeFields,
+		"includeWorkflow":  o.IncludeWorkflow,
+	}
+	if params["category"] == "" {
+		return nil, fmt.Errorf("category is required, e.g. Task, Bug, Req, Risk")
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "workItemTypeId", o.WorkItemTypeID)
+	if o.Page > 0 {
+		params["page"] = o.Page
+	}
+	if o.PerPage > 0 {
+		params["perPage"] = o.PerPage
+	}
+	return params, nil
 }
