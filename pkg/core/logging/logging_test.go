@@ -9,14 +9,8 @@ import (
 )
 
 func preserveLogger() func() {
-	globalLevel := zerolog.GlobalLevel()
-	logger := log.Logger
-	timeFieldFormat := zerolog.TimeFieldFormat
-	return func() {
-		zerolog.SetGlobalLevel(globalLevel)
-		log.Logger = logger
-		zerolog.TimeFieldFormat = timeFieldFormat
-	}
+	saved := SaveGlobalState()
+	return func() { RestoreGlobalState(saved) }
 }
 
 func TestInitializeSetsLevelAndOutput(t *testing.T) {

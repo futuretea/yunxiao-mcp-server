@@ -9,13 +9,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/futuretea/yunxiao-mcp-server/pkg/core/logging"
 )
 
 func TestVersionCommandPrintsVersionInfo(t *testing.T) {
+	restoreLogger := preserveLogger()
+	t.Cleanup(restoreLogger)
+
 	var out, errOut bytes.Buffer
 	command := NewMCPServer(IOStreams{Out: &out, ErrOut: &errOut})
 	command.SetArgs([]string{"version"})
@@ -32,6 +35,9 @@ func TestVersionCommandPrintsVersionInfo(t *testing.T) {
 }
 
 func TestRootCommandHelp(t *testing.T) {
+	restoreLogger := preserveLogger()
+	t.Cleanup(restoreLogger)
+
 	var out bytes.Buffer
 	command := NewMCPServer(IOStreams{Out: &out, ErrOut: &bytes.Buffer{}})
 	command.SetArgs([]string{"--help"})
@@ -117,12 +123,6 @@ func TestBindFlagsReturnsErrorOnMissingFlag(t *testing.T) {
 }
 
 func preserveLogger() func() {
-	globalLevel := zerolog.GlobalLevel()
-	logger := log.Logger
-	timeFieldFormat := zerolog.TimeFieldFormat
-	return func() {
-		zerolog.SetGlobalLevel(globalLevel)
-		log.Logger = logger
-		zerolog.TimeFieldFormat = timeFieldFormat
-	}
+	saved := logging.SaveGlobalState()
+	return func() { logging.RestoreGlobalState(saved) }
 }
