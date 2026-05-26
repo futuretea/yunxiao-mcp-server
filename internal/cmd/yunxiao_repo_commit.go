@@ -139,10 +139,6 @@ type repoCommitRow struct {
 	Date    string
 }
 
-func repoCommitRowsFromJSON(raw string) []repoCommitRow {
-	rows, _ := repoCommitRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func repoCommitRowsFromJSONForPrint(raw string) ([]repoCommitRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

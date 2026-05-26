@@ -132,10 +132,6 @@ type mrRow struct {
 	Target string
 }
 
-func mrRowsFromJSON(raw string) []mrRow {
-	rows, _ := mrRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func mrRowsFromJSONForPrint(raw string) ([]mrRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

@@ -100,10 +100,6 @@ type pipelineResourceMemberRow struct {
 	Role string
 }
 
-func pipelineResourceMemberRowsFromJSON(raw string) []pipelineResourceMemberRow {
-	rows, _ := pipelineResourceMemberRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func pipelineResourceMemberRowsFromJSONForPrint(raw string) ([]pipelineResourceMemberRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

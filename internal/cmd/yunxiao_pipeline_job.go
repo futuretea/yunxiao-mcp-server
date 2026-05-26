@@ -160,10 +160,6 @@ func (o pipelineJobLogOptions) params() (map[string]any, error) {
 	return params, nil
 }
 
-func pipelineJobRowsFromJSON(raw string) []pipelineJobRow {
-	rows, _ := pipelineJobRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func pipelineJobRowsFromJSONForPrint(raw string) ([]pipelineJobRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

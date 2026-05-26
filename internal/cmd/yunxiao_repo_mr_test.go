@@ -172,7 +172,7 @@ func TestPrintMRListPrintsHeaderForEmptyList(t *testing.T) {
 }
 
 func TestMRRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := mrRowsFromJSON(`{"result":{"items":[{"mergeRequestId":"mr-1","localId":"12","name":"Fix login","status":"merged","authorName":"carol","target":"develop"}]}}`)
+	rows, _ := mrRowsFromJSONForPrint(`{"result":{"items":[{"mergeRequestId":"mr-1","localId":"12","name":"Fix login","status":"merged","authorName":"carol","target":"develop"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -183,7 +183,7 @@ func TestMRRowsFromJSONExtractsAlternateFields(t *testing.T) {
 }
 
 func TestMRRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := mrRowsFromJSON(`{"data":["skip",{"id":"2","iid":"43","title":"Update docs","state":"closed","authorUsername":"dan","targetBranchName":"staging"}]}`)
+	rows, _ := mrRowsFromJSONForPrint(`{"data":["skip",{"id":"2","iid":"43","title":"Update docs","state":"closed","authorUsername":"dan","targetBranchName":"staging"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -286,7 +286,7 @@ func TestMRViewOptionsParamsRequiresRepositoryID(t *testing.T) {
 }
 
 func TestMRRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := mrRowsFromJSON(`not-json`); len(rows) != 0 {
+	if rows, _ := mrRowsFromJSONForPrint(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }

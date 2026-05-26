@@ -124,10 +124,6 @@ type pipelineRow struct {
 	LastRun string
 }
 
-func pipelineRowsFromJSON(raw string) []pipelineRow {
-	rows, _ := pipelineRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func pipelineRowsFromJSONForPrint(raw string) ([]pipelineRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

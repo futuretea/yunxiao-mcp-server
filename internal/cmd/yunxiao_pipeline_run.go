@@ -127,10 +127,6 @@ type pipelineRunRow struct {
 	Trigger string
 }
 
-func pipelineRunRowsFromJSON(raw string) []pipelineRunRow {
-	rows, _ := pipelineRunRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func pipelineRunRowsFromJSONForPrint(raw string) ([]pipelineRunRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

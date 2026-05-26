@@ -117,10 +117,6 @@ type repoBranchRow struct {
 	LastCommit string
 }
 
-func repoBranchRowsFromJSON(raw string) []repoBranchRow {
-	rows, _ := repoBranchRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func repoBranchRowsFromJSONForPrint(raw string) ([]repoBranchRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

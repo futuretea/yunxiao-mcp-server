@@ -167,7 +167,7 @@ func TestPrintRepoBranchListPrintsHeaderForEmptyList(t *testing.T) {
 }
 
 func TestRepoBranchRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := repoBranchRowsFromJSON(`{"result":{"items":[{"branchName":"dev","isDefault":false,"isProtected":true,"latestCommit":{"sha":"def456"}}]}}`)
+	rows, _ := repoBranchRowsFromJSONForPrint(`{"result":{"items":[{"branchName":"dev","isDefault":false,"isProtected":true,"latestCommit":{"sha":"def456"}}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -178,7 +178,7 @@ func TestRepoBranchRowsFromJSONExtractsAlternateFields(t *testing.T) {
 }
 
 func TestRepoBranchRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := repoBranchRowsFromJSON(`{"data":["skip",{"name":"main"}]}`)
+	rows, _ := repoBranchRowsFromJSONForPrint(`{"data":["skip",{"name":"main"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -188,7 +188,7 @@ func TestRepoBranchRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 }
 
 func TestRepoBranchRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := repoBranchRowsFromJSON(`not-json`); len(rows) != 0 {
+	if rows, _ := repoBranchRowsFromJSONForPrint(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }

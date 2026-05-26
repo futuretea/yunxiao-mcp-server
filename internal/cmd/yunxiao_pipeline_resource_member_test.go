@@ -192,7 +192,7 @@ func TestPrintPipelineResourceMemberListPrintsHeaderForEmptyList(t *testing.T) {
 }
 
 func TestPipelineResourceMemberRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := pipelineResourceMemberRowsFromJSON(`{"result":{"items":[{"accountId":"a-1","username":"alice","accessLevel":"admin"}]}}`)
+	rows, _ := pipelineResourceMemberRowsFromJSONForPrint(`{"result":{"items":[{"accountId":"a-1","username":"alice","accessLevel":"admin"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -203,7 +203,7 @@ func TestPipelineResourceMemberRowsFromJSONExtractsAlternateFields(t *testing.T)
 }
 
 func TestPipelineResourceMemberRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := pipelineResourceMemberRowsFromJSON(`{"data":["skip",{"memberId":"m-1","nickName":"Bob","roleName":"Viewer"}]}`)
+	rows, _ := pipelineResourceMemberRowsFromJSONForPrint(`{"data":["skip",{"memberId":"m-1","nickName":"Bob","roleName":"Viewer"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -214,7 +214,7 @@ func TestPipelineResourceMemberRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 }
 
 func TestPipelineResourceMemberRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := pipelineResourceMemberRowsFromJSON(`not-json`); len(rows) != 0 {
+	if rows, _ := pipelineResourceMemberRowsFromJSONForPrint(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }
