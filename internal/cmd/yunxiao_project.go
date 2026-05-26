@@ -32,6 +32,10 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 	command.AddCommand(newYunxiaoProjectViewCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectSummaryCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectContextCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectRiskCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectBlockersCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectWorkloadCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectBoardCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -368,6 +372,262 @@ func (o projectContextOptions) params() (map[string]any, error) {
 	}
 	if o.PerPage > 0 {
 		params["perPage"] = o.PerPage
+	}
+	return params, nil
+}
+
+type projectRiskOptions struct {
+	OrganizationID string
+	ProjectID      string
+	Categories     string
+	Subject        string
+	Status         string
+	StatusStage    string
+	AssignedTo     string
+	Creator        string
+	Sprint         string
+	WorkItemType   string
+	Tag            string
+	SampleLimit    int
+}
+
+func newYunxiaoProjectRiskCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectRiskOptions
+	command := &cobra.Command{
+		Use:     "risk <project-id>",
+		Aliases: []string{"health"},
+		Short:   "show project risk dashboard as JSON",
+		Example: `  # View risk dashboard
+  yunxiao project risk 123
+
+  # Focus on specific categories
+  yunxiao project risk 123 --categories "Bug,Risk"`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_project_risk_dashboard", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Risk,Bug,Task")
+	flags.StringVar(&options.Subject, "subject", "", "subject/title keyword")
+	flags.StringVar(&options.Status, "status", "", "comma-separated active status IDs")
+	flags.StringVar(&options.StatusStage, "status-stage", "", "comma-separated status stage IDs")
+	flags.StringVar(&options.AssignedTo, "assigned-to", "", "comma-separated assignee user IDs")
+	flags.StringVar(&options.Creator, "creator", "", "comma-separated creator user IDs")
+	flags.StringVar(&options.Sprint, "sprint", "", "comma-separated sprint IDs")
+	flags.StringVar(&options.WorkItemType, "workitem-type", "", "comma-separated work item type IDs")
+	flags.StringVar(&options.Tag, "tag", "", "comma-separated tag IDs")
+	flags.IntVar(&options.SampleLimit, "sample-limit", 0, "samples per section")
+	return command
+}
+
+func (o projectRiskOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "categories", o.Categories)
+	setCLIStringParam(params, "subject", o.Subject)
+	setCLIStringParam(params, "status", o.Status)
+	setCLIStringParam(params, "statusStage", o.StatusStage)
+	setCLIStringParam(params, "assignedTo", o.AssignedTo)
+	setCLIStringParam(params, "creator", o.Creator)
+	setCLIStringParam(params, "sprint", o.Sprint)
+	setCLIStringParam(params, "workitemType", o.WorkItemType)
+	setCLIStringParam(params, "tag", o.Tag)
+	if o.SampleLimit > 0 {
+		params["sampleLimit"] = o.SampleLimit
+	}
+	return params
+}
+
+type projectBlockersOptions struct {
+	OrganizationID string
+	ProjectID      string
+	Categories     string
+	SampleLimit    int
+}
+
+func newYunxiaoProjectBlockersCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectBlockersOptions
+	command := &cobra.Command{
+		Use:     "blockers <project-id>",
+		Aliases: []string{"dependencies"},
+		Short:   "show dependency blocker analysis as JSON",
+		Example: `  # View blocker analysis
+  yunxiao project blockers 123`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_blocker_analysis", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Task,Bug")
+	flags.IntVar(&options.SampleLimit, "sample-limit", 0, "max work items per category")
+	return command
+}
+
+func (o projectBlockersOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "categories", o.Categories)
+	if o.SampleLimit > 0 {
+		params["sampleLimit"] = o.SampleLimit
+	}
+	return params
+}
+
+type projectWorkloadOptions struct {
+	OrganizationID string
+	ProjectID      string
+	AssigneeIDs    string
+	Categories     string
+	Status         string
+	MemberLimit    int
+	TaskLimit      int
+}
+
+func newYunxiaoProjectWorkloadCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectWorkloadOptions
+	command := &cobra.Command{
+		Use:     "workload <project-id>",
+		Aliases: []string{"capacity"},
+		Short:   "show per-member workload breakdown as JSON",
+		Example: `  # View team workload
+  yunxiao project workload 123
+
+  # Filter by assignees
+  yunxiao project workload 123 --assignee-ids "user1,user2"`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_team_workload_breakdown", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.AssigneeIDs, "assignee-ids", "", "comma-separated assignee user IDs")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Task,Bug")
+	flags.StringVar(&options.Status, "status", "", "comma-separated status IDs to include")
+	flags.IntVar(&options.MemberLimit, "member-limit", 0, "max members to inspect")
+	flags.IntVar(&options.TaskLimit, "task-limit", 0, "max tasks per member")
+	return command
+}
+
+func (o projectWorkloadOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "assigneeIds", o.AssigneeIDs)
+	setCLIStringParam(params, "categories", o.Categories)
+	setCLIStringParam(params, "status", o.Status)
+	if o.MemberLimit > 0 {
+		params["memberLimit"] = o.MemberLimit
+	}
+	if o.TaskLimit > 0 {
+		params["taskLimit"] = o.TaskLimit
+	}
+	return params
+}
+
+type projectBoardOptions struct {
+	OrganizationID string
+	ProjectID      string
+	Category       string
+	Sprint         string
+	Subject        string
+	Status         string
+	AssignedTo     string
+	Creator        string
+	SampleLimit    int
+}
+
+func newYunxiaoProjectBoardCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectBoardOptions
+	command := &cobra.Command{
+		Use:     "board <project-id>",
+		Aliases: []string{"kanban"},
+		Short:   "show Kanban board grouped by status as JSON",
+		Example: `  # View task board
+  yunxiao project board 123 --category Task
+
+  # Filter by sprint
+  yunxiao project board 123 --category Task --sprint sprint-456`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			params, err := options.params()
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_project_workitem_board", params)
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Category, "category", "", "work item category, e.g. Task or Bug")
+	flags.StringVar(&options.Sprint, "sprint", "", "sprint ID filter")
+	flags.StringVar(&options.Subject, "subject", "", "subject/title keyword")
+	flags.StringVar(&options.Status, "status", "", "comma-separated status IDs")
+	flags.StringVar(&options.AssignedTo, "assigned-to", "", "comma-separated assignee user IDs")
+	flags.StringVar(&options.Creator, "creator", "", "comma-separated creator user IDs")
+	flags.IntVar(&options.SampleLimit, "sample-limit", 0, "max work items returned")
+	return command
+}
+
+func (o projectBoardOptions) params() (map[string]any, error) {
+	params := map[string]any{
+		"projectId": o.ProjectID,
+		"category":  o.Category,
+	}
+	if params["category"] == "" {
+		return nil, fmt.Errorf("category is required, e.g. Task or Bug")
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "sprint", o.Sprint)
+	setCLIStringParam(params, "subject", o.Subject)
+	setCLIStringParam(params, "status", o.Status)
+	setCLIStringParam(params, "assignedTo", o.AssignedTo)
+	setCLIStringParam(params, "creator", o.Creator)
+	if o.SampleLimit > 0 {
+		params["sampleLimit"] = o.SampleLimit
 	}
 	return params, nil
 }

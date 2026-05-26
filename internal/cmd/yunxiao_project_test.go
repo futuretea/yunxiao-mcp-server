@@ -225,3 +225,55 @@ func TestYunxiaoCLIProjectSummaryReturnsToolError(t *testing.T) {
 		t.Fatalf("error = %v", err)
 	}
 }
+
+func TestYunxiaoCLIProjectRiskReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "projex", "project", "risk", "123"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected tool error")
+	}
+	if !strings.Contains(err.Error(), `unknown Yunxiao tool "get_project_risk_dashboard"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestYunxiaoCLIProjectBlockersReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "projex", "project", "blockers", "123"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected tool error")
+	}
+	if !strings.Contains(err.Error(), `unknown Yunxiao tool "get_blocker_analysis"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestYunxiaoCLIProjectWorkloadReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "projex", "project", "workload", "123"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected tool error")
+	}
+	if !strings.Contains(err.Error(), `unknown Yunxiao tool "get_team_workload_breakdown"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestYunxiaoCLIProjectBoardReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "projex", "project", "board", "123", "--category", "Task"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected tool error")
+	}
+	if !strings.Contains(err.Error(), `unknown Yunxiao tool "get_project_workitem_board"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
