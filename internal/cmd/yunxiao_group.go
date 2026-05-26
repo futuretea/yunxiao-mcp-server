@@ -22,6 +22,7 @@ func newYunxiaoGroupCommand(streams IOStreams, cfgFile *string, v *viper.Viper) 
 		Short:   "work with Yunxiao organization groups",
 	}
 	command.AddCommand(newYunxiaoGroupListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoGroupViewCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -111,4 +112,53 @@ func groupRowsFromJSONForPrint(raw string) ([]groupRow, bool) {
 		})
 	}
 	return rows, true
+}
+
+type groupViewOptions struct {
+	OrganizationID string
+	GroupID        string
+	IncludeMembers bool
+	MemberLimit    int
+}
+
+func newYunxiaoGroupViewCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	options := groupViewOptions{IncludeMembers: true}
+	command := &cobra.Command{
+		Use:     "view <group-id>",
+		Aliases: []string{"overview"},
+		Short:   "view a group overview as JSON",
+		Example: `  # View group
+  yunxiao group view group-123`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.GroupID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_organization_group_overview", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.BoolVar(&options.IncludeMembers, "include-members", true, "include group members")
+	flags.IntVar(&options.MemberLimit, "member-limit", 0, "max members to include")
+	return command
+}
+
+func (o groupViewOptions) params() map[string]any {
+	params := map[string]any{
+		"groupId":        o.GroupID,
+		"includeMembers": o.IncludeMembers,
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	if o.MemberLimit > 0 {
+		params["memberLimit"] = o.MemberLimit
+	}
+	return params
 }

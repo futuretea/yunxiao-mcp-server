@@ -32,6 +32,7 @@ func newYunxiaoUserCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *
 	command.AddCommand(newYunxiaoUserWhoamiCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoUserListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoUserGetCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoUserOrgsCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -201,4 +202,27 @@ func userRowsFromJSONForPrint(raw string) ([]userRow, bool) {
 		})
 	}
 	return rows, true
+}
+
+func newYunxiaoUserOrgsCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	command := &cobra.Command{
+		Use:     "orgs",
+		Aliases: []string{"organizations"},
+		Short:   "list organizations visible to the current user as JSON",
+		Example: `  # List my organizations
+  yunxiao user orgs`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_user_organizations", map[string]any{})
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	return command
 }

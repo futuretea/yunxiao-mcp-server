@@ -23,6 +23,7 @@ func newYunxiaoDepartmentCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 		Short:   "work with Yunxiao organization departments",
 	}
 	command.AddCommand(newYunxiaoDepartmentListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoDepartmentViewCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -117,4 +118,48 @@ func departmentRowsFromJSONForPrint(raw string) ([]departmentRow, bool) {
 		})
 	}
 	return rows, true
+}
+
+type departmentViewOptions struct {
+	OrganizationID  string
+	DepartmentID    string
+	IncludeAncestors bool
+}
+
+func newYunxiaoDepartmentViewCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	options := departmentViewOptions{IncludeAncestors: true}
+	command := &cobra.Command{
+		Use:     "view <department-id>",
+		Aliases: []string{"overview"},
+		Short:   "view a department overview as JSON",
+		Example: `  # View department
+  yunxiao department view dept-123`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.DepartmentID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_organization_department_overview", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.BoolVar(&options.IncludeAncestors, "include-ancestors", true, "include ancestor chain")
+	return command
+}
+
+func (o departmentViewOptions) params() map[string]any {
+	params := map[string]any{
+		"departmentId":     o.DepartmentID,
+		"includeAncestors": o.IncludeAncestors,
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params
 }
