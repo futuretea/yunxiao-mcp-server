@@ -295,3 +295,63 @@ func (o taskMyOptions) params() map[string]any {
 	}
 	return params
 }
+
+type taskTypeViewOptions struct {
+	OrganizationID    string
+	ProjectID         string
+	WorkItemTypeID    string
+	IncludeFieldConfig bool
+	IncludeWorkflow   bool
+}
+
+func newYunxiaoTaskTypeViewCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	options := taskTypeViewOptions{
+		IncludeFieldConfig: true,
+		IncludeWorkflow:    true,
+	}
+	command := &cobra.Command{
+		Use:     "type-view <type-id>",
+		Aliases: []string{"type-info"},
+		Short:   "show work item type details as JSON",
+		Example: `  # View work item type details
+  yunxiao task type-view 456 --project-id 123`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.WorkItemTypeID = args[0]
+			params, err := options.params()
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_work_item_type_overview", params)
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.ProjectID, "project-id", "", "Projex project ID")
+	flags.BoolVar(&options.IncludeFieldConfig, "include-field-config", true, "include field configuration")
+	flags.BoolVar(&options.IncludeWorkflow, "include-workflow", true, "include workflow metadata")
+	return command
+}
+
+func (o taskTypeViewOptions) params() (map[string]any, error) {
+	params := map[string]any{
+		"projectId":         o.ProjectID,
+		"workItemTypeId":    o.WorkItemTypeID,
+		"includeFieldConfig": o.IncludeFieldConfig,
+		"includeWorkflow":   o.IncludeWorkflow,
+	}
+	if params["projectId"] == "" {
+		return nil, fmt.Errorf("project-id is required")
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params, nil
+}
