@@ -164,7 +164,7 @@ func TestPrintRepoFileListShowsNoResultsWhenRowsEmpty(t *testing.T) {
 }
 
 func TestRepoFileRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := repoFileRowsFromJSON(`{"result":{"items":[{"filePath":"README.md","kind":"blob","fileSize":456,"mode":"100644"}]}}`)
+	rows, _ := repoFileRowsFromJSONForPrint(`{"result":{"items":[{"filePath":"README.md","kind":"blob","fileSize":456,"mode":"100644"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -175,7 +175,7 @@ func TestRepoFileRowsFromJSONExtractsAlternateFields(t *testing.T) {
 }
 
 func TestRepoFileRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := repoFileRowsFromJSON(`{"data":["skip",{"path":"README.md"}]}`)
+	rows, _ := repoFileRowsFromJSONForPrint(`{"data":["skip",{"path":"README.md"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -185,7 +185,7 @@ func TestRepoFileRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 }
 
 func TestRepoFileRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := repoFileRowsFromJSON(`not-json`); len(rows) != 0 {
+	if rows, _ := repoFileRowsFromJSONForPrint(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }

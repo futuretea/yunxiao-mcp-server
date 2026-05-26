@@ -192,7 +192,7 @@ func TestPrintPipelineRunListPrintsHeaderForEmptyList(t *testing.T) {
 }
 
 func TestPipelineRunRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := pipelineRunRowsFromJSON(`{"result":{"items":[{"runId":"run-1","runStatus":"RUNNING","runResult":"UNKNOWN","startedAt":"2026-05-25T10:00:00Z","finishedAt":"2026-05-25T10:10:00Z","triggerUser":"alice"}]}}`)
+	rows, _ := pipelineRunRowsFromJSONForPrint(`{"result":{"items":[{"runId":"run-1","runStatus":"RUNNING","runResult":"UNKNOWN","startedAt":"2026-05-25T10:00:00Z","finishedAt":"2026-05-25T10:10:00Z","triggerUser":"alice"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -210,7 +210,7 @@ func TestPipelineRunRowsFromJSONExtractsAlternateFields(t *testing.T) {
 }
 
 func TestPipelineRunRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := pipelineRunRowsFromJSON(`{"data":["skip",{"id":"run-1","state":"SUCCESS","executeResult":"PASS","gmtStarted":"start","gmtFinished":"end","creator":"bob"}]}`)
+	rows, _ := pipelineRunRowsFromJSONForPrint(`{"data":["skip",{"id":"run-1","state":"SUCCESS","executeResult":"PASS","gmtStarted":"start","gmtFinished":"end","creator":"bob"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -221,7 +221,7 @@ func TestPipelineRunRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 }
 
 func TestPipelineRunRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := pipelineRunRowsFromJSON(`not-json`); len(rows) != 0 {
+	if rows, _ := pipelineRunRowsFromJSONForPrint(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }

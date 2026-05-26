@@ -238,7 +238,7 @@ func TestPrintRepoCommitListShowsNoResultsWhenRowsEmpty(t *testing.T) {
 }
 
 func TestRepoCommitRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := repoCommitRowsFromJSON(`{"result":{"items":[{"sha":"abcdef123456","short_id":"abcdef1","message":"Fix login","author":{"displayName":"Alice"},"committed_date":"2026-05-24"}]}}`)
+	rows, _ := repoCommitRowsFromJSONForPrint(`{"result":{"items":[{"sha":"abcdef123456","short_id":"abcdef1","message":"Fix login","author":{"displayName":"Alice"},"committed_date":"2026-05-24"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -249,7 +249,7 @@ func TestRepoCommitRowsFromJSONExtractsAlternateFields(t *testing.T) {
 }
 
 func TestRepoCommitRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := repoCommitRowsFromJSON(`{"data":["skip",{"id":"abcdef123456"}]}`)
+	rows, _ := repoCommitRowsFromJSONForPrint(`{"data":["skip",{"id":"abcdef123456"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -259,7 +259,7 @@ func TestRepoCommitRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 }
 
 func TestRepoCommitRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := repoCommitRowsFromJSON(`not-json`); len(rows) != 0 {
+	if rows, _ := repoCommitRowsFromJSONForPrint(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }

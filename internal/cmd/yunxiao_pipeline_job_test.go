@@ -179,7 +179,7 @@ func TestPrintPipelineJobListPrintsHeaderForEmptyList(t *testing.T) {
 }
 
 func TestPipelineJobRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := pipelineJobRowsFromJSON(`{"result":{"items":[{"id":"job-1","displayName":"Job 1","taskCategory":"BUILD","taskStatus":"RUNNING"}]}}`)
+	rows, _ := pipelineJobRowsFromJSONForPrint(`{"result":{"items":[{"id":"job-1","displayName":"Job 1","taskCategory":"BUILD","taskStatus":"RUNNING"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -195,7 +195,7 @@ func TestPipelineJobRowsFromJSONExtractsAlternateFields(t *testing.T) {
 }
 
 func TestPipelineJobRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := pipelineJobRowsFromJSON(`{"data":["skip",{"jobId":"j-1","taskName":"Deploy","category":"DEPLOY","state":"SUCCESS"}]}`)
+	rows, _ := pipelineJobRowsFromJSONForPrint(`{"data":["skip",{"jobId":"j-1","taskName":"Deploy","category":"DEPLOY","state":"SUCCESS"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -206,7 +206,7 @@ func TestPipelineJobRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 }
 
 func TestPipelineJobRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := pipelineJobRowsFromJSON(`not-json`); len(rows) != 0 {
+	if rows, _ := pipelineJobRowsFromJSONForPrint(`not-json`); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }

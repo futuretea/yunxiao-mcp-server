@@ -109,10 +109,6 @@ type repoFileRow struct {
 	Mode string
 }
 
-func repoFileRowsFromJSON(raw string) []repoFileRow {
-	rows, _ := repoFileRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func repoFileRowsFromJSONForPrint(raw string) ([]repoFileRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

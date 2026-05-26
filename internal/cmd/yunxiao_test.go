@@ -472,20 +472,20 @@ func TestYunxiaoCLIToolsCallRejectsReadOnlyWriteTool(t *testing.T) {
 }
 
 func TestParseToolParamsRejectsNonObject(t *testing.T) {
-	if _, err := parseToolParams("[]", ""); err == nil {
-		t.Fatal("parseToolParams() expected error")
+	if _, err := parseToolParamsWithInput("[]", "", nil); err == nil {
+		t.Fatal("parseToolParamsWithInput() expected error")
 	}
 }
 
 func TestParseToolParamsRejectsTrailingJSON(t *testing.T) {
-	if _, err := parseToolParams(`{} {}`, ""); err == nil {
-		t.Fatal("parseToolParams() expected trailing JSON error")
+	if _, err := parseToolParamsWithInput(`{} {}`, "", nil); err == nil {
+		t.Fatal("parseToolParamsWithInput() expected trailing JSON error")
 	}
 }
 
 func TestParseToolParamsRejectsUnreadableFile(t *testing.T) {
-	_, err := parseToolParams("{}", filepath.Join(t.TempDir(), "missing.json"))
+	_, err := parseToolParamsWithInput("{}", filepath.Join(t.TempDir(), "missing.json"), nil)
 	if err == nil {
-		t.Fatal("parseToolParams() expected file read error")
+		t.Fatal("parseToolParamsWithInput() expected file read error")
 	}
 }

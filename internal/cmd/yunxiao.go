@@ -358,9 +358,6 @@ func printToolSummariesTable(out anyWriter, tools []toolset.ServerTool) error {
 	return writer.Flush()
 }
 
-func parseToolParams(rawParams, paramsFile string) (map[string]any, error) {
-	return parseToolParamsWithInput(rawParams, paramsFile, nil)
-}
 
 func parseToolParamsWithInput(rawParams, paramsFile string, in io.Reader) (map[string]any, error) {
 	if strings.TrimSpace(paramsFile) != "" {

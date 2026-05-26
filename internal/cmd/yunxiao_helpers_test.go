@@ -48,9 +48,9 @@ func TestNewToolSummaryMarksWriteTools(t *testing.T) {
 }
 
 func TestParseToolParamsAcceptsEmptyInput(t *testing.T) {
-	params, err := parseToolParams("   ", "")
+	params, err := parseToolParamsWithInput("   ", "", nil)
 	if err != nil {
-		t.Fatalf("parseToolParams() error = %v", err)
+		t.Fatalf("parseToolParamsWithInput() error = %v", err)
 	}
 	if len(params) != 0 {
 		t.Fatalf("params = %#v, want empty map", params)

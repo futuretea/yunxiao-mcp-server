@@ -187,7 +187,7 @@ func TestPrintRepoChangeRequestListShowsNoResultsWhenRowsEmpty(t *testing.T) {
 }
 
 func TestRepoChangeRequestRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := repoChangeRequestRowsFromJSON(`{"result":{"items":[{"iid":"12","project":{"displayName":"Demo Repo"},"subject":"Add CLI","status":"opened","creator":{"displayName":"Ada"},"source_branch":"feature","target_branch":"main"}]}}`)
+	rows, _ := repoChangeRequestRowsFromJSONForPrint(`{"result":{"items":[{"iid":"12","project":{"displayName":"Demo Repo"},"subject":"Add CLI","status":"opened","creator":{"displayName":"Ada"},"source_branch":"feature","target_branch":"main"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v, want one row", rows)
 	}
@@ -307,7 +307,7 @@ func TestPrintCRPatchSetListPrintsHeaderForEmptyList(t *testing.T) {
 }
 
 func TestCRPatchSetRowsFromJSONExtractsAlternateFields(t *testing.T) {
-	rows := crPatchSetRowsFromJSON(`{"result":{"items":[{"patchSetBizId":"ps-2","sha":"def456","gmtCreated":"2026-02-01","commitInfo":"Update docs"}]}}`)
+	rows, _ := crPatchSetRowsFromJSONForPrint(`{"result":{"items":[{"patchSetBizId":"ps-2","sha":"def456","gmtCreated":"2026-02-01","commitInfo":"Update docs"}]}}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v", rows)
 	}
@@ -318,7 +318,7 @@ func TestCRPatchSetRowsFromJSONExtractsAlternateFields(t *testing.T) {
 }
 
 func TestCRPatchSetRowsFromJSONSkipsNonObjectRows(t *testing.T) {
-	rows := crPatchSetRowsFromJSON(`{"data":["skip",{"patchSetId":"ps-3","commitSha":"ghi789","createdDate":"2026-03-01","description":"Refactor"}]}`)
+	rows, _ := crPatchSetRowsFromJSONForPrint(`{"data":["skip",{"patchSetId":"ps-3","commitSha":"ghi789","createdDate":"2026-03-01","description":"Refactor"}]}`)
 	if len(rows) != 1 {
 		t.Fatalf("rows = %#v", rows)
 	}
@@ -329,7 +329,7 @@ func TestCRPatchSetRowsFromJSONSkipsNonObjectRows(t *testing.T) {
 }
 
 func TestCRPatchSetRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
-	if rows := crPatchSetRowsFromJSON("not-json"); len(rows) != 0 {
+	if rows, _ := crPatchSetRowsFromJSONForPrint("not-json"); len(rows) != 0 {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }

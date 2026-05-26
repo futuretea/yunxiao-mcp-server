@@ -245,10 +245,6 @@ func crPatchSetRowsFromJSONForPrint(raw string) ([]crPatchSetRow, bool) {
 	return rows, true
 }
 
-func repoChangeRequestRowsFromJSON(raw string) []repoChangeRequestRow {
-	rows, _ := repoChangeRequestRowsFromJSONForPrint(raw)
-	return rows
-}
 
 func repoChangeRequestRowsFromJSONForPrint(raw string) ([]repoChangeRequestRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)
