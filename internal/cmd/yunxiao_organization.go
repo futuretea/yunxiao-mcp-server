@@ -21,6 +21,7 @@ func newYunxiaoOrganizationCommand(streams IOStreams, cfgFile *string, v *viper.
 		Short:   "work with Yunxiao organizations",
 	}
 	command.AddCommand(newYunxiaoOrganizationListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoOrganizationViewCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -103,4 +104,79 @@ func organizationRowsFromJSON(raw string) []organizationRow {
 		})
 	}
 	return rows
+}
+
+type orgViewOptions struct {
+	OrganizationID     string
+	IncludeDepartments bool
+	IncludeMembers     bool
+	IncludeGroups      bool
+	IncludeRoles       bool
+	DepartmentLimit    int
+	MemberLimit        int
+	GroupLimit         int
+}
+
+func newYunxiaoOrganizationViewCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	options := orgViewOptions{
+		IncludeDepartments: true,
+		IncludeMembers:     true,
+		IncludeGroups:      true,
+		IncludeRoles:       true,
+	}
+	command := &cobra.Command{
+		Use:     "view",
+		Aliases: []string{"overview", "info"},
+		Short:   "view a Yunxiao organization overview as JSON",
+		Example: `  # View default organization
+  yunxiao organization view
+
+  # View specific organization
+  yunxiao organization view --organization-id org-abc
+
+  # View without member details
+  yunxiao organization view --include-members=false`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_organization_overview", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.BoolVar(&options.IncludeDepartments, "include-departments", true, "include departments list")
+	flags.BoolVar(&options.IncludeMembers, "include-members", true, "include members list")
+	flags.BoolVar(&options.IncludeGroups, "include-groups", true, "include groups list")
+	flags.BoolVar(&options.IncludeRoles, "include-roles", true, "include roles list")
+	flags.IntVar(&options.DepartmentLimit, "department-limit", 0, "max departments to include")
+	flags.IntVar(&options.MemberLimit, "member-limit", 0, "max members to include")
+	flags.IntVar(&options.GroupLimit, "group-limit", 0, "max groups to include")
+	return command
+}
+
+func (o orgViewOptions) params() map[string]any {
+	params := map[string]any{
+		"includeDepartments": o.IncludeDepartments,
+		"includeMembers":     o.IncludeMembers,
+		"includeGroups":      o.IncludeGroups,
+		"includeRoles":       o.IncludeRoles,
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	if o.DepartmentLimit > 0 {
+		params["departmentLimit"] = o.DepartmentLimit
+	}
+	if o.MemberLimit > 0 {
+		params["memberLimit"] = o.MemberLimit
+	}
+	if o.GroupLimit > 0 {
+		params["groupLimit"] = o.GroupLimit
+	}
+	return params
 }
