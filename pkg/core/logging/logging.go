@@ -30,3 +30,26 @@ func Disable() {
 	zerolog.SetGlobalLevel(zerolog.Disabled)
 	log.Logger = zerolog.New(io.Discard)
 }
+
+// GlobalState is a snapshot of process-wide zerolog configuration.
+type GlobalState struct {
+	Level           zerolog.Level
+	Logger          zerolog.Logger
+	TimeFieldFormat string
+}
+
+// SaveGlobalState captures the current zerolog global configuration.
+func SaveGlobalState() GlobalState {
+	return GlobalState{
+		Level:           zerolog.GlobalLevel(),
+		Logger:          log.Logger,
+		TimeFieldFormat: zerolog.TimeFieldFormat,
+	}
+}
+
+// RestoreGlobalState restores zerolog global configuration from a snapshot.
+func RestoreGlobalState(s GlobalState) {
+	zerolog.SetGlobalLevel(s.Level)
+	log.Logger = s.Logger
+	zerolog.TimeFieldFormat = s.TimeFieldFormat
+}
