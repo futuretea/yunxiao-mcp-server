@@ -38,6 +38,7 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 	command.AddCommand(newYunxiaoProjectBoardCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectLabelsCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectMilestonesCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectMemberTasksCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -835,4 +836,62 @@ func milestoneRowsFromJSONForPrint(raw string) ([]milestoneRow, bool) {
 		})
 	}
 	return rows, true
+}
+
+type projectMemberTasksOptions struct {
+	OrganizationID string
+	ProjectID      string
+	AssigneeIDs    string
+	Categories     string
+	Status         string
+	MemberLimit    int
+	SampleLimit    int
+}
+
+func newYunxiaoProjectMemberTasksCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectMemberTasksOptions
+	command := &cobra.Command{
+		Use:     "member-tasks <project-id>",
+		Aliases: []string{"member-status"},
+		Short:   "show per-member task status as JSON",
+		Example: `  # View per-member task status
+  yunxiao project member-tasks 123`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_project_member_task_status", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.AssigneeIDs, "assignee-ids", "", "comma-separated assignee user IDs")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Task,Bug")
+	flags.StringVar(&options.Status, "status", "", "comma-separated status IDs")
+	flags.IntVar(&options.MemberLimit, "member-limit", 0, "max members to inspect")
+	flags.IntVar(&options.SampleLimit, "sample-limit", 0, "samples per member section")
+	return command
+}
+
+func (o projectMemberTasksOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "assigneeIds", o.AssigneeIDs)
+	setCLIStringParam(params, "categories", o.Categories)
+	setCLIStringParam(params, "status", o.Status)
+	if o.MemberLimit > 0 {
+		params["memberLimit"] = o.MemberLimit
+	}
+	if o.SampleLimit > 0 {
+		params["sampleLimit"] = o.SampleLimit
+	}
+	return params
 }
