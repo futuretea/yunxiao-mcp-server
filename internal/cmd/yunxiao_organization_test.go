@@ -152,3 +152,40 @@ func TestOrganizationRowsFromJSONReturnsNilForInvalidPayload(t *testing.T) {
 		t.Fatalf("rows = %#v, want empty", rows)
 	}
 }
+
+func TestYunxiaoCLIOrganizationViewReturnsToolError(t *testing.T) {
+	command := NewYunxiaoCLI(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}})
+	command.SetArgs([]string{"--disable-domains", "platform", "organization", "view"})
+
+	err := command.Execute()
+	if err == nil {
+		t.Fatal("Execute() expected tool error")
+	}
+	if !strings.Contains(err.Error(), `unknown Yunxiao tool "get_organization_overview"`) {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestOrgViewOptionsParamsIncludesFlags(t *testing.T) {
+	params := (orgViewOptions{
+		OrganizationID:     " org-1 ",
+		IncludeDepartments: true,
+		IncludeMembers:     false,
+		IncludeGroups:      true,
+		DepartmentLimit:    3,
+	}).params()
+
+	wants := map[string]any{
+		"organizationId":     "org-1",
+		"includeDepartments": true,
+		"includeMembers":     false,
+		"includeGroups":      true,
+		"includeRoles":       false,
+		"departmentLimit":    3,
+	}
+	for key, want := range wants {
+		if got := params[key]; got != want {
+			t.Fatalf("params[%q] = %#v, want %#v", key, got, want)
+		}
+	}
+}

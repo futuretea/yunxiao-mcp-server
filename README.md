@@ -63,7 +63,9 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao mcp
 The same `yunxiao` binary also provides human-facing CLI commands:
 
 ```bash
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao department list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization list
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization view
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao member list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline list
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run list --pipeline-id <pipeline-id>
@@ -73,6 +75,7 @@ YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline job list --pipeline
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline job log --pipeline-id <pipeline-id> --run-id <run-id> --job-id <job-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline resource-member list --resource-id <pipeline-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
+YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project view <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member list --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project role list --project-id <project-id>
 YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo list
