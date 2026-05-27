@@ -18,6 +18,7 @@ type repoListOptions struct {
 	Archived       bool
 	ArchivedSet    bool
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoRepoCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -63,7 +64,7 @@ func newYunxiaoRepoListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -80,6 +81,7 @@ func newYunxiaoRepoListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	flags.StringVar(&options.Search, "search", "", "repository path search keyword")
 	flags.BoolVar(&options.Archived, "archived", false, "filter archived repositories; use --archived=false for non-archived only")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

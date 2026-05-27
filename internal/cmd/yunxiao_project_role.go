@@ -13,6 +13,7 @@ type projectRoleListOptions struct {
 	OrganizationID string
 	ProjectID      string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoProjectRoleCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -48,7 +49,7 @@ func newYunxiaoProjectRoleListCommand(streams IOStreams, cfgFile *string, v *vip
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -59,6 +60,7 @@ func newYunxiaoProjectRoleListCommand(streams IOStreams, cfgFile *string, v *vip
 	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
 	flags.StringVar(&options.ProjectID, "project-id", "", "Projex project ID")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

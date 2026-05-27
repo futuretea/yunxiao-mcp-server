@@ -19,6 +19,7 @@ type pipelineRunListOptions struct {
 	Status         string
 	TriggerMode    int
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoPipelineRunCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -55,7 +56,7 @@ func newYunxiaoPipelineRunListCommand(streams IOStreams, cfgFile *string, v *vip
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -73,6 +74,7 @@ func newYunxiaoPipelineRunListCommand(streams IOStreams, cfgFile *string, v *vip
 	flags.StringVar(&options.Status, "status", "", "run status, e.g. FAIL, SUCCESS, or RUNNING")
 	flags.IntVar(&options.TriggerMode, "trigger-mode", 0, "trigger mode: 1 manual, 2 scheduled, 3 code push, 5 pipeline, 6 webhook")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

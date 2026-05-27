@@ -17,6 +17,7 @@ type repoBranchListOptions struct {
 	Sort           string
 	Search         string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoRepoBranchCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -59,7 +60,7 @@ func newYunxiaoRepoBranchListCommand(streams IOStreams, cfgFile *string, v *vipe
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -75,6 +76,7 @@ func newYunxiaoRepoBranchListCommand(streams IOStreams, cfgFile *string, v *vipe
 	flags.StringVar(&options.Sort, "sort", "", "sort mode, e.g. name_asc, name_desc, updated_asc, updated_desc")
 	flags.StringVar(&options.Search, "search", "", "branch search keyword")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

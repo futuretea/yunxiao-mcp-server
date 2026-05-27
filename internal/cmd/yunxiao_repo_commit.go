@@ -23,6 +23,7 @@ type repoCommitListOptions struct {
 	ShowSignatureSet bool
 	CommitterIDs     string
 	JSONOutput       bool
+	OutputFormat string
 }
 
 func newYunxiaoRepoCommitCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -63,7 +64,7 @@ func newYunxiaoRepoCommitListCommand(streams IOStreams, cfgFile *string, v *vipe
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -84,6 +85,7 @@ func newYunxiaoRepoCommitListCommand(streams IOStreams, cfgFile *string, v *vipe
 	flags.BoolVar(&options.ShowSignature, "show-signature", false, "include commit signatures; use --show-signature=false to exclude explicitly")
 	flags.StringVar(&options.CommitterIDs, "committer-ids", "", "comma-separated committer user IDs")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

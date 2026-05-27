@@ -14,6 +14,7 @@ type pipelineJobListOptions struct {
 	PipelineID     string
 	Category       string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoPipelineJobCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -50,7 +51,7 @@ func newYunxiaoPipelineJobListCommand(streams IOStreams, cfgFile *string, v *vip
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -62,6 +63,7 @@ func newYunxiaoPipelineJobListCommand(streams IOStreams, cfgFile *string, v *vip
 	flags.StringVar(&options.PipelineID, "pipeline-id", "", "Flow pipeline ID")
 	flags.StringVar(&options.Category, "category", "", "task category, e.g. DEPLOY")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

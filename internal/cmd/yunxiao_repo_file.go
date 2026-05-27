@@ -16,6 +16,7 @@ type repoFileListOptions struct {
 	Ref            string
 	TreeType       string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoRepoFileCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -58,7 +59,7 @@ func newYunxiaoRepoFileListCommand(streams IOStreams, cfgFile *string, v *viper.
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -72,6 +73,7 @@ func newYunxiaoRepoFileListCommand(streams IOStreams, cfgFile *string, v *viper.
 	flags.StringVar(&options.Ref, "ref", "", "branch, tag, or commit SHA")
 	flags.StringVar(&options.TreeType, "type", "", "tree mode: DIRECT, RECURSIVE, or FLATTEN")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

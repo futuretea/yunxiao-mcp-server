@@ -14,6 +14,7 @@ type pipelineResourceMemberListOptions struct {
 	ResourceType   string
 	ResourceID     string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoPipelineResourceMemberCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -49,7 +50,7 @@ func newYunxiaoPipelineResourceMemberListCommand(streams IOStreams, cfgFile *str
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -61,6 +62,7 @@ func newYunxiaoPipelineResourceMemberListCommand(streams IOStreams, cfgFile *str
 	flags.StringVar(&options.ResourceType, "resource-type", "pipeline", "Flow resource type, e.g. pipeline or hostGroup")
 	flags.StringVar(&options.ResourceID, "resource-id", "", "Flow resource ID, e.g. pipeline ID")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

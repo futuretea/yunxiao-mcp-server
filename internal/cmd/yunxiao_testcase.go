@@ -28,6 +28,7 @@ type testcaseRepoListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoTestcaseRepoListCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -50,7 +51,7 @@ func newYunxiaoTestcaseRepoListCommand(streams IOStreams, cfgFile *string, v *vi
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -63,6 +64,7 @@ func newYunxiaoTestcaseRepoListCommand(streams IOStreams, cfgFile *string, v *vi
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
 	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 
@@ -141,6 +143,7 @@ type testcaseSearchOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoTestcaseSearchCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -166,7 +169,7 @@ func newYunxiaoTestcaseSearchCommand(streams IOStreams, cfgFile *string, v *vipe
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -184,6 +187,7 @@ func newYunxiaoTestcaseSearchCommand(streams IOStreams, cfgFile *string, v *vipe
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
 	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

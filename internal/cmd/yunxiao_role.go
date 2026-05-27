@@ -11,6 +11,7 @@ import (
 type roleListOptions struct {
 	OrganizationID string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoRoleCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -42,7 +43,7 @@ func newYunxiaoRoleListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -52,6 +53,7 @@ func newYunxiaoRoleListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	flags := command.Flags()
 	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 
