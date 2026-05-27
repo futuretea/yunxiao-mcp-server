@@ -16,6 +16,7 @@ func newYunxiaoTestcaseCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 		Short:   "work with Projex test cases",
 	}
 	command.AddCommand(newYunxiaoTestcaseRepoListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTestPlanListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTestcaseViewCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTestcaseSearchCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTestcaseFieldConfigCommand(streams, cfgFile, v))
@@ -337,4 +338,101 @@ func (o testcaseFieldConfigOptions) params() (map[string]any, error) {
 	}
 	setCLIStringParam(params, "organizationId", o.OrganizationID)
 	return params, nil
+}
+
+type testPlanListOptions struct {
+	OrganizationID string
+	Page           int
+	PerPage        int
+	JSONOutput     bool
+	OutputFormat   string
+}
+
+func newYunxiaoTestPlanListCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options testPlanListOptions
+	command := &cobra.Command{
+		Use:     "plan-list",
+		Aliases: []string{"plans"},
+		Short:   "list Projex test plans",
+		Example: `  # List test plans
+  yunxiao testcase plan-list
+
+  # Output as JSON
+  yunxiao testcase plan-list --json`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "list_test_plans", options.params())
+			if err != nil {
+				return err
+			}
+			if options.JSONOutput || options.OutputFormat == "json" {
+				printCLIJSON(streams.Out, result)
+				return nil
+			}
+			return printTestPlanList(streams.Out, result)
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.IntVar(&options.Page, "page", 0, "page number")
+	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
+	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
+	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
+	return command
+}
+
+func (o testPlanListOptions) params() map[string]any {
+	params := map[string]any{}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	if o.Page > 0 {
+		params["page"] = o.Page
+	}
+	if o.PerPage > 0 {
+		params["perPage"] = o.PerPage
+	}
+	return params
+}
+
+func printTestPlanList(out anyWriter, raw string) error {
+	rows, ok := testPlanRowsFromJSONForPrint(raw)
+	if !ok {
+		_, _ = fmt.Fprintln(out, "No results found.")
+		return nil
+	}
+	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tNAME\tSTATUS"))
+	for _, row := range rows {
+		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\n", row.ID, row.Name, row.Status)
+	}
+	return writer.Flush()
+}
+
+type testPlanRow struct {
+	ID     string
+	Name   string
+	Status string
+}
+
+func testPlanRowsFromJSONForPrint(raw string) ([]testPlanRow, bool) {
+	items, ok := rowsFromJSONWithPresence(raw)
+	if !ok {
+		return nil, false
+	}
+	rows := make([]testPlanRow, 0, len(items))
+	for _, item := range items {
+		m, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		rows = append(rows, testPlanRow{
+			ID:     firstStringValue(m, "id", "testPlanId"),
+			Name:   firstStringValue(m, "name", "displayName"),
+			Status: firstStringValue(m, "status", "statusName"),
+		})
+	}
+	return rows, true
 }

@@ -30,6 +30,7 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 	command.AddCommand(newYunxiaoProjectListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectMemberCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectRoleCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectRoleAllCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectViewCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectSummaryCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectContextCommand(streams, cfgFile, v))

@@ -110,3 +110,49 @@ func projectRoleRowsFromJSON(raw string) []projectRoleRow {
 	}
 	return rows
 }
+
+type projectRoleAllOptions struct {
+	OrganizationID string
+	JSONOutput     bool
+	OutputFormat   string
+}
+
+func newYunxiaoProjectRoleAllCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectRoleAllOptions
+	command := &cobra.Command{
+		Use:     "role-all",
+		Aliases: []string{"all-roles"},
+		Short:   "list all Projex project roles across the organization",
+		Example: `  # List all project roles
+  yunxiao project role-all
+
+  # Output as JSON
+  yunxiao project role-all --json`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "list_all_project_roles", options.params())
+			if err != nil {
+				return err
+			}
+			if options.JSONOutput || options.OutputFormat == "json" {
+				printCLIJSON(streams.Out, result)
+				return nil
+			}
+			return printProjectRoleList(streams.Out, result)
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
+	return command
+}
+
+func (o projectRoleAllOptions) params() map[string]any {
+	params := map[string]any{}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params
+}
