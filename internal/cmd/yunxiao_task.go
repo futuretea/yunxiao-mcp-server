@@ -355,3 +355,103 @@ func (o taskTypeViewOptions) params() (map[string]any, error) {
 	setCLIStringParam(params, "organizationId", o.OrganizationID)
 	return params, nil
 }
+
+type taskTypeAllOptions struct {
+	OrganizationID string
+	Categories     string
+	JSONOutput     bool
+}
+
+func newYunxiaoTaskTypeAllCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options taskTypeAllOptions
+	command := &cobra.Command{
+		Use:     "type-all",
+		Aliases: []string{"all-types"},
+		Short:   "list all work item types across the organization",
+		Example: `  # List all task types
+  yunxiao task type-all --categories Task
+
+  # Output as JSON
+  yunxiao task type-all --json`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "list_all_work_item_types", options.params())
+			if err != nil {
+				return err
+			}
+			if options.JSONOutput {
+				printCLIJSON(streams.Out, result)
+				return nil
+			}
+			return printTaskTypeList(streams.Out, result)
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories, e.g. Req,Bug,Task,Risk")
+	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	return command
+}
+
+func (o taskTypeAllOptions) params() map[string]any {
+	params := map[string]any{}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "categories", o.Categories)
+	return params
+}
+
+type taskRelationTypesOptions struct {
+	OrganizationID string
+	WorkItemTypeID string
+	RelationType   string
+	JSONOutput     bool
+}
+
+func newYunxiaoTaskRelationTypesCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options taskRelationTypesOptions
+	command := &cobra.Command{
+		Use:     "relation-types <type-id>",
+		Aliases: []string{"related-types"},
+		Short:   "list work item types that can be related to a given type",
+		Example: `  # List types that can be related
+  yunxiao task relation-types 456
+
+  # Filter by relation type
+  yunxiao task relation-types 456 --relation-type PARENT
+
+  # Output as JSON
+  yunxiao task relation-types 456 --json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.WorkItemTypeID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "list_work_item_relation_work_item_types", options.params())
+			if err != nil {
+				return err
+			}
+			if options.JSONOutput {
+				printCLIJSON(streams.Out, result)
+				return nil
+			}
+			return printTaskTypeList(streams.Out, result)
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.RelationType, "relation-type", "", "relation type: PARENT, SUB, ASSOCIATED, DEPEND_ON, DEPENDED_BY")
+	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	return command
+}
+
+func (o taskRelationTypesOptions) params() map[string]any {
+	params := map[string]any{"workItemTypeId": o.WorkItemTypeID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "relationType", o.RelationType)
+	return params
+}
