@@ -41,6 +41,8 @@ func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper
 	command.AddCommand(newYunxiaoProjectLabelsCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectMilestonesCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoProjectMemberTasksCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectMemberTrendCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoProjectTemplatesCommand(streams, cfgFile, v))
 	return command
 }
 
