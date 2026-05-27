@@ -499,3 +499,61 @@ func (o projectBoardOptions) params() (map[string]any, error) {
 	return params, nil
 }
 
+
+type projectMemberTrendOptions struct {
+	OrganizationID string
+	ProjectID      string
+	AssigneeIDs    string
+	Categories     string
+	MemberLimit    int
+	DaysBack       int
+}
+
+func newYunxiaoProjectMemberTrendCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectMemberTrendOptions
+	command := &cobra.Command{
+		Use:     "member-trend <project-id>",
+		Aliases: []string{"member-workload"},
+		Short:   "show member workload trend as JSON",
+		Example: `  # View workload trends
+  yunxiao project member-trend 123
+
+  # Look back 60 days
+  yunxiao project member-trend 123 --days-back 60`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			options.ProjectID = args[0]
+			result, err := callYunxiaoTool(cmd, cfg, "get_member_workload_trend", options.params())
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.AssigneeIDs, "assignee-ids", "", "comma-separated assignee user IDs")
+	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories; defaults to Task,Bug")
+	flags.IntVar(&options.MemberLimit, "member-limit", 0, "max members to analyze")
+	flags.IntVar(&options.DaysBack, "days-back", 0, "days to look back for activity; defaults to 30")
+	return command
+}
+
+func (o projectMemberTrendOptions) params() map[string]any {
+	params := map[string]any{"projectId": o.ProjectID}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	setCLIStringParam(params, "assigneeIds", o.AssigneeIDs)
+	setCLIStringParam(params, "categories", o.Categories)
+	if o.MemberLimit > 0 {
+		params["memberLimit"] = o.MemberLimit
+	}
+	if o.DaysBack > 0 {
+		params["daysBack"] = o.DaysBack
+	}
+	return params
+}

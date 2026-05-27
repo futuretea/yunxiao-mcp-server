@@ -18,6 +18,7 @@ func newYunxiaoTestcaseCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	command.AddCommand(newYunxiaoTestcaseRepoListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTestcaseViewCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTestcaseSearchCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTestcaseFieldConfigCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -287,4 +288,49 @@ func testcaseRowsFromJSONForPrint(raw string) ([]testcaseRow, bool) {
 		})
 	}
 	return rows, true
+}
+
+type testcaseFieldConfigOptions struct {
+	OrganizationID string
+	TestRepoID     string
+}
+
+func newYunxiaoTestcaseFieldConfigCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options testcaseFieldConfigOptions
+	command := &cobra.Command{
+		Use:     "field-config",
+		Aliases: []string{"fields", "schema"},
+		Short:   "show test case field configuration as JSON",
+		Example: `  # View field configuration
+  yunxiao testcase field-config --repo-id repo-456`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			params, err := options.params()
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "get_testcase_field_config", params)
+			if err != nil {
+				return err
+			}
+			printCLIJSON(streams.Out, result)
+			return nil
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.StringVar(&options.TestRepoID, "repo-id", "", "testcase repository ID")
+	return command
+}
+
+func (o testcaseFieldConfigOptions) params() (map[string]any, error) {
+	params := map[string]any{"testRepoId": o.TestRepoID}
+	if params["testRepoId"] == "" {
+		return nil, fmt.Errorf("repo-id is required")
+	}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params, nil
 }
