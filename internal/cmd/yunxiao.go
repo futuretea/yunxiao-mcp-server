@@ -419,7 +419,7 @@ type anyWriter interface {
 
 func newYunxiaoCompletionCommand(streams IOStreams) *cobra.Command {
 	command := &cobra.Command{
-		Use:   "completion [bash|zsh|fish|powershell]",
+		Use:   "completion [bash|zsh|fish|powershell|install]",
 		Short: "generate shell completion script",
 		Long: `To load completions:
 
@@ -435,10 +435,13 @@ func newYunxiaoCompletionCommand(streams IOStreams) *cobra.Command {
   PowerShell:
     yunxiao completion powershell | Out-String | Invoke-Expression`,
 		DisableFlagsInUseLine: true,
-		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
+		ValidArgs:             []string{"bash", "zsh", "fish", "powershell", "install"},
 		Args:                  cobra.ExactValidArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			switch args[0] {
+		case "install":
+			printCompletionInstall(streams.Out)
+			return
 			case "bash":
 				cmd.Root().GenBashCompletion(streams.Out)
 			case "zsh":
@@ -453,4 +456,20 @@ func newYunxiaoCompletionCommand(streams IOStreams) *cobra.Command {
 	command.SetOut(streams.Out)
 	command.SetErr(streams.ErrOut)
 	return command
+}
+
+func printCompletionInstall(out anyWriter) {
+	_, _ = fmt.Fprintln(out, `# Add the appropriate line to your shell profile:
+
+# bash (~/.bashrc or ~/.bash_profile):
+source <(yunxiao completion bash)
+
+# zsh (~/.zshrc):
+source <(yunxiao completion zsh)
+
+# fish (~/.config/fish/config.fish):
+yunxiao completion fish | source
+
+# PowerShell ($PROFILE):
+yunxiao completion powershell | Out-String | Invoke-Expression`)
 }
