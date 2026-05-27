@@ -15,7 +15,7 @@ func main() {
 	})
 
 	if err := command.Execute(); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		_, _ = fmt.Fprintln(os.Stderr, cmd.FormatCLIError(err))
+		os.Exit(cmd.ExitCodeFromError(err))
 	}
 }

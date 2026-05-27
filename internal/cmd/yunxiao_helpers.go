@@ -109,6 +109,9 @@ func parseOutputFormat(jsonFlag bool, outputFlag string) (outputFormat, error) {
 	if jsonFlag {
 		return outputJSON, nil
 	}
+	if outputFlag == "" && cliOutputFormat != "" {
+		outputFlag = cliOutputFormat
+	}
 	switch strings.ToLower(strings.TrimSpace(outputFlag)) {
 	case "", "table":
 		return outputTable, nil
@@ -150,4 +153,60 @@ func printCSVTable(out anyWriter, headers []string, rows [][]string) error {
 	}
 	w.Flush()
 	return w.Error()
+}
+
+var cliOutputFormat string
+
+// SetCLIOutputFormat sets the global output format for error formatting.
+func SetCLIOutputFormat(v string) { cliOutputFormat = v }
+
+// FormatCLIError formats an error for CLI output. When output is json,
+// returns a JSON object; otherwise returns the plain error message.
+func FormatCLIError(err error) string {
+	if cliOutputFormat == "json" {
+		data, _ := json.Marshal(map[string]any{
+			"error": err.Error(),
+		})
+		return string(data)
+	}
+	return "Error: " + err.Error()
+}
+
+// ExitCodeFromError maps an error to an exit code based on its category.
+func ExitCodeFromError(err error) int {
+	cat := classifyCLIError(err)
+	switch cat {
+	case "auth":
+		return 2
+	case "permission":
+		return 3
+	case "validation":
+		return 4
+	case "rate_limit":
+		return 5
+	case "network":
+		return 6
+	case "server":
+		return 7
+	default:
+		return 1
+	}
+}
+
+func classifyCLIError(err error) string {
+	type classified interface{ ClassifyError(error) string }
+	// Check for tagged errors from yunxiao SDK
+	if err == nil {
+		return ""
+	}
+	msg := err.Error()
+	if len(msg) > 0 {
+		switch {
+		case msg[0] == '[':
+			if end := strings.IndexByte(msg, ']'); end > 0 {
+				return msg[1:end]
+			}
+		}
+	}
+	return ""
 }
