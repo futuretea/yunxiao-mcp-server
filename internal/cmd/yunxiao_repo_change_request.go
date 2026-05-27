@@ -223,11 +223,6 @@ type crPatchSetRow struct {
 	Message string
 }
 
-func crPatchSetRowsFromJSON(raw string) []crPatchSetRow {
-	rows, _ := crPatchSetRowsFromJSONForPrint(raw)
-	return rows
-}
-
 func crPatchSetRowsFromJSONForPrint(raw string) ([]crPatchSetRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)
 	if !ok {

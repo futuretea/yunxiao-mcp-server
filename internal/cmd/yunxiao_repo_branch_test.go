@@ -161,7 +161,7 @@ func TestPrintRepoBranchListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printRepoBranchList(&out, `{"data":[]}`); err != nil {
 		t.Fatalf("printRepoBranchList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "[1mNAME  DEFAULT  PROTECTED  LAST_COMMIT[0m" {
+	if strings.TrimSpace(out.String()) != "\033[1mNAME  DEFAULT  PROTECTED  LAST_COMMIT\033[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

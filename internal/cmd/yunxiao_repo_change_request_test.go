@@ -301,7 +301,7 @@ func TestPrintCRPatchSetListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printCRPatchSetList(&out, `[]`); err != nil {
 		t.Fatalf("printCRPatchSetList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "[1mID  COMMIT  DATE  MESSAGE[0m" {
+	if strings.TrimSpace(out.String()) != "\033[1mID  COMMIT  DATE  MESSAGE\033[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }

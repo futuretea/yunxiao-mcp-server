@@ -149,6 +149,11 @@ func newYunxiaoTaskCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *
 	command.AddCommand(newYunxiaoTaskListCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTaskViewCommand(streams, cfgFile, v))
 	command.AddCommand(newYunxiaoTaskTypeListCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTaskTimelineCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTaskMyCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTaskTypeViewCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTaskTypeAllCommand(streams, cfgFile, v))
+	command.AddCommand(newYunxiaoTaskRelationTypesCommand(streams, cfgFile, v))
 	return command
 }
 
@@ -439,20 +444,20 @@ func newYunxiaoCompletionCommand(streams IOStreams) *cobra.Command {
     yunxiao completion powershell | Out-String | Invoke-Expression`,
 		DisableFlagsInUseLine: true,
 		ValidArgs:             []string{"bash", "zsh", "fish", "powershell", "install"},
-		Args:                  cobra.ExactValidArgs(1),
+		Args:                  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 		Run: func(cmd *cobra.Command, args []string) {
 			switch args[0] {
 		case "install":
 			printCompletionInstall(streams.Out)
 			return
 			case "bash":
-				cmd.Root().GenBashCompletion(streams.Out)
+				_ = cmd.Root().GenBashCompletion(streams.Out)
 			case "zsh":
-				cmd.Root().GenZshCompletion(streams.Out)
+				_ = cmd.Root().GenZshCompletion(streams.Out)
 			case "fish":
-				cmd.Root().GenFishCompletion(streams.Out, true)
+				_ = cmd.Root().GenFishCompletion(streams.Out, true)
 			case "powershell":
-				cmd.Root().GenPowerShellCompletionWithDesc(streams.Out)
+				_ = cmd.Root().GenPowerShellCompletionWithDesc(streams.Out)
 			}
 		},
 	}

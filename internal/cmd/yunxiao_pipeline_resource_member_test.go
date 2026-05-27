@@ -186,7 +186,7 @@ func TestPrintPipelineResourceMemberListPrintsHeaderForEmptyList(t *testing.T) {
 	if err := printPipelineResourceMemberList(&out, `[]`); err != nil {
 		t.Fatalf("printPipelineResourceMemberList() error = %v", err)
 	}
-	if strings.TrimSpace(out.String()) != "[1mID  NAME  ROLE[0m" {
+	if strings.TrimSpace(out.String()) != "\033[1mID  NAME  ROLE\033[0m" {
 		t.Fatalf("stdout = %q", out.String())
 	}
 }
