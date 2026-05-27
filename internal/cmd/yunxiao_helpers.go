@@ -9,7 +9,15 @@ import (
 const ansiBold = "\033[1m"
 const ansiReset = "\033[0m"
 
+var cliNoColor bool
+
+// SetCLINoColor enables or disables ANSI color output.
+func SetCLINoColor(v bool) { cliNoColor = v }
+
 func boldTableHeader(line string) string {
+	if cliNoColor {
+		return line
+	}
 	return ansiBold + line + ansiReset
 }
 
