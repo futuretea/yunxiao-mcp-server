@@ -15,6 +15,7 @@ type projectMemberListOptions struct {
 	Name           string
 	RoleID         string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoProjectMemberCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -53,7 +54,7 @@ func newYunxiaoProjectMemberListCommand(streams IOStreams, cfgFile *string, v *v
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -66,6 +67,7 @@ func newYunxiaoProjectMemberListCommand(streams IOStreams, cfgFile *string, v *v
 	flags.StringVar(&options.Name, "name", "", "project member name keyword")
 	flags.StringVar(&options.RoleID, "role-id", "", "project role ID")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

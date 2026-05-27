@@ -13,6 +13,7 @@ type memberListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoMemberCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -48,7 +49,7 @@ func newYunxiaoMemberListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -61,6 +62,7 @@ func newYunxiaoMemberListCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
 	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 
@@ -126,6 +128,7 @@ type memberSearchOptions struct {
 	Page            int
 	PerPage         int
 	JSONOutput      bool
+	OutputFormat string
 }
 
 func newYunxiaoMemberSearchCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -153,7 +156,7 @@ func newYunxiaoMemberSearchCommand(streams IOStreams, cfgFile *string, v *viper.
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -171,6 +174,7 @@ func newYunxiaoMemberSearchCommand(streams IOStreams, cfgFile *string, v *viper.
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
 	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

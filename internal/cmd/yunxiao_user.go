@@ -16,6 +16,7 @@ type userListOptions struct {
 	Page       int
 	PerPage    int
 	JSONOutput bool
+	OutputFormat string
 }
 
 type userViewOptions struct {
@@ -83,7 +84,7 @@ func newYunxiaoUserListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -98,6 +99,7 @@ func newYunxiaoUserListCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 	flags.IntVar(&options.PerPage, "per-page", 0, "page size")
 	flags.IntVar(&options.PerPage, "limit", 0, "max results (alias for --per-page)")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 

@@ -22,6 +22,7 @@ type taskListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func (o taskListOptions) params() (map[string]any, error) {
@@ -94,6 +95,7 @@ type taskTypeListOptions struct {
 	ProjectID      string
 	Category       string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoTaskTypeListCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -123,7 +125,7 @@ func newYunxiaoTaskTypeListCommand(streams IOStreams, cfgFile *string, v *viper.
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -135,6 +137,7 @@ func newYunxiaoTaskTypeListCommand(streams IOStreams, cfgFile *string, v *viper.
 	flags.StringVar(&options.ProjectID, "project-id", "", "Projex project ID")
 	flags.StringVar(&options.Category, "category", "", "work item category, e.g. Task, Bug, Req, Risk")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 
@@ -360,6 +363,7 @@ type taskTypeAllOptions struct {
 	OrganizationID string
 	Categories     string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoTaskTypeAllCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -382,7 +386,7 @@ func newYunxiaoTaskTypeAllCommand(streams IOStreams, cfgFile *string, v *viper.V
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -393,6 +397,7 @@ func newYunxiaoTaskTypeAllCommand(streams IOStreams, cfgFile *string, v *viper.V
 	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
 	flags.StringVar(&options.Categories, "categories", "", "comma-separated categories, e.g. Req,Bug,Task,Risk")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 
@@ -408,6 +413,7 @@ type taskRelationTypesOptions struct {
 	WorkItemTypeID string
 	RelationType   string
 	JSONOutput     bool
+	OutputFormat string
 }
 
 func newYunxiaoTaskRelationTypesCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -435,7 +441,7 @@ func newYunxiaoTaskRelationTypesCommand(streams IOStreams, cfgFile *string, v *v
 			if err != nil {
 				return err
 			}
-			if options.JSONOutput {
+			if options.JSONOutput || options.OutputFormat == "json" {
 				printCLIJSON(streams.Out, result)
 				return nil
 			}
@@ -446,6 +452,7 @@ func newYunxiaoTaskRelationTypesCommand(streams IOStreams, cfgFile *string, v *v
 	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
 	flags.StringVar(&options.RelationType, "relation-type", "", "relation type: PARENT, SUB, ASSOCIATED, DEPEND_ON, DEPENDED_BY")
 	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
 	return command
 }
 
