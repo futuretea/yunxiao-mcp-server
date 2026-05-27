@@ -271,3 +271,89 @@ func (o projectMemberTasksOptions) params() map[string]any {
 	}
 	return params
 }
+
+type projectTemplatesOptions struct {
+	OrganizationID string
+	JSONOutput     bool
+	OutputFormat   string
+}
+
+func newYunxiaoProjectTemplatesCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
+	var options projectTemplatesOptions
+	command := &cobra.Command{
+		Use:     "templates",
+		Aliases: []string{"template"},
+		Short:   "list Projex project templates",
+		Example: `  # List project templates
+  yunxiao project templates
+
+  # Output as JSON
+  yunxiao project templates --json`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
+			if err != nil {
+				return err
+			}
+			result, err := callYunxiaoTool(cmd, cfg, "list_project_templates", options.params())
+			if err != nil {
+				return err
+			}
+			if options.JSONOutput || options.OutputFormat == "json" {
+				printCLIJSON(streams.Out, result)
+				return nil
+			}
+			return printTemplateList(streams.Out, result)
+		},
+	}
+	flags := command.Flags()
+	flags.StringVar(&options.OrganizationID, "organization-id", "", "Yunxiao organization ID; defaults when the token belongs to one organization")
+	flags.BoolVar(&options.JSONOutput, "json", false, "print raw JSON")
+	flags.StringVar(&options.OutputFormat, "output", "", "output format: table, json, or csv")
+	return command
+}
+
+func (o projectTemplatesOptions) params() map[string]any {
+	params := map[string]any{}
+	setCLIStringParam(params, "organizationId", o.OrganizationID)
+	return params
+}
+
+func printTemplateList(out anyWriter, raw string) error {
+	rows, ok := templateRowsFromJSONForPrint(raw)
+	if !ok {
+		_, _ = fmt.Fprintln(out, "No results found.")
+		return nil
+	}
+	writer := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
+	_, _ = fmt.Fprintln(writer, boldTableHeader("ID\tNAME\tDESCRIPTION"))
+	for _, row := range rows {
+		_, _ = fmt.Fprintf(writer, "%s\t%s\t%s\n", row.ID, row.Name, row.Description)
+	}
+	return writer.Flush()
+}
+
+type templateRow struct {
+	ID          string
+	Name        string
+	Description string
+}
+
+func templateRowsFromJSONForPrint(raw string) ([]templateRow, bool) {
+	items, ok := rowsFromJSONWithPresence(raw)
+	if !ok {
+		return nil, false
+	}
+	rows := make([]templateRow, 0, len(items))
+	for _, item := range items {
+		m, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		rows = append(rows, templateRow{
+			ID:          firstStringValue(m, "id", "templateId"),
+			Name:        firstStringValue(m, "name", "displayName"),
+			Description: firstStringValue(m, "description", "desc"),
+		})
+	}
+	return rows, true
+}
