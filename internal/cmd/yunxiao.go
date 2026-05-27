@@ -34,6 +34,8 @@ func NewYunxiaoCLI(streams IOStreams) *cobra.Command {
 			PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 				noColor, _ := cmd.Flags().GetBool("no-color")
 				SetCLINoColor(noColor)
+				outputFormat, _ := cmd.Flags().GetString("output")
+				SetCLIOutputFormat(outputFormat)
 				return nil
 			},
 	}
@@ -75,6 +77,7 @@ func addYunxiaoCommonFlags(command *cobra.Command, cfgFile *string) {
 	flags.StringSlice("disable-domains", []string{}, "comma-separated list of tool domains to disable (e.g. codeup,flow)")
 	flags.Bool("compact", true, "hide raw API tools that have enhanced overview alternatives; set false to show all tools")
 	flags.Bool("no-color", false, "disable ANSI color output")
+	flags.String("output", "", "output format for all commands: table, json, or csv (overrides per-command --output)")
 	flags.Int("request-timeout-seconds", 30, "Yunxiao API request timeout in seconds")
 }
 
