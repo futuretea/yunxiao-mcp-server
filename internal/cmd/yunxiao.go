@@ -31,6 +31,11 @@ func NewYunxiaoCLI(streams IOStreams) *cobra.Command {
 		Short:         "Yunxiao CLI for Alibaba Cloud DevOps",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+			PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+				noColor, _ := cmd.Flags().GetBool("no-color")
+				SetCLINoColor(noColor)
+				return nil
+			},
 	}
 
 	command.SetIn(streams.In)
@@ -69,6 +74,7 @@ func addYunxiaoCommonFlags(command *cobra.Command, cfgFile *string) {
 	flags.StringSlice("enable-domains", []string{}, "comma-separated list of tool domains to enable (e.g. platform,projex)")
 	flags.StringSlice("disable-domains", []string{}, "comma-separated list of tool domains to disable (e.g. codeup,flow)")
 	flags.Bool("compact", true, "hide raw API tools that have enhanced overview alternatives; set false to show all tools")
+	flags.Bool("no-color", false, "disable ANSI color output")
 	flags.Int("request-timeout-seconds", 30, "Yunxiao API request timeout in seconds")
 }
 
