@@ -1,261 +1,276 @@
-# Yunxiao MCP Server
+# yunxiao-mcp-server
 
-[中文文档](README.zh.md)
+MCP (Model Context Protocol) server and CLI for [Alibaba Cloud Yunxiao](https://www.aliyun.com/product/yunxiao) DevOps platform. Lets AI coding assistants (Claude Code, Cursor, etc.) browse projects, track work items, review code, and monitor pipelines directly from your IDE.
 
-Let your AI coding assistant talk directly to [Alibaba Yunxiao](https://www.aliyun.com/product/yunxiao) — browse projects, track iterations, review code, and monitor pipelines without leaving your IDE.
-
-**Read-only by default, safety first.** 177 of 193 tools are read-only queries. 16 write operations require explicit `read_only=false`.
-
----
-
-## What can you do?
-
-| Scenario | Tools |
-|----------|-------|
-| 📋 Project Management | Browse projects, work items, iterations, milestones, members; create/update work items |
-| 🔍 Code Review | Browse repositories, branches, commits, merge requests, change requests; create/close/merge CRs |
-| 🚀 Pipelines | List pipelines, runs, build tasks; approve/reject validation gates |
-| 📦 Release Management | Browse applications, environments, releases, change orders, resources |
-| 🧠 Knowledge Base | Browse Lingma knowledge bases, members, files |
-| 🤖 AI Adoption | Analyze team Lingma usage |
-
-> Write operations (create/update work items, manage CR/MR, pipeline approvals) require `read_only=false`.
-
----
-
-## Quick Start
-
-### npx (zero install)
+## Quick start
 
 ```bash
+# One-shot via npx (no install)
 npx -y @futuretea/yunxiao-mcp-server
+
+# Or install locally
+go install github.com/futuretea/yunxiao-mcp-server/cmd/yunxiao@latest
 ```
 
-With token:
+You need a Yunxiao access token. Set it via environment variable:
 
 ```bash
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> npx -y @futuretea/yunxiao-mcp-server
+export YUNXIAO_MCP_ACCESS_TOKEN=<your-token>
 ```
 
-### Docker
+## Features
 
-**Stdio MCP mode (default Docker entrypoint):**
+- **193 MCP tools** across 9 domains (177 read-only, 16 write)
+- **Dual mode**: MCP server for AI assistants + standalone CLI for humans (`yunxiao`)
+- **Zero-install**: available via `npx` with automatic platform binary download
+- **Multi-transport**: stdio, SSE, and Streamable HTTP
 
-```bash
-docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
-  ghcr.io/futuretea/yunxiao-mcp-server:latest
+### Tool domains
+
+| Domain | Tools | What you can do |
+|--------|-------|-----------------|
+| **Projex** | 47 | Projects, work items, sprints, milestones, test cases |
+| **Codeup** | 37 | Repositories, branches, commits, MRs, CRs, code review |
+| **Flow** | 18 | Pipelines, pipeline runs, build jobs, validation gates |
+| **Appstack** | 62 | App stacks, environments, releases, change orders |
+| **Platform** | 18 | Organizations, departments, members, roles |
+| **Packages** | 3 | Artifact repositories and versions |
+| **Lingma** | 6 | Knowledge base and AI usage statistics |
+| **API** | 1 | Generic API fallback |
+| **Meta** | 1 | Tool discovery |
+
+### Enhanced tools
+
+Some tools aggregate multiple API calls into a single operation to reduce AI round-trips:
+
+- `get_project_overview` — project info + members + sprints + milestones + versions + labels
+- `get_project_workitem_detail` — work item + activities + comments + attachments + relations
+- `get_repository_overview` — repo + default branch + recent commits + recent MRs
+- `get_change_request_overview` — CR details + patch sets + comments
+- `get_pipeline_overview` — pipeline info + recent runs + history
+- `get_pipeline_run_overview` — pipeline run info + categorized jobs
+
+### Insight tools
+
+- `get_project_risk_dashboard` — risk dashboard with category samples and overdue items
+- `get_member_workload_trend` — member workload trends with recent activity
+- `get_team_workload_breakdown` — per-member workload breakdown with task details
+- `get_sprint_velocity` — historical sprint velocity metrics
+- `get_blocker_analysis` — dependency blocker analysis
+- `get_workitem_status_timeline` — status change history with dwell time
+
+## MCP client configuration
+
+Add to your MCP client config (e.g., Claude Code's `mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "yunxiao": {
+      "command": "npx",
+      "args": ["-y", "@futuretea/yunxiao-mcp-server"],
+      "env": {
+        "YUNXIAO_MCP_ACCESS_TOKEN": "<your-token>"
+      }
+    }
+  }
+}
 ```
 
-**HTTP MCP mode:**
+For HTTP mode:
 
-```bash
-docker run --rm -p 3000:3000 -e YUNXIAO_MCP_ACCESS_TOKEN=<your-token> \
-  ghcr.io/futuretea/yunxiao-mcp-server:latest --port 3000
+```json
+{
+  "mcpServers": {
+    "yunxiao": {
+      "url": "http://localhost:8080/mcp"
+    }
+  }
+}
 ```
-
-### Build from source
-
-```bash
-make build
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao mcp
-```
-
-The same `yunxiao` binary also provides human-facing CLI commands:
-
-```bash
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao department list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao department view <dept-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao group list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao group view <group-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao role list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization view
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao organization info
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao member list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao member search --query <keyword>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run list --pipeline-id <pipeline-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline run view <pipeline-run-id> --pipeline-id <pipeline-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline view <pipeline-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline job list --pipeline-id <pipeline-id> --category DEPLOY
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline job log --pipeline-id <pipeline-id> --run-id <run-id> --job-id <job-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao pipeline resource-member list --resource-id <pipeline-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project view <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project summary <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project context <project-id> --category Task
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project risk <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project board <project-id> --category Task
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project labels <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project milestones <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member list --project-id <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project member-tasks <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao project role list --project-id <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo view <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo branch list --repository-id <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo branch view <branch-name> --repository-id <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo change-request list --project-ids <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo change-request view <local-id> --repository-id <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo mr list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo mr view <mr-id> --repository-id <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo commit list --repository-id <repository-id> --ref <branch>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo commit view <sha> --repository-id <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo compare <from> <to> --repository-id <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo file list --repository-id <repository-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao repo file view <path> --repository-id <repository-id> --ref <branch>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao sprint list --project-id <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao sprint view <sprint-id> --project-id <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao sprint velocity <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task list --project-id <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task view <workitem-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task type-list --project-id <id> --category Task
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task timeline <workitem-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao task my <project-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao testcase repo-list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao testcase search --repo-id <id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao testcase view <tc-id> --repo-id <repo-id>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao user whoami
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao user list
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao user get <id-or-username>
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao user orgs
-./bin/yunxiao tools describe search_projects
-YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao tools call get_current_user --params '{}'
-printf '{"page":1}' | YUNXIAO_MCP_ACCESS_TOKEN=<your-token> ./bin/yunxiao tools call list_organization_members --params-file -
-```
-
-### IDE Setup
-
-See [MCP Client Config](docs/mcp-client-config.md) for Claude, Cursor, and other IDE setup examples.
-
----
-
-## Tools Overview
-
-| Domain | Tools | Access | Description |
-|--------|-------|--------|-------------|
-| **Projex** | 47 | 43 read-only + 4 write | Projects, iterations, work items, milestones, test cases |
-| **Codeup** | 37 | 31 read-only + 6 write | Repositories, branches, commits, MR, CR, code review |
-| **Flow** | 18 | 16 read-only + 2 write | Pipelines, runs, build tasks, validation |
-| **Appstack** | 62 | 58 read-only + 4 write | Applications, environments, releases, change orders |
-| **Platform** | 18 | read-only | Organizations, departments, members, roles |
-| **Packages** | 3 | read-only | Artifact repositories and versions |
-| **Lingma** | 6 | read-only | Knowledge bases and usage |
-| **API** | 1 | read-only | Generic API fallback |
-| **Meta** | 1 | read-only | Tool discovery |
-
-### Enhanced Tools
-
-Enhanced tools aggregate multiple API calls into single operations, reducing AI round-trips.
-
-| Tool | What it combines |
-|------|------------------|
-| `get_project_overview` | Project info + members + sprints + milestones + labels |
-| `get_project_workitem_detail` | Work item + activities + comments + attachments + relations |
-| `get_repository_overview` | Repository + default branch + recent commits + recent MRs |
-| `get_change_request_overview` | CR detail + patch sets + comments |
-| `get_pipeline_overview` | Pipeline info + latest run + history |
-| `get_pipeline_run_overview` | Pipeline run info + jobs by category |
-
-Full list: [Enhanced Tools Index](docs/enhanced-tools-index.md)
-
----
 
 ## Configuration
 
-Priority: flags > environment variables > config file > defaults.
+Priority: **flags > environment variables > config file > defaults**.
 
-### Required
-
-| Variable | Description |
-|----------|-------------|
-| `YUNXIAO_MCP_ACCESS_TOKEN` | Yunxiao access token |
-
-### Optional
+### Environment variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `YUNXIAO_MCP_ACCESS_TOKEN` | Yunxiao access token | (required) |
 | `YUNXIAO_MCP_BASE_URL` | API base URL | `https://openapi-rdc.aliyuncs.com` |
-| `YUNXIAO_MCP_SSE_BASE_URL` | Public SSE base URL (reverse proxy) | — |
-| `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY` | Skip TLS verify (internal only) | `false` |
+| `YUNXIAO_MCP_SSE_BASE_URL` | Public SSE base URL (for reverse proxies) | `""` |
+| `YUNXIAO_MCP_INSECURE_SKIP_TLS_VERIFY` | Skip TLS verification | `false` |
 
-Legacy aliases: `YUNXIAO_ACCESS_TOKEN`, `YUNXIAO_API_BASE_URL`.
+### Config file
 
-### Tool Modes
+Create `config.yaml`:
 
-| Flag | Default | Purpose |
-|------|---------|---------|
-| `--read-only` | `true` | Set `false` to enable write tools |
-| `--compact` | `true` | Hide raw tools with enhanced alternatives (set `false` to show all) |
-| `--enabled-tools` | — | Explicit tool allow-list |
-| `--disabled-tools` | — | Explicit tool deny-list |
-| `--enable-domains` | — | Domain allow-list |
-| `--disable-domains` | — | Domain deny-list |
-
-### Config File
-
-```bash
-./bin/yunxiao mcp --config config.example.yaml
+```yaml
+port: 0                    # 0 = stdio mode, >0 = HTTP server
+sse_base_url: ""           # public URL when behind a reverse proxy
+log_level: info            # debug, info, warn, error
+base_url: https://openapi-rdc.aliyuncs.com
+access_token: ""           # set via env var instead
+insecure_skip_tls_verify: false
+read_only: true            # deny write tools when true
+compact: true              # compact tool descriptions
+enabled_tools: []          # whitelist specific tools
+disabled_tools: []         # blacklist specific tools
+enabled_domains: []        # whitelist specific domains
+disabled_domains: []       # blacklist specific domains
+request_timeout_seconds: 30
 ```
 
-### Per-Request Token (HTTP/SSE)
+### Per-request tokens
+
+For multi-tenant scenarios, pass the token via HTTP header or query parameter:
 
 ```bash
-curl -H "x-yunxiao-token: <token>" http://localhost:3000/mcp
-# or
-http://localhost:3000/sse?yunxiao_access_token=<token>
+# Header
+curl -H "x-yunxiao-token: <token>" http://localhost:8080/mcp
+
+# Query parameter
+curl "http://localhost:8080/sse?yunxiao_access_token=<token>"
 ```
 
----
+## CLI usage
 
-## HTTP Endpoints
-
-| Endpoint | Purpose |
-|----------|---------|
-| `/mcp` | Streamable HTTP MCP |
-| `/sse` | SSE MCP |
-| `/message` | SSE message endpoint |
-| `/healthz` | Health check (503 if no tools registered) |
-
----
-
-## Security
-
-- **Read-only by default**: 177 tools safe for exploration without write access.
-- **Explicit write opt-in**: 16 write tools require manual `read_only=false`.
-- **Per-request token**: HTTP/SSE support request-level token override for multi-tenant use.
-- **No sensitive endpoints**: Admin audit logs, PAT queries, and other high-privilege endpoints are excluded.
-
----
-
-## Development
+The `yunxiao` binary doubles as a standalone CLI for humans:
 
 ```bash
-make fmt      # gofmt
-make tidy     # go mod tidy
-make lint     # go vet + gofmt
-make test     # go test ./...
-make build    # build the yunxiao binary
-make smoke    # smoke test
-make ci       # full CI
+# List projects
+yunxiao project list
+
+# Search by name
+yunxiao project list --name demo
+
+# Output as JSON
+yunxiao project list --json
+
+# View project overview
+yunxiao project view 123
+
+# List tasks in a sprint
+yunxiao task list --project-id 123 --sprint sprint-456
+
+# View pipeline status
+yunxiao pipeline view pipeline-789
+
+# Show your own tasks
+yunxiao task my 123
 ```
 
-The shared Yunxiao SDK lives in `pkg/yunxiao`; MCP mode and the CLI commands both use it for authenticated OpenAPI requests, path encoding, response metadata, and error classification.
+### Global flags
 
-Coverage threshold: 98%. Run `make coverage-check`.
+```
+--config                    path to config file
+--base-url                  API base URL
+--access-token              Yunxiao access token
+--insecure-skip-tls-verify  skip TLS certificate verification
+--read-only                 deny write operations (default true)
+--output                    output format: table, json, csv
+--no-color                  disable ANSI color output
+--compact                   compact output
+--enabled-tools             comma-separated tool whitelist
+--disabled-tools            comma-separated tool blacklist
+--enable-domains            comma-separated domain whitelist
+--disable-domains           comma-separated domain blacklist
+--request-timeout-seconds   API request timeout (default 30)
+```
 
----
+### Command tree
+
+```
+yunxiao
+├── mcp                 start MCP server
+├── version             print version
+├── completion          shell completions (bash, zsh, fish, powershell, install)
+├── organization        list, view, info
+├── member              list, search
+├── group               list, view
+├── department          list, view
+├── pipeline            list, view, run, job, resource-member
+├── project             list, view, summary, context, risk, board,
+│                       labels, milestones, member, role, member-tasks,
+│                       member-trend, templates
+├── role                list, view
+├── repo                list, view, branch, change-request, mr, commit,
+│                       compare, file
+├── sprint              list, view, velocity
+├── task                list, view, type-list, timeline, my,
+│                       type-view, type-all, relation-types
+├── testcase            repo-list, search, view, field-config,
+│                       directories, plan-list
+├── tools               list, describe, call
+└── user                whoami, list, get, orgs
+```
+
+## Build from source
+
+```bash
+git clone https://github.com/futuretea/yunxiao-mcp-server.git
+cd yunxiao-mcp-server
+make build
+```
+
+Requires Go 1.25+.
+
+### Make targets
+
+| Target | Description |
+|--------|-------------|
+| `build` | Build `bin/yunxiao` binary |
+| `test` | Run all tests |
+| `lint` | Run go vet + gofmt + golangci-lint + gocyclo |
+| `ci` | Full CI pipeline (lint + mod verify + race tests + build) |
+| `coverage` | Generate test coverage report |
+| `smoke` | Start server and verify `/healthz` |
+| `docs` | Generate tool documentation |
+| `build-all-platforms` | Cross-compile for darwin/linux/windows × amd64/arm64 |
+| `clean` | Remove build artifacts |
+
+## Docker
+
+```bash
+# Build
+docker build -t yunxiao-mcp-server .
+
+# Run in stdio mode (for MCP clients)
+docker run -i --rm -e YUNXIAO_MCP_ACCESS_TOKEN=<token> yunxiao-mcp-server
+
+# Run in HTTP mode
+docker run -p 8080:8080 -e YUNXIAO_MCP_ACCESS_TOKEN=<token> \
+  yunxiao-mcp-server yunxiao mcp --port 8080
+```
+
+Pre-built images: `ghcr.io/futuretea/yunxiao-mcp-server`
+
+## Architecture
+
+```
+AI Assistant (IDE) <--MCP JSON-RPC--> yunxiao binary (stdio or HTTP)
+                                           |
+                                           v
+                                    Yunxiao OpenAPI
+                              https://openapi-rdc.aliyuncs.com
+```
+
+The binary has two entry points that share the same core SDK:
+
+- **MCP server** (`yunxiao mcp`): speaks MCP JSON-RPC over stdio, SSE, or Streamable HTTP. Designed for AI assistants.
+- **Standalone CLI** (`yunxiao`): human-friendly output with table/JSON/CSV formatting. Same API surface.
+
+**Security**: write tools are disabled by default (`read_only: true`). Per-request token override supports multi-tenant deployments.
 
 ## Documentation
 
-- [MCP Client Config](docs/mcp-client-config.md) — IDE setup examples
-- [Quick Start Guide](docs/quickstart.md) — AI conversation patterns
-- [Enhanced Tools Index](docs/enhanced-tools-index.md) — Enhanced tool reference
-- [Conditions Cookbook](docs/conditions-cookbook.md) — Query filter examples
-- [Pagination Guide](docs/pagination-guide.md) — Pagination reference
-- [GA Readiness](docs/ga-readiness.md) — Release checklist
-
----
+- [Quickstart guide](docs/quickstart.md)
+- [MCP client configuration](docs/mcp-client-config.md)
+- [Enhanced tools index](docs/enhanced-tools-index.md)
+- [Conditions cookbook](docs/conditions-cookbook.md)
+- [Pagination guide](docs/pagination-guide.md)
+- Per-domain tool references in `docs/*-tools.md`
 
 ## License
 
