@@ -29,7 +29,7 @@ func handleGetProjectOverview(ctx context.Context, client any, params map[string
 	overview["project"] = project
 
 	for _, section := range projectOverviewSections(projectPath, params) {
-		if err := addProjectOverviewSection(ctx, c, overview, params, section); err != nil {
+		if err := addOverviewSection(ctx, c, overview, params, section); err != nil {
 			return "", err
 		}
 	}
@@ -54,7 +54,7 @@ func handleGetProjectWorkitemSummary(ctx context.Context, client any, params map
 
 	result, err := buildCategoryResult(ctx, categories, projectWorkitemSummaryFilters(params, categories),
 		func(cat string) (any, error) {
-			return searchProjectWorkitemSummaryCategory(ctx, c, organizationID, projectID, cat, params)
+			return searchProjectWorkitems(ctx, c, organizationID, projectID, cat, params)
 		})
 	if err != nil {
 		return "", err
@@ -119,7 +119,7 @@ func handleGetMyProjectWorkitems(ctx context.Context, client any, params map[str
 
 	result, err := buildCategoryResult(ctx, categories, myProjectWorkitemFilters(params, userID, relation, categories),
 		func(cat string) (any, error) {
-			return searchProjectWorkitemSummaryCategory(ctx, c, organizationID, projectID, cat, searchParams)
+			return searchProjectWorkitems(ctx, c, organizationID, projectID, cat, searchParams)
 		})
 	if err != nil {
 		return "", err

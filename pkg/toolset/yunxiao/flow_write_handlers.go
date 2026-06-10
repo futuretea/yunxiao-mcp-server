@@ -2,26 +2,23 @@ package yunxiao
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 )
 
 func handlePassPipelineValidate(ctx context.Context, client any, params map[string]any) (string, error) {
-	c, err := getClient(client)
-	if err != nil {
-		return "", err
-	}
-	organizationID, pipelineID, pipelineRunID, jobID, err := requiredOrganizationPipelineRunAndJob(params)
-	if err != nil {
-		return "", err
-	}
-	path := "/flow/organizations/" + url.PathEscape(organizationID) +
-		"/pipelines/" + url.PathEscape(pipelineID) +
-		"/pipelineRuns/" + url.PathEscape(pipelineRunID) +
-		"/jobs/" + url.PathEscape(jobID) + "/pass"
-	return c.PostJSONWithMetadata(ctx, path, map[string]any{})
+	return handlePipelineValidateAction(ctx, client, params, "pass")
 }
 
 func handleRefusePipelineValidate(ctx context.Context, client any, params map[string]any) (string, error) {
+	return handlePipelineValidateAction(ctx, client, params, "refuse")
+}
+
+func handlePipelineValidateAction(ctx context.Context, client any, params map[string]any, action string) (string, error) {
+	if action != "pass" && action != "refuse" {
+		return "", &ValidationError{Msg: fmt.Sprintf("invalid action %q, must be pass or refuse", action)}
+	}
+
 	c, err := getClient(client)
 	if err != nil {
 		return "", err
@@ -33,7 +30,7 @@ func handleRefusePipelineValidate(ctx context.Context, client any, params map[st
 	path := "/flow/organizations/" + url.PathEscape(organizationID) +
 		"/pipelines/" + url.PathEscape(pipelineID) +
 		"/pipelineRuns/" + url.PathEscape(pipelineRunID) +
-		"/jobs/" + url.PathEscape(jobID) + "/refuse"
+		"/jobs/" + url.PathEscape(jobID) + "/" + action
 	return c.PostJSONWithMetadata(ctx, path, map[string]any{})
 }
 

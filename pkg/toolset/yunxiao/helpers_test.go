@@ -125,3 +125,31 @@ func TestRequiredOrganizationAndPipelineRequiresPipelineId(t *testing.T) {
 		t.Fatal("expected missing pipelineId error")
 	}
 }
+
+func TestCopyParams(t *testing.T) {
+	original := map[string]any{"a": 1, "b": "two"}
+	copied := copyParams(original)
+	copied["a"] = 999
+	if original["a"] != 1 {
+		t.Fatal("copyParams did not create independent copy")
+	}
+}
+
+func TestTodayDate(t *testing.T) {
+	if todayDate() == "" {
+		t.Fatal("todayDate() returned empty")
+	}
+}
+
+func TestTodayDateWithFixedClock(t *testing.T) {
+	original := timeNow
+	fixed := time.Date(2024, time.March, 15, 0, 0, 0, 0, time.UTC)
+	timeNow = func() time.Time { return fixed }
+	defer func() { timeNow = original }()
+
+	got := todayDate()
+	want := "2024-03-15"
+	if got != want {
+		t.Fatalf("todayDate() = %q, want %q", got, want)
+	}
+}

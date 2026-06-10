@@ -40,7 +40,7 @@ func handleExecuteSystemReleaseStage(ctx context.Context, client any, params map
 	if err != nil {
 		return "", err
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 func handleListSystemReleaseWorkflows(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -171,9 +171,9 @@ func requiredSystemReleaseWithKey(params map[string]any, releaseKey string) (str
 }
 
 func appstackSystemPath(organizationID, systemName string) string {
-	return "/appstack/organizations/" + url.PathEscape(organizationID) + "/systems/" + url.PathEscape(systemName)
+	return "/appstack/organizations/" + encodePathValue(organizationID) + "/systems/" + encodePathValue(systemName)
 }
 
 func appstackSystemReleasePath(organizationID, systemName, sn string) string {
-	return appstackSystemPath(organizationID, systemName) + "/releases/" + url.PathEscape(sn)
+	return appstackSystemPath(organizationID, systemName) + "/releases/" + encodePathValue(sn)
 }

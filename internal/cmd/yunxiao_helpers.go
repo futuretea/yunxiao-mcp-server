@@ -96,7 +96,6 @@ func stringifyCLIValue(value any) string {
 	}
 }
 
-
 var cliOutputFormat string
 
 // SetCLIOutputFormat sets the global output format for error formatting.

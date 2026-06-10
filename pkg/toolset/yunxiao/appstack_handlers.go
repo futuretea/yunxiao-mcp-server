@@ -43,6 +43,5 @@ func handleGetApplication(ctx context.Context, client any, params map[string]any
 		return "", err
 	}
 
-	path := "/appstack/organizations/" + url.PathEscape(organizationID) + "/apps/" + url.PathEscape(appName)
-	return c.GetJSON(ctx, path, nil)
+	return c.GetJSON(ctx, appstackAppPath(organizationID, appName), nil)
 }

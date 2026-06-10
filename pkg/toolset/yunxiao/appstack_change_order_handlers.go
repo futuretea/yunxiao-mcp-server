@@ -18,13 +18,9 @@ func handleListChangeOrderVersions(ctx context.Context, client any, params map[s
 		return "", err
 	}
 
-	query := url.Values{}
+	query := appstackDefaultPageQuery(params)
 	setOptionalString(query, params, "envNames")
 	setOptionalString(query, params, "creators")
-	query.Set("current", "1")
-	query.Set("pageSize", "10")
-	setOptionalInt(query, params, "current")
-	setOptionalInt(query, params, "pageSize")
 
 	path := appstackAppPath(organizationID, appName) + "/changeOrders/versions"
 	return c.GetJSON(ctx, path, query)
@@ -54,11 +50,7 @@ func handleListChangeOrderJobLogs(ctx context.Context, client any, params map[st
 		return "", err
 	}
 
-	query := url.Values{}
-	query.Set("current", "1")
-	query.Set("pageSize", "10")
-	setOptionalInt(query, params, "current")
-	setOptionalInt(query, params, "pageSize")
+	query := appstackDefaultPageQuery(params)
 
 	path := appstackChangeOrderPath(organizationID, appName, changeOrderSn) + "/jobs/" + url.PathEscape(jobSn) + "/logs"
 	return c.GetJSON(ctx, path, query)
@@ -110,7 +102,7 @@ func handleCreateChangeOrder(ctx context.Context, client any, params map[string]
 	if err != nil {
 		return "", err
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 func handleExecuteJobAction(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -137,7 +129,7 @@ func handleExecuteJobAction(ctx context.Context, client any, params map[string]a
 	if err != nil {
 		return "", err
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 func handleListChangeOrdersByOrigin(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -206,9 +198,9 @@ func requiredAppChangeOrderJob(params map[string]any) (string, string, string, s
 }
 
 func appstackAppPath(organizationID, appName string) string {
-	return "/appstack/organizations/" + url.PathEscape(organizationID) + "/apps/" + url.PathEscape(appName)
+	return "/appstack/organizations/" + encodePathValue(organizationID) + "/apps/" + encodePathValue(appName)
 }
 
 func appstackChangeOrderPath(organizationID, appName, changeOrderSn string) string {
-	return appstackAppPath(organizationID, appName) + "/changeOrders/" + url.PathEscape(changeOrderSn)
+	return appstackAppPath(organizationID, appName) + "/changeOrders/" + encodePathValue(changeOrderSn)
 }

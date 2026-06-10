@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
 type projectViewOptions struct {
 	OrganizationID    string
 	ProjectID         string
@@ -222,12 +223,12 @@ func newYunxiaoProjectContextCommand(streams IOStreams, cfgFile *string, v *vipe
 
 func (o projectContextOptions) params() (map[string]any, error) {
 	params := map[string]any{
-		"projectId":        o.ProjectID,
-		"category":         o.Category,
-		"includeMembers":   o.IncludeMembers,
-		"includeLabels":    o.IncludeLabels,
-		"includeFields":    o.IncludeFields,
-		"includeWorkflow":  o.IncludeWorkflow,
+		"projectId":       o.ProjectID,
+		"category":        o.Category,
+		"includeMembers":  o.IncludeMembers,
+		"includeLabels":   o.IncludeLabels,
+		"includeFields":   o.IncludeFields,
+		"includeWorkflow": o.IncludeWorkflow,
 	}
 	if params["category"] == "" {
 		return nil, fmt.Errorf("category is required, e.g. Task, Bug, Req, Risk")
@@ -498,7 +499,6 @@ func (o projectBoardOptions) params() (map[string]any, error) {
 	}
 	return params, nil
 }
-
 
 type projectMemberTrendOptions struct {
 	OrganizationID string

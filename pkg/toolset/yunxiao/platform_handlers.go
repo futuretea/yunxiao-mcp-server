@@ -18,12 +18,9 @@ func handleGetCurrentUser(ctx context.Context, client any, params map[string]any
 		if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound {
 			return c.GetJSON(ctx, "/platform/user", nil)
 		}
+		return "", err
 	}
-	return result, err
-}
-
-func handleGetCurrentOrganizationInfo(ctx context.Context, client any, params map[string]any) (string, error) {
-	return handleGetCurrentUser(ctx, client, params)
+	return result, nil
 }
 
 func handleListOrganizations(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -36,10 +33,6 @@ func handleListOrganizations(ctx context.Context, client any, params map[string]
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 	return c.GetJSON(ctx, "/platform/organizations", query)
-}
-
-func handleGetUserOrganizations(ctx context.Context, client any, params map[string]any) (string, error) {
-	return handleListOrganizations(ctx, client, params)
 }
 
 func handleGetOrganization(ctx context.Context, client any, params map[string]any) (string, error) {

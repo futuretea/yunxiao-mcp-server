@@ -55,7 +55,7 @@ func handleListTestcaseRepositories(ctx context.Context, client any, params map[
 	if err != nil {
 		return "", err
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 func handleGetTestcaseFieldConfig(ctx context.Context, client any, params map[string]any) (string, error) {

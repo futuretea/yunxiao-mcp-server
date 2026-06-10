@@ -9,15 +9,15 @@ import (
 	"strings"
 )
 
-type projectOverviewSection struct {
+type overviewSection struct {
 	flag  string
 	name  string
 	path  string
 	query url.Values
 }
 
-func projectOverviewSections(projectPath string, params map[string]any) []projectOverviewSection {
-	return []projectOverviewSection{
+func projectOverviewSections(projectPath string, params map[string]any) []overviewSection {
+	return []overviewSection{
 		{flag: "includeMembers", name: "members", path: projectPath + "/members"},
 		{flag: "includeSprints", name: "sprints", path: projectPath + "/sprints", query: projectOverviewListQuery(params, true)},
 		{flag: "includeMilestones", name: "milestones", path: projectPath + "/milestones", query: projectOverviewListQuery(params, true)},
@@ -26,7 +26,7 @@ func projectOverviewSections(projectPath string, params map[string]any) []projec
 	}
 }
 
-func addProjectOverviewSection(ctx context.Context, c *Client, overview map[string]any, params map[string]any, section projectOverviewSection) error {
+func addOverviewSection(ctx context.Context, c *Client, target map[string]any, params map[string]any, section overviewSection) error {
 	if !optionalBoolDefault(params, section.flag, true) {
 		return nil
 	}
@@ -34,7 +34,7 @@ func addProjectOverviewSection(ctx context.Context, c *Client, overview map[stri
 	if err != nil {
 		return err
 	}
-	overview[section.name] = payload
+	target[section.name] = payload
 	return nil
 }
 
@@ -117,15 +117,8 @@ func addProjectWorkitemTypeContext(ctx context.Context, c *Client, payload map[s
 	return nil
 }
 
-type workitemDetailSection struct {
-	flag  string
-	name  string
-	path  string
-	query url.Values
-}
-
-func workitemDetailSections(workitemPath string, params map[string]any) []workitemDetailSection {
-	sections := []workitemDetailSection{
+func workitemDetailSections(workitemPath string, params map[string]any) []overviewSection {
+	sections := []overviewSection{
 		{flag: "includeActivities", name: "activities", path: workitemPath + "/activities"},
 		{flag: "includeAttachments", name: "attachments", path: workitemPath + "/attachments"},
 	}
@@ -134,7 +127,7 @@ func workitemDetailSections(workitemPath string, params map[string]any) []workit
 		query := url.Values{}
 		query.Set("page", strconv.Itoa(optionalIntDefault(params, "page", 1)))
 		query.Set("perPage", strconv.Itoa(optionalIntDefault(params, "perPage", 20)))
-		sections = append(sections, workitemDetailSection{flag: "includeComments", name: "comments", path: workitemPath + "/comments", query: query})
+		sections = append(sections, overviewSection{flag: "includeComments", name: "comments", path: workitemPath + "/comments", query: query})
 	}
 
 	if optionalBoolDefault(params, "includeRelations", true) {
@@ -142,7 +135,7 @@ func workitemDetailSections(workitemPath string, params map[string]any) []workit
 		for _, rt := range relationTypes {
 			query := url.Values{}
 			query.Set("relationType", rt)
-			sections = append(sections, workitemDetailSection{
+			sections = append(sections, overviewSection{
 				flag:  "includeRelations",
 				name:  "relations_" + strings.ToLower(rt),
 				path:  workitemPath + "/relationRecords",
@@ -152,18 +145,6 @@ func workitemDetailSections(workitemPath string, params map[string]any) []workit
 	}
 
 	return sections
-}
-
-func addWorkitemDetailSection(ctx context.Context, c *Client, detail map[string]any, params map[string]any, section workitemDetailSection) error {
-	if !optionalBoolDefault(params, section.flag, true) {
-		return nil
-	}
-	payload, err := getProjectOverviewSection(ctx, c, section.name, section.path, section.query)
-	if err != nil {
-		return err
-	}
-	detail[section.name] = payload
-	return nil
 }
 
 func workitemDetailFilters(params map[string]any) map[string]any {

@@ -14,7 +14,7 @@ type pipelineJobListOptions struct {
 	PipelineID     string
 	Category       string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoPipelineJobCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -161,7 +161,6 @@ func (o pipelineJobLogOptions) params() (map[string]any, error) {
 	setCLIStringParam(params, "organizationId", o.OrganizationID)
 	return params, nil
 }
-
 
 func pipelineJobRowsFromJSONForPrint(raw string) ([]pipelineJobRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

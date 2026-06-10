@@ -264,3 +264,171 @@ func TestHandleGetAppReleaseWorkflowOverviewCombinesResponses(t *testing.T) {
 		t.Fatal("overview missing stageBriefs")
 	}
 }
+
+func TestHandleGetAppReleaseStageOverviewCombinesResponses(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		switch callCount {
+		case 1:
+			if !strings.Contains(r.URL.Path, "/releaseStages/stage-1") {
+				t.Fatalf("unexpected stage path: %s", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`{"name":"stage-1"}`))
+		case 2:
+			if !strings.Contains(r.RequestURI, ":getPipelineRun") {
+				t.Fatalf("unexpected pipelineRun path: %s", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`{"id":"run-1"}`))
+		case 3:
+			if !strings.Contains(r.URL.Path, "/integratedMetadata") {
+				t.Fatalf("unexpected metadata path: %s", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`{"key":"value"}`))
+		default:
+			t.Fatalf("unexpected request %d", callCount)
+		}
+	})
+
+	result, err := handleGetAppReleaseStageOverview(context.Background(), client, map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "wf-1",
+		"releaseStageSn":    "stage-1",
+		"executionNumber":   "1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetAppReleaseStageOverview() error = %v", err)
+	}
+	if callCount != 3 {
+		t.Fatalf("callCount = %d, want 3", callCount)
+	}
+
+	var overview map[string]any
+	if err := json.Unmarshal([]byte(result), &overview); err != nil {
+		t.Fatalf("unmarshal result: %v", err)
+	}
+	for _, key := range []string{"stage", "pipelineRun", "metadata", "filters"} {
+		if _, ok := overview[key]; !ok {
+			t.Fatalf("overview missing key %q", key)
+		}
+	}
+}
+
+func TestHandleGetAppReleaseStageOverviewWithoutOptionalSections(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		if callCount > 1 {
+			t.Fatalf("unexpected request %d", callCount)
+		}
+		_, _ = w.Write([]byte(`{"name":"stage-1"}`))
+	})
+
+	result, err := handleGetAppReleaseStageOverview(context.Background(), client, map[string]any{
+		"organizationId":     "org-1",
+		"appName":            "app-1",
+		"releaseWorkflowSn":  "wf-1",
+		"releaseStageSn":     "stage-1",
+		"executionNumber":    "1",
+		"includePipelineRun": false,
+		"includeMetadata":    false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetAppReleaseStageOverview() error = %v", err)
+	}
+	if callCount != 1 {
+		t.Fatalf("callCount = %d, want 1", callCount)
+	}
+
+	var overview map[string]any
+	if err := json.Unmarshal([]byte(result), &overview); err != nil {
+		t.Fatalf("unmarshal result: %v", err)
+	}
+	if _, ok := overview["pipelineRun"]; ok {
+		t.Fatal("overview should not include pipelineRun when disabled")
+	}
+	if _, ok := overview["metadata"]; ok {
+		t.Fatal("overview should not include metadata when disabled")
+	}
+}
+
+func TestHandleGetAppReleaseStageOverviewSoftErrors(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		switch callCount {
+		case 1:
+			_, _ = w.Write([]byte(`{"name":"stage-1"}`))
+		case 2:
+			w.WriteHeader(http.StatusInternalServerError)
+		case 3:
+			w.WriteHeader(http.StatusBadGateway)
+		default:
+			t.Fatalf("unexpected request %d", callCount)
+		}
+	})
+
+	result, err := handleGetAppReleaseStageOverview(context.Background(), client, map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "wf-1",
+		"releaseStageSn":    "stage-1",
+		"executionNumber":   "1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetAppReleaseStageOverview() error = %v", err)
+	}
+
+	var overview map[string]any
+	if err := json.Unmarshal([]byte(result), &overview); err != nil {
+		t.Fatalf("unmarshal result: %v", err)
+	}
+	if _, ok := overview["pipelineRunError"]; !ok {
+		t.Fatal("overview should include pipelineRunError for soft failure")
+	}
+	if _, ok := overview["metadataError"]; !ok {
+		t.Fatal("overview should include metadataError for soft failure")
+	}
+}
+
+func TestHandleGetAppReleaseStageOverviewRequiresParams(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request: %s %s", r.Method, r.RequestURI)
+	})
+
+	if _, err := handleGetAppReleaseStageOverview(context.Background(), client, map[string]any{}); err == nil {
+		t.Fatal("expected missing organizationId error")
+	}
+	if _, err := handleGetAppReleaseStageOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+	}); err == nil {
+		t.Fatal("expected missing appName error")
+	}
+	if _, err := handleGetAppReleaseStageOverview(context.Background(), client, map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "wf-1",
+		"releaseStageSn":    "stage-1",
+	}); err == nil {
+		t.Fatal("expected missing executionNumber error")
+	}
+}
+
+func TestStageOverviewFilters(t *testing.T) {
+	params := map[string]any{
+		"includeStageInfo":   false,
+		"includePipelineRun": false,
+		"includeMetadata":    false,
+	}
+	filters := stageOverviewFilters(params)
+	if filters["includeStageInfo"] != false {
+		t.Fatalf("includeStageInfo = %v, want false", filters["includeStageInfo"])
+	}
+	if filters["includePipelineRun"] != false {
+		t.Fatalf("includePipelineRun = %v, want false", filters["includePipelineRun"])
+	}
+	if filters["includeMetadata"] != false {
+		t.Fatalf("includeMetadata = %v, want false", filters["includeMetadata"])
+	}
+}

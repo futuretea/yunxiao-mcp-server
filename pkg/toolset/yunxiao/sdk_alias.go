@@ -30,16 +30,7 @@ var (
 	ClassifyError             = sdk.ClassifyError
 	WrapError                 = sdk.WrapError
 	EncodeRepositoryID        = sdk.EncodeRepositoryID
+	PrettyResponseJSON        = sdk.PrettyResponseJSON
+	EncodeFilePath            = sdk.EncodeFilePath
+	encodePathValue           = sdk.EncodePathValue
 )
-
-func prettyResponseJSON(resp *Response) string {
-	return sdk.PrettyResponseJSON(resp)
-}
-
-func encodePathValue(value string) string {
-	return sdk.EncodePathValue(value)
-}
-
-func encodeFilePath(filePath string) string {
-	return sdk.EncodeFilePath(filePath)
-}

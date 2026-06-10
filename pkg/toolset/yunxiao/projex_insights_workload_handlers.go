@@ -100,24 +100,34 @@ func buildMemberWorkload(ctx context.Context, c *Client, organizationID, project
 }
 
 func countWorkitemStatuses(data []any, workload map[string]any) (totalActive, totalOverdue int) {
-	tasksByStatus := workload["tasksByStatus"].(map[string]int)
+	tasksByStatus, ok := workload["tasksByStatus"].(map[string]int)
+	if !ok || tasksByStatus == nil {
+		tasksByStatus = map[string]int{}
+		workload["tasksByStatus"] = tasksByStatus
+	}
+	totalAssigned, _ := workload["totalAssigned"].(int)
+	overdueCount, _ := workload["overdueCount"].(int)
 
+	today := todayDate()
 	for _, item := range data {
 		if itemMap, ok := item.(map[string]any); ok {
-			workload["totalAssigned"] = workload["totalAssigned"].(int) + 1
+			totalAssigned++
 			totalActive++
 
 			statusName := extractWorkitemStatusName(itemMap)
 			tasksByStatus[statusName]++
 
 			if finishTime, ok := itemMap["finishTime"].(string); ok && finishTime != "" {
-				if finishTime < todayDate() {
-					workload["overdueCount"] = workload["overdueCount"].(int) + 1
+				if finishTime < today {
+					overdueCount++
 					totalOverdue++
 				}
 			}
 		}
 	}
+
+	workload["totalAssigned"] = totalAssigned
+	workload["overdueCount"] = overdueCount
 	return totalActive, totalOverdue
 }
 
@@ -221,15 +231,6 @@ func teamWorkloadBreakdownFilters(params map[string]any, categories []string, me
 		"taskLimit":   taskLimit,
 		"status":      optionalStringDefault(params, "status", ""),
 	}
-}
-
-func extractWorkitemStatusName(itemMap map[string]any) string {
-	if status, ok := itemMap["status"].(map[string]any); ok {
-		if name, ok := status["name"].(string); ok {
-			return name
-		}
-	}
-	return "Unknown"
 }
 
 func extractLabelNames(itemMap map[string]any) []string {

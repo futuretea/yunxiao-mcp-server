@@ -31,7 +31,7 @@ func newYunxiaoSprintViewCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 
   # View with specific categories
   yunxiao sprint view sprint-456 --project-id 123 --categories "Task,Bug"`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

@@ -132,14 +132,16 @@ func (h *Handler) withShutdownContext(next http.Handler) http.Handler {
 func (h *Handler) Shutdown(ctx context.Context) error {
 	h.shutdownCancel()
 
-	var shutdownErr error
+	var errs []error
 	if h.sseServer != nil {
-		shutdownErr = h.sseServer.Shutdown(ctx)
-	}
-	if h.streamableHTTPServer != nil {
-		if err := h.streamableHTTPServer.Shutdown(ctx); shutdownErr == nil {
-			shutdownErr = err
+		if err := h.sseServer.Shutdown(ctx); err != nil {
+			errs = append(errs, err)
 		}
 	}
-	return shutdownErr
+	if h.streamableHTTPServer != nil {
+		if err := h.streamableHTTPServer.Shutdown(ctx); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errors.Join(errs...)
 }

@@ -29,7 +29,7 @@ func newYunxiaoRepoBranchViewCommand(streams IOStreams, cfgFile *string, v *vipe
 		Short:   "view a CodeUp branch overview as JSON",
 		Example: `  # View branch overview
   yunxiao repo branch view feature-x --repository-id group/repo`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

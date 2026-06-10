@@ -42,7 +42,7 @@ func newYunxiaoToolsDescribeCommand(streams IOStreams, cfgFile *string, v *viper
 
   # Describe with tool name and sub-command
   yunxiao tools schema search_projects`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

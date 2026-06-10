@@ -23,7 +23,7 @@ type repoChangeRequestListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoRepoChangeRequestCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -137,7 +137,7 @@ type crPatchSetListOptions struct {
 	RepositoryID   string
 	LocalID        string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoRepoCRPatchSetCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -243,7 +243,6 @@ func crPatchSetRowsFromJSONForPrint(raw string) ([]crPatchSetRow, bool) {
 	}
 	return rows, true
 }
-
 
 func repoChangeRequestRowsFromJSONForPrint(raw string) ([]repoChangeRequestRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

@@ -41,7 +41,7 @@ func handleListGlobalVars(ctx context.Context, client any, params map[string]any
 	if err != nil {
 		return "", err
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 func requiredGlobalVar(params map[string]any) (string, string, error) {
@@ -57,5 +57,5 @@ func requiredGlobalVar(params map[string]any) (string, string, error) {
 }
 
 func appstackGlobalVarPath(organizationID, name string) string {
-	return "/appstack/organizations/" + url.PathEscape(organizationID) + "/globalVars/" + url.PathEscape(name)
+	return "/appstack/organizations/" + encodePathValue(organizationID) + "/globalVars/" + encodePathValue(name)
 }

@@ -15,7 +15,7 @@ type projectMemberListOptions struct {
 	Name           string
 	RoleID         string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoProjectMemberCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

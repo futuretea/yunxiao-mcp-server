@@ -28,7 +28,7 @@ func handleListWorkItemTypes(ctx context.Context, client any, params map[string]
 		return "", err
 	}
 
-	organizationID, projectID, err := requiredOrganizationAndProject(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", err
 	}
@@ -104,20 +104,8 @@ func handleGetWorkItemWorkflow(ctx context.Context, client any, params map[strin
 	return c.GetJSON(ctx, path, nil)
 }
 
-func requiredOrganizationAndProject(params map[string]any) (string, string, error) {
-	organizationID, err := requiredString(params, "organizationId")
-	if err != nil {
-		return "", "", err
-	}
-	projectID, err := requiredString(params, "projectId")
-	if err != nil {
-		return "", "", err
-	}
-	return organizationID, projectID, nil
-}
-
 func requiredOrganizationProjectAndWorkItemType(params map[string]any) (string, string, string, error) {
-	organizationID, projectID, err := requiredOrganizationAndProject(params)
+	organizationID, projectID, err := requiredOrganizationAndNamedID(params, "projectId")
 	if err != nil {
 		return "", "", "", err
 	}

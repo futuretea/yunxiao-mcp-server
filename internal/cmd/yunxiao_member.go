@@ -13,7 +13,7 @@ type memberListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoMemberCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -128,7 +128,7 @@ type memberSearchOptions struct {
 	Page            int
 	PerPage         int
 	JSONOutput      bool
-	OutputFormat string
+	OutputFormat    string
 }
 
 func newYunxiaoMemberSearchCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

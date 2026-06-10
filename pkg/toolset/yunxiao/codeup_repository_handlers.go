@@ -24,7 +24,7 @@ func handleListRepositories(ctx context.Context, client any, params map[string]a
 	setOptionalString(query, params, "search")
 	setOptionalBool(query, params, "archived")
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories"
+	path := codeupOrganizationPath(organizationID) + "/repositories"
 	return c.GetJSONWithMetadata(ctx, path, query)
 }
 
@@ -39,8 +39,7 @@ func handleGetRepository(ctx context.Context, client any, params map[string]any)
 		return "", err
 	}
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID)
-	return c.GetJSON(ctx, path, nil)
+	return c.GetJSON(ctx, codeupRepositoryPath(organizationID, repositoryID), nil)
 }
 
 func handleListBranches(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -60,7 +59,7 @@ func handleListBranches(ctx context.Context, client any, params map[string]any) 
 	setOptionalString(query, params, "sort")
 	setOptionalString(query, params, "search")
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/branches"
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/branches"
 	return c.GetJSONWithMetadata(ctx, path, query)
 }
 
@@ -79,7 +78,7 @@ func handleGetBranch(ctx context.Context, client any, params map[string]any) (st
 		return "", err
 	}
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/branches/" + encodePathValue(branchName)
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/branches/" + encodePathValue(branchName)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -99,7 +98,7 @@ func handleListFiles(ctx context.Context, client any, params map[string]any) (st
 	setOptionalString(query, params, "ref")
 	setOptionalString(query, params, "type")
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/files/tree"
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/files/tree"
 	return c.GetJSON(ctx, path, query)
 }
 
@@ -126,6 +125,6 @@ func handleGetFileBlobs(ctx context.Context, client any, params map[string]any) 
 	query.Set("ref", ref)
 	setOptionalString(query, params, "since")
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/files/" + encodeFilePath(filePath)
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/files/" + EncodeFilePath(filePath)
 	return c.GetJSON(ctx, path, query)
 }

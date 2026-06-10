@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"sort"
 	"strings"
-	"time"
 )
 
 func handleGetProjectMemberTaskStatus(ctx context.Context, client any, params map[string]any) (string, error) {
@@ -125,27 +124,17 @@ func projectMembersFromResponse(resp *Response, limit int) (map[string]any, []st
 	ids := make([]string, 0, len(members))
 	for _, member := range members {
 		userID, _ := member["userId"].(string)
-		if strings.TrimSpace(userID) == "" {
+		userID = strings.TrimSpace(userID)
+		if userID == "" {
 			continue
 		}
 		if limit > 0 && len(ids) >= limit {
 			break
 		}
-		userID = strings.TrimSpace(userID)
 		result[userID] = member
 		ids = append(ids, userID)
 	}
 	return result, ids, nil
-}
-
-func searchProjectWorkitems(ctx context.Context, c *Client, organizationID, projectID, category string, params map[string]any) (any, error) {
-	body := projectWorkitemSummaryBody(projectID, category, params)
-	path := projexOrganizationPath(organizationID) + "/workitems:search"
-	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", category, err)
-	}
-	return responsePayload(resp), nil
 }
 
 func parseStatusGroups(params map[string]any) (map[string]string, error) {
@@ -184,16 +173,4 @@ func projectTaskStatusFilters(params map[string]any, assigneeIDs []string, group
 		"memberLimit":   optionalIntDefault(params, "memberLimit", 20),
 		"sampleLimit":   normalizedSampleLimit(params),
 	}
-}
-
-func copyParams(params map[string]any) map[string]any {
-	copied := make(map[string]any, len(params))
-	for key, value := range params {
-		copied[key] = value
-	}
-	return copied
-}
-
-func todayDate() string {
-	return time.Now().Format("2006-01-02")
 }

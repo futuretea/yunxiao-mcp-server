@@ -17,7 +17,7 @@ type repoBranchListOptions struct {
 	Sort           string
 	Search         string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoRepoBranchCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -118,7 +118,6 @@ type repoBranchRow struct {
 	Protected  string
 	LastCommit string
 }
-
 
 func repoBranchRowsFromJSONForPrint(raw string) ([]repoBranchRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

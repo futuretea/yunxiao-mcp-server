@@ -13,7 +13,7 @@ type projectRoleListOptions struct {
 	OrganizationID string
 	ProjectID      string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoProjectRoleCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

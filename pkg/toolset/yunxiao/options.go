@@ -68,27 +68,26 @@ func setOptionalBoolBody(body map[string]any, params map[string]any, key string)
 func trimmedNonEmptyStrings(value any) []string {
 	switch v := value.(type) {
 	case []any:
-		result := make([]string, 0, len(v))
-		for _, item := range v {
+		return filterNonEmptyStrings(v, func(item any) string {
 			if s, ok := item.(string); ok {
-				s = strings.TrimSpace(s)
-				if s != "" {
-					result = append(result, s)
-				}
+				return s
 			}
-		}
-		return result
+			return ""
+		})
 	case []string:
-		result := make([]string, 0, len(v))
-		for _, item := range v {
-			item = strings.TrimSpace(item)
-			if item != "" {
-				result = append(result, item)
-			}
-		}
-		return result
+		return filterNonEmptyStrings(v, func(item string) string { return item })
 	}
 	return nil
+}
+
+func filterNonEmptyStrings[T any](items []T, get func(T) string) []string {
+	result := make([]string, 0, len(items))
+	for _, item := range items {
+		if s := strings.TrimSpace(get(item)); s != "" {
+			result = append(result, s)
+		}
+	}
+	return result
 }
 
 func setOptionalStringArrayBody(body map[string]any, params map[string]any, key string) {

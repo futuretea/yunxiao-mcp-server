@@ -209,15 +209,15 @@ func TestHandleGetWorkItemWorkflowRequiresWorkItemTypeId(t *testing.T) {
 	}
 }
 
-func TestRequiredOrganizationAndProjectRequiresProjectId(t *testing.T) {
-	_, _, err := requiredOrganizationAndProject(map[string]any{"organizationId": "org-1"})
+func TestRequiredOrganizationAndNamedIDRequiresProjectId(t *testing.T) {
+	_, _, err := requiredOrganizationAndNamedID(map[string]any{"organizationId": "org-1"}, "projectId")
 	if err == nil {
 		t.Fatal("expected missing projectId error")
 	}
 }
 
-func TestRequiredOrganizationAndProjectRequiresOrganizationId(t *testing.T) {
-	_, _, err := requiredOrganizationAndProject(map[string]any{})
+func TestRequiredOrganizationAndNamedIDRequiresOrganizationId(t *testing.T) {
+	_, _, err := requiredOrganizationAndNamedID(map[string]any{}, "projectId")
 	if err == nil {
 		t.Fatal("expected missing organizationId error")
 	}

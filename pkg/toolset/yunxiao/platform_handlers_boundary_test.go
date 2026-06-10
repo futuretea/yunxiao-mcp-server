@@ -15,13 +15,13 @@ func TestPlatformHandlersRequireParams(t *testing.T) {
 	if _, err := handleGetCurrentUser(context.Background(), "invalid-client", nil); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleGetCurrentOrganizationInfo(context.Background(), "invalid-client", nil); err == nil {
+	if _, err := handleGetCurrentUser(context.Background(), "invalid-client", nil); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleListOrganizations(context.Background(), "invalid-client", nil); err == nil {
 		t.Fatal("expected getClient error")
 	}
-	if _, err := handleGetUserOrganizations(context.Background(), "invalid-client", nil); err == nil {
+	if _, err := handleListOrganizations(context.Background(), "invalid-client", nil); err == nil {
 		t.Fatal("expected getClient error")
 	}
 	if _, err := handleGetOrganization(context.Background(), client, map[string]any{}); err == nil {

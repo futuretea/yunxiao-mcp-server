@@ -10,17 +10,17 @@ import (
 )
 
 type userListOptions struct {
-	Filter     string
-	Status     string
-	DeptID     string
-	Page       int
-	PerPage    int
-	JSONOutput bool
+	Filter       string
+	Status       string
+	DeptID       string
+	Page         int
+	PerPage      int
+	JSONOutput   bool
 	OutputFormat string
 }
 
 type userViewOptions struct {
-	IDOrUsername  string
+	IDOrUsername   string
 	OrganizationID string
 }
 

@@ -16,7 +16,7 @@ type repoFileListOptions struct {
 	Ref            string
 	TreeType       string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoRepoFileCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -110,7 +110,6 @@ type repoFileRow struct {
 	Size string
 	Mode string
 }
-
 
 func repoFileRowsFromJSONForPrint(raw string) ([]repoFileRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

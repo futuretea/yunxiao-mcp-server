@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -17,6 +18,7 @@ import (
 )
 
 func newTestMCPServer(t *testing.T, accessToken string) *mcpserver.Server {
+	t.Helper()
 	return newTestMCPServerWithBaseURL(t, accessToken, config.DefaultBaseURL)
 }
 
@@ -340,5 +342,84 @@ func TestHandlerShutdownCancelsActiveStreamableHTTPGet(t *testing.T) {
 		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("Shutdown() timed out with active streamable HTTP GET")
+	}
+}
+
+func TestHandlerShutdownPreservesBothErrors(t *testing.T) {
+	mcpServer := newTestMCPServer(t, "token")
+
+	// Independent underlying HTTP servers for SSE and streamable HTTP.  Their
+	// handlers intentionally block so that Shutdown has to time out.
+	sseDone := make(chan struct{})
+	sseStarted := make(chan struct{})
+	sseTestServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(sseStarted)
+		<-sseDone
+	}))
+	defer sseTestServer.Close()
+	defer close(sseDone)
+
+	streamableDone := make(chan struct{})
+	streamableStarted := make(chan struct{})
+	streamableTestServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(streamableStarted)
+		<-streamableDone
+	}))
+	defer streamableTestServer.Close()
+	defer close(streamableDone)
+
+	sseServer := mcpServer.ServeSSE(sseTestServer.URL, sseTestServer.Config)
+	streamableHTTPServer := mcpServer.ServeStreamableHTTP(streamableTestServer.Config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	handler := &Handler{
+		mux:                  http.NewServeMux(),
+		shutdownCtx:          ctx,
+		shutdownCancel:       cancel,
+		sseServer:            sseServer,
+		streamableHTTPServer: streamableHTTPServer,
+	}
+
+	// Hold active connections on both servers so their Shutdown calls fail.
+	go func() {
+		resp, err := sseTestServer.Client().Get(sseTestServer.URL)
+		if err == nil {
+			_ = resp.Body.Close()
+		}
+	}()
+	go func() {
+		resp, err := streamableTestServer.Client().Get(streamableTestServer.URL)
+		if err == nil {
+			_ = resp.Body.Close()
+		}
+	}()
+
+	select {
+	case <-sseStarted:
+	case <-time.After(time.Second):
+		t.Fatal("SSE connection did not start")
+	}
+	select {
+	case <-streamableStarted:
+	case <-time.After(time.Second):
+		t.Fatal("streamable HTTP connection did not start")
+	}
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer shutdownCancel()
+
+	err := handler.Shutdown(shutdownCtx)
+	if err == nil {
+		t.Fatal("Shutdown() expected an error")
+	}
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Shutdown() error = %v, want context.DeadlineExceeded", err)
+	}
+	if !strings.Contains(err.Error(), "context deadline exceeded") {
+		t.Fatalf("Shutdown() error message missing deadline: %v", err)
+	}
+	// Both SSE and streamable HTTP shutdowns should have contributed an error.
+	if strings.Count(err.Error(), "context deadline exceeded") < 2 {
+		t.Fatalf("Shutdown() error should contain both server errors: %v", err)
 	}
 }

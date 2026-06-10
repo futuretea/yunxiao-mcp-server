@@ -36,16 +36,6 @@ func projectWorkitemSummaryBody(projectID, category string, params map[string]an
 	return body
 }
 
-func searchProjectWorkitemSummaryCategory(ctx context.Context, c *Client, organizationID, projectID, category string, params map[string]any) (any, error) {
-	body := projectWorkitemSummaryBody(projectID, category, params)
-	path := projexOrganizationPath(organizationID) + "/workitems:search"
-	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", category, err)
-	}
-	return responsePayload(resp), nil
-}
-
 func projectWorkitemSummaryFilters(params map[string]any, categories []string) map[string]any {
 	return map[string]any{
 		"categories":  categories,
@@ -85,6 +75,16 @@ func buildCategoryResult(ctx context.Context, categories []string, filters map[s
 	return result, nil
 }
 
+func searchProjectWorkitems(ctx context.Context, c *Client, organizationID, projectID, category string, params map[string]any) (any, error) {
+	body := projectWorkitemSummaryBody(projectID, category, params)
+	path := projexOrganizationPath(organizationID) + "/workitems:search"
+	resp, err := c.Request(ctx, http.MethodPost, path, nil, body)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", category, err)
+	}
+	return responsePayload(resp), nil
+}
+
 func searchSprintWorkitems(ctx context.Context, c *Client, organizationID, projectID, sprintID, category string, params map[string]any) (any, error) {
 	body := projectWorkitemSummaryBody(projectID, category, params)
 	sprintConditions := buildWorkitemConditions(map[string]any{"sprint": sprintID})
@@ -121,7 +121,10 @@ func mergeConditionsAsArrays(existing, extra string) (string, bool) {
 	if err := json.Unmarshal([]byte(extra), &extraArr); err != nil {
 		return "", false
 	}
-	mergedBytes, _ := json.Marshal(append(existingArr, extraArr...))
+	mergedBytes, err := json.Marshal(append(existingArr, extraArr...))
+	if err != nil {
+		return "", false
+	}
 	return string(mergedBytes), true
 }
 
@@ -144,7 +147,10 @@ func mergeConditionGroups(existing, extra string) string {
 		existingObj["conditionGroups"] = extraGroups
 	}
 
-	mergedBytes, _ := json.Marshal(existingObj)
+	mergedBytes, err := json.Marshal(existingObj)
+	if err != nil {
+		return existing
+	}
 	return string(mergedBytes)
 }
 
@@ -177,9 +183,7 @@ func extractWorkitemData(payload any) ([]any, int, error) {
 		data, _ := p["data"].([]any)
 		total := 0
 		if pagination, ok := p["pagination"].(map[string]any); ok {
-			if t, ok := pagination["total"].(float64); ok {
-				total = int(t)
-			}
+			total = intValue(pagination["total"])
 		}
 		return data, total, nil
 	default:
@@ -187,32 +191,49 @@ func extractWorkitemData(payload any) ([]any, int, error) {
 	}
 }
 
-func extractStatusName(item any) string {
-	m, ok := item.(map[string]any)
-	if !ok {
-		return ""
+func intValue(v any) int {
+	switch n := v.(type) {
+	case float64:
+		return int(n)
+	case int:
+		return n
+	case int64:
+		return int(n)
 	}
-	status, ok := m["status"].(map[string]any)
-	if !ok {
-		return ""
-	}
-	name, _ := status["name"].(string)
-	return name
+	return 0
 }
 
 func groupWorkitemsByStatus(data []any) (map[string]any, map[string]int) {
 	columns := map[string]any{}
 	counts := map[string]int{}
 	for _, item := range data {
-		statusName := extractStatusName(item)
-		if statusName == "" {
-			statusName = "Unknown"
-		}
-		if columns[statusName] == nil {
-			columns[statusName] = []any{}
-		}
-		columns[statusName] = append(columns[statusName].([]any), item)
+		itemMap, _ := item.(map[string]any)
+		statusName := extractWorkitemStatusName(itemMap)
+		col, _ := columns[statusName].([]any)
+		columns[statusName] = append(col, item)
 		counts[statusName]++
 	}
 	return columns, counts
+}
+
+func extractWorkitemStatusName(itemMap map[string]any) string {
+	if status, ok := itemMap["status"].(map[string]any); ok {
+		if name, ok := status["name"].(string); ok {
+			return name
+		}
+	}
+	return "Unknown"
+}
+
+// parseListData extracts a []any from either a raw slice or a map["data"] wrapper.
+func parseListData(data any) []any {
+	switch d := data.(type) {
+	case []any:
+		return d
+	case map[string]any:
+		if data, ok := d["data"].([]any); ok {
+			return data
+		}
+	}
+	return nil
 }

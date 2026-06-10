@@ -61,15 +61,8 @@ func workitemStatusTimelineFilters(params map[string]any) map[string]any {
 func parseStatusTimeline(activities any) []map[string]any {
 	timeline := make([]map[string]any, 0)
 
-	var activityList []any
-	switch a := activities.(type) {
-	case []any:
-		activityList = a
-	case map[string]any:
-		if data, ok := a["data"].([]any); ok {
-			activityList = data
-		}
-	default:
+	activityList := parseListData(activities)
+	if activityList == nil {
 		return timeline
 	}
 
@@ -110,7 +103,6 @@ func calculateTimelineStats(timeline []map[string]any) map[string]any {
 			}
 		}
 	}
-
 	return map[string]any{
 		"totalChanges": len(timeline),
 		"statusVisits": statuses,

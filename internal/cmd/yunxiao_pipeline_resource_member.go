@@ -14,7 +14,7 @@ type pipelineResourceMemberListOptions struct {
 	ResourceType   string
 	ResourceID     string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoPipelineResourceMemberCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -101,7 +101,6 @@ type pipelineResourceMemberRow struct {
 	Name string
 	Role string
 }
-
 
 func pipelineResourceMemberRowsFromJSONForPrint(raw string) ([]pipelineResourceMemberRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

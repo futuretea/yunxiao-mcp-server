@@ -18,7 +18,7 @@ type projectListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoProjectCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -146,4 +146,3 @@ func projectRowsFromJSON(raw string) []projectRow {
 	}
 	return rows
 }
-

@@ -58,6 +58,7 @@ func handleListPipelineRuns(ctx context.Context, client any, params map[string]a
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 	setOptionalInt(query, params, "startTime")
+	// API field name is intentionally "endTme" (not "endTime").
 	setOptionalIntAs(query, params, "endTime", "endTme")
 	setOptionalString(query, params, "status")
 	setOptionalInt(query, params, "triggerMode")

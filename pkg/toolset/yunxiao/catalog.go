@@ -176,7 +176,12 @@ func validateToolFilters(tools []toolset.ServerTool, enabledTools, disabledTools
 		known[name] = struct{}{}
 	}
 
-	for _, name := range append(append([]string{}, enabledTools...), disabledTools...) {
+	for _, name := range enabledTools {
+		if _, exists := known[name]; !exists {
+			return fmt.Errorf("unknown MCP tool %q; known tools: %s", name, strings.Join(knownToolNames(known), ", "))
+		}
+	}
+	for _, name := range disabledTools {
 		if _, exists := known[name]; !exists {
 			return fmt.Errorf("unknown MCP tool %q; known tools: %s", name, strings.Join(knownToolNames(known), ", "))
 		}

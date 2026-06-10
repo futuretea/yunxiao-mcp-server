@@ -34,7 +34,7 @@ func platformBasicTools() []toolset.ServerTool {
 				mcp.WithDescription("Get the current user's default Yunxiao organization context, including organization ID and name. Use this to discover the default organizationId before calling organization-scoped tools."),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
-			Handler: handleGetCurrentOrganizationInfo,
+			Handler: handleGetCurrentUser,
 		},
 		{
 			Tool: mcp.NewTool("get_user_organizations",
@@ -47,7 +47,7 @@ func platformBasicTools() []toolset.ServerTool {
 				),
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
-			Handler: handleGetUserOrganizations,
+			Handler: handleListOrganizations,
 		},
 		{
 			Tool: mcp.NewTool("list_organizations",

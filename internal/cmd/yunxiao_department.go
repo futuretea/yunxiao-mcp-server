@@ -14,7 +14,7 @@ type departmentListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoDepartmentCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -123,8 +123,8 @@ func departmentRowsFromJSONForPrint(raw string) ([]departmentRow, bool) {
 }
 
 type departmentViewOptions struct {
-	OrganizationID  string
-	DepartmentID    string
+	OrganizationID   string
+	DepartmentID     string
 	IncludeAncestors bool
 }
 

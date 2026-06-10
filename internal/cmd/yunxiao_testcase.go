@@ -29,7 +29,7 @@ type testcaseRepoListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoTestcaseRepoListCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -144,7 +144,7 @@ type testcaseSearchOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoTestcaseSearchCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

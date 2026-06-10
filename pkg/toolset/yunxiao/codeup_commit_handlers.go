@@ -31,7 +31,7 @@ func handleListCommits(ctx context.Context, client any, params map[string]any) (
 	setOptionalBool(query, params, "showSignature")
 	setOptionalString(query, params, "committerIds")
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/commits"
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/commits"
 	return c.GetJSONWithMetadata(ctx, path, query)
 }
 
@@ -50,7 +50,7 @@ func handleGetCommit(ctx context.Context, client any, params map[string]any) (st
 		return "", err
 	}
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/commits/" + url.PathEscape(sha)
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/commits/" + url.PathEscape(sha)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -80,6 +80,6 @@ func handleCompare(ctx context.Context, client any, params map[string]any) (stri
 	setOptionalString(query, params, "targetType")
 	setOptionalString(query, params, "straight")
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/compares"
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/compares"
 	return c.GetJSON(ctx, path, query)
 }

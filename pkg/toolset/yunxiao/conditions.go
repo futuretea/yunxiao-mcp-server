@@ -6,7 +6,7 @@ import (
 )
 
 func buildProjectConditions(params map[string]any) string {
-	filterConditions := make([]map[string]any, 0)
+	var filterConditions []map[string]any
 	if name, _ := params["name"].(string); name != "" {
 		filterConditions = append(filterConditions, stringContainsCondition("name", name))
 	}
@@ -23,7 +23,7 @@ func buildProjectConditions(params map[string]any) string {
 }
 
 func buildWorkitemConditions(params map[string]any) string {
-	filterConditions := make([]map[string]any, 0)
+	var filterConditions []map[string]any
 	if subject, _ := params["subject"].(string); subject != "" {
 		filterConditions = append(filterConditions, stringContainsCondition("subject", subject))
 	}

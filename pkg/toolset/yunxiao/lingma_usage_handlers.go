@@ -92,5 +92,5 @@ func requiredLingmaUsageQuery(params map[string]any, requiredKeys ...string) (ur
 }
 
 func lingmaOrganizationPath(organizationID string) string {
-	return "/lingma/organizations/" + url.PathEscape(organizationID)
+	return "/lingma/organizations/" + encodePathValue(organizationID)
 }

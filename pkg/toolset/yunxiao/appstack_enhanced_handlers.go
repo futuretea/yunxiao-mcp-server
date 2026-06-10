@@ -16,7 +16,7 @@ func handleGetApplicationOverview(ctx context.Context, client any, params map[st
 		return "", err
 	}
 
-	appPath := "/appstack/organizations/" + url.PathEscape(organizationID) + "/apps/" + url.PathEscape(appName)
+	appPath := appstackAppPath(organizationID, appName)
 
 	app, err := getProjectOverviewSection(ctx, c, "application", appPath, nil)
 	if err != nil {

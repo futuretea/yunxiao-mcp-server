@@ -26,7 +26,7 @@ func newYunxiaoRepoFileViewCommand(streams IOStreams, cfgFile *string, v *viper.
 
   # View file on a specific branch
   yunxiao repo file view src/main.go --repository-id group/repo --ref-name develop`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

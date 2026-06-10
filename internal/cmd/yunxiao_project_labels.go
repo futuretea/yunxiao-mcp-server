@@ -7,13 +7,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
 type projectLabelsOptions struct {
 	OrganizationID string
 	ProjectID      string
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoProjectLabelsCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -115,7 +116,7 @@ type projectMilestonesOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoProjectMilestonesCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

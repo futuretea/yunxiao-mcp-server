@@ -44,7 +44,7 @@ func handleGetSprintVelocity(ctx context.Context, client any, params map[string]
 		"sprints": []any{},
 	}
 
-	sprints := parseSprintList(responsePayload(sprintResp))
+	sprints := parseListData(responsePayload(sprintResp))
 	velocityData := make([]map[string]any, 0, len(sprints))
 
 	for _, sprint := range sprints {
@@ -66,18 +66,6 @@ func clampSprintCount(n int) int {
 		return 1
 	}
 	return n
-}
-
-func parseSprintList(data any) []any {
-	switch d := data.(type) {
-	case []any:
-		return d
-	case map[string]any:
-		if data, ok := d["data"].([]any); ok {
-			return data
-		}
-	}
-	return nil
 }
 
 func buildSprintVelocityStats(ctx context.Context, c *Client, organizationID, projectID string, sprint any, categories []string, params map[string]any) map[string]any {
