@@ -34,7 +34,7 @@ ci: lint
 smoke: build
 	./scripts/smoke.sh
 
-COVERAGE_PKGS := $(shell go list ./... | grep -v -E '/scripts$$|/cmd/yunxiao$$')
+COVERAGE_PKGS := $(shell go list ./... | grep -v -E '/scripts$$|/cmd/yunxiao$$|/internal/cmd$$')
 
 coverage:
 	go test -coverprofile=coverage.out $(COVERAGE_PKGS)

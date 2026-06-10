@@ -36,7 +36,7 @@ func newYunxiaoTaskViewCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 
   # View a task from a specific organization
   yunxiao task view wi-12345 --organization-id org-abc`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

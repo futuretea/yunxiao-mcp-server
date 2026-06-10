@@ -2,8 +2,13 @@ package yunxiao
 
 import (
 	"context"
-	"net/url"
 )
+
+func setChangeRequestOptionalBody(body map[string]any, params map[string]any) {
+	setOptionalStringBody(body, params, "description")
+	setOptionalStringBody(body, params, "sourceProjectId")
+	setOptionalStringBody(body, params, "targetProjectId")
+}
 
 func handleCreateChangeRequest(ctx context.Context, client any, params map[string]any) (string, error) {
 	c, err := getClient(client)
@@ -33,11 +38,9 @@ func handleCreateChangeRequest(ctx context.Context, client any, params map[strin
 		"sourceBranch": sourceBranch,
 		"targetBranch": targetBranch,
 	}
-	setOptionalStringBody(body, params, "description")
-	setOptionalStringBody(body, params, "sourceProjectId")
-	setOptionalStringBody(body, params, "targetProjectId")
+	setChangeRequestOptionalBody(body, params)
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/changeRequests"
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/changeRequests"
 	return c.PostJSONWithMetadata(ctx, path, body)
 }
 
@@ -69,15 +72,13 @@ func handleCreateMergeRequest(ctx context.Context, client any, params map[string
 		"sourceBranch": sourceBranch,
 		"targetBranch": targetBranch,
 	}
-	setOptionalStringBody(body, params, "description")
-	setOptionalStringBody(body, params, "sourceProjectId")
-	setOptionalStringBody(body, params, "targetProjectId")
+	setChangeRequestOptionalBody(body, params)
 
 	if assigneeIds, ok := params["assigneeIds"].([]any); ok && len(assigneeIds) > 0 {
 		body["assigneeIds"] = assigneeIds
 	}
 
-	path := "/codeup/organizations/" + url.PathEscape(organizationID) + "/repositories/" + EncodeRepositoryID(repositoryID) + "/mergeRequests"
+	path := codeupRepositoryPath(organizationID, repositoryID) + "/mergeRequests"
 	return c.PostJSONWithMetadata(ctx, path, body)
 }
 

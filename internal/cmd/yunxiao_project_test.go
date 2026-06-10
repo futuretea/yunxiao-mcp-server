@@ -186,25 +186,25 @@ func TestYunxiaoCLIProjectViewReturnsToolError(t *testing.T) {
 
 func TestProjectViewOptionsParamsIncludesFlags(t *testing.T) {
 	params := (projectViewOptions{
-		OrganizationID:    " org-1 ",
-		ProjectID:         "123",
-		IncludeMembers:    true,
-		IncludeSprints:    false,
-		ActiveOnly:        true,
-		Status:            " DOING ",
-		Page:              2,
-		PerPage:           10,
+		OrganizationID: " org-1 ",
+		ProjectID:      "123",
+		IncludeMembers: true,
+		IncludeSprints: false,
+		ActiveOnly:     true,
+		Status:         " DOING ",
+		Page:           2,
+		PerPage:        10,
 	}).params()
 
 	wants := map[string]any{
-		"organizationId":  "org-1",
-		"projectId":       "123",
-		"includeMembers":  true,
-		"includeSprints":  false,
-		"activeOnly":      true,
-		"status":          "DOING",
-		"page":            2,
-		"perPage":         10,
+		"organizationId": "org-1",
+		"projectId":      "123",
+		"includeMembers": true,
+		"includeSprints": false,
+		"activeOnly":     true,
+		"status":         "DOING",
+		"page":           2,
+		"perPage":        10,
 	}
 	for key, want := range wants {
 		if got := params[key]; got != want {

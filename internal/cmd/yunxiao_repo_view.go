@@ -35,7 +35,7 @@ func newYunxiaoRepoViewCommand(streams IOStreams, cfgFile *string, v *viper.Vipe
 
   # View with explicit organization
   yunxiao repo view group/repo --organization-id org-abc`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

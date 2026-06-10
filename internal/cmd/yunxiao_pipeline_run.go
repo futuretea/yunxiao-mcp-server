@@ -19,7 +19,7 @@ type pipelineRunListOptions struct {
 	Status         string
 	TriggerMode    int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoPipelineRunCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -128,7 +128,6 @@ type pipelineRunRow struct {
 	End     string
 	Trigger string
 }
-
 
 func pipelineRunRowsFromJSONForPrint(raw string) ([]pipelineRunRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

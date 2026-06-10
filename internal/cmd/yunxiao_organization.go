@@ -9,9 +9,9 @@ import (
 )
 
 type organizationListOptions struct {
-	Page       int
-	PerPage    int
-	JSONOutput bool
+	Page         int
+	PerPage      int
+	JSONOutput   bool
 	OutputFormat string
 }
 

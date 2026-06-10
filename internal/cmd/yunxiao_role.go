@@ -11,7 +11,7 @@ import (
 type roleListOptions struct {
 	OrganizationID string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoRoleCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

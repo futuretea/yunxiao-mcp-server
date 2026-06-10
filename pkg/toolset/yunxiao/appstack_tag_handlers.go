@@ -29,5 +29,5 @@ func handleSearchAppTags(ctx context.Context, client any, params map[string]any)
 	if err != nil {
 		return "", err
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }

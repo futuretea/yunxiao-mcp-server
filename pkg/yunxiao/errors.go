@@ -124,7 +124,3 @@ func FriendlyAPIError(err error) error {
 
 	return fmt.Errorf("%w\n\nSuggestion: %s", apiErr, suggestion)
 }
-
-func friendlyAPIError(err error) error {
-	return FriendlyAPIError(err)
-}

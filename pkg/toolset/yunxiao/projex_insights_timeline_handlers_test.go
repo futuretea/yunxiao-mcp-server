@@ -167,6 +167,19 @@ func TestHandleGetWorkitemStatusTimelineWorkitemFetchError(t *testing.T) {
 	}
 }
 
+func TestCalculateTimelineStatsEmpty(t *testing.T) {
+	got := calculateTimelineStats(nil)
+	if len(got) != 1 {
+		t.Fatalf("calculateTimelineStats(nil) len = %d, want 1", len(got))
+	}
+	if got["totalChanges"] != 0 {
+		t.Fatalf("calculateTimelineStats(nil) totalChanges = %v, want 0", got["totalChanges"])
+	}
+	if _, ok := got["statusVisits"]; ok {
+		t.Fatal("calculateTimelineStats(nil) should not include statusVisits")
+	}
+}
+
 func TestHandleGetWorkitemStatusTimelineRequiresWorkitemId(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("handler should not issue request without workitemId")

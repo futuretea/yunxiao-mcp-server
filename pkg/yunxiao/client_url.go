@@ -61,10 +61,6 @@ func EncodePathValue(value string) string {
 	return url.PathEscape(value)
 }
 
-func encodePathValue(value string) string {
-	return EncodePathValue(value)
-}
-
 // EncodeFilePath escapes a repository file path for CodeUp file endpoints.
 func EncodeFilePath(filePath string) string {
 	return EncodePathValue(strings.TrimPrefix(strings.TrimSpace(filePath), "/"))

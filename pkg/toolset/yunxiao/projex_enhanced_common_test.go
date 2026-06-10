@@ -3,6 +3,7 @@ package yunxiao
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"testing"
 )
 
@@ -88,28 +89,6 @@ func TestBuildCategoryResultReturnsErrorOnSearchFailure(t *testing.T) {
 	}
 }
 
-func TestExtractStatusName(t *testing.T) {
-	tests := []struct {
-		name string
-		item any
-		want string
-	}{
-		{"nil", nil, ""},
-		{"string", "not-a-map", ""},
-		{"map without status", map[string]any{"id": "1"}, ""},
-		{"map with string status", map[string]any{"status": "TODO"}, ""},
-		{"map with status missing name", map[string]any{"status": map[string]any{"id": "1"}}, ""},
-		{"map with valid status", map[string]any{"status": map[string]any{"name": "TODO"}}, "TODO"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := extractStatusName(tt.item); got != tt.want {
-				t.Fatalf("extractStatusName(%v) = %q, want %q", tt.item, got, tt.want)
-			}
-		})
-	}
-}
-
 func TestGroupWorkitemsByStatus(t *testing.T) {
 	data := []any{
 		map[string]any{"status": map[string]any{"name": "TODO"}},
@@ -134,6 +113,34 @@ func TestGroupWorkitemsByStatus(t *testing.T) {
 	}
 }
 
+func TestParseListData(t *testing.T) {
+	tests := []struct {
+		name string
+		data any
+		want int // expected length, -1 for nil
+	}{
+		{"slice", []any{"a", "b"}, 2},
+		{"map with data key", map[string]any{"data": []any{"x", "y", "z"}}, 3},
+		{"empty map", map[string]any{}, -1},
+		{"map with non-list data", map[string]any{"data": "string"}, -1},
+		{"string input", "not a list", -1},
+		{"int input", 42, -1},
+		{"nil input", nil, -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseListData(tt.data)
+			if tt.want < 0 {
+				if got != nil {
+					t.Fatalf("parseListData(%v) = %v, want nil", tt.data, got)
+				}
+			} else if len(got) != tt.want {
+				t.Fatalf("parseListData(%v) len = %d, want %d", tt.data, len(got), tt.want)
+			}
+		})
+	}
+}
+
 func TestExtractWorkitemData(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -145,6 +152,8 @@ func TestExtractWorkitemData(t *testing.T) {
 		{"array", []any{map[string]any{"id": "1"}}, 1, 1, false},
 		{"map with pagination", map[string]any{"data": []any{map[string]any{"id": "1"}}, "pagination": map[string]any{"total": float64(10)}}, 1, 10, false},
 		{"map without pagination", map[string]any{"data": []any{map[string]any{"id": "1"}}}, 1, 0, false},
+		{"map with int total", map[string]any{"data": []any{map[string]any{"id": "1"}}, "pagination": map[string]any{"total": int(5)}}, 1, 5, false},
+		{"map with int64 total", map[string]any{"data": []any{map[string]any{"id": "1"}}, "pagination": map[string]any{"total": int64(7)}}, 1, 7, false},
 		{"invalid type", "string", 0, 0, true},
 	}
 	for _, tt := range tests {
@@ -162,5 +171,57 @@ func TestExtractWorkitemData(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestExtractWorkitemStatusName(t *testing.T) {
+	tests := []struct {
+		name    string
+		itemMap map[string]any
+		want    string
+	}{
+		{
+			"valid status",
+			map[string]any{"status": map[string]any{"name": "DOING"}},
+			"DOING",
+		},
+		{
+			"missing status key",
+			map[string]any{"id": "wi-1"},
+			"Unknown",
+		},
+		{
+			"status is not a map",
+			map[string]any{"status": "DOING"},
+			"Unknown",
+		},
+		{
+			"status map without name",
+			map[string]any{"status": map[string]any{"stage": "dev"}},
+			"Unknown",
+		},
+		{
+			"empty map",
+			map[string]any{},
+			"Unknown",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := extractWorkitemStatusName(tt.itemMap)
+			if got != tt.want {
+				t.Errorf("extractWorkitemStatusName(%v) = %q, want %q", tt.itemMap, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSearchProjectWorkitemsReturnsError(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	c, _ := getClient(client)
+	if _, err := searchProjectWorkitems(context.Background(), c, "org-1", "project-1", "Task", map[string]any{}); err == nil {
+		t.Fatal("expected search error")
 	}
 }

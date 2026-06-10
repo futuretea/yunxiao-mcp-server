@@ -219,3 +219,12 @@ func TestLingmaUsageHandlersReturnAPIError(t *testing.T) {
 		t.Fatal("expected API error")
 	}
 }
+
+func TestLingmaOrganizationPathEncodesValue(t *testing.T) {
+	if got := lingmaOrganizationPath("org/1"); got != "/lingma/organizations/org%2F1" {
+		t.Fatalf("lingmaOrganizationPath() = %q", got)
+	}
+	if got := lingmaOrganizationPath("org%2F1"); got != "/lingma/organizations/org%2F1" {
+		t.Fatalf("lingmaOrganizationPath() = %q", got)
+	}
+}

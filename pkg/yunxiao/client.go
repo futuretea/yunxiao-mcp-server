@@ -127,10 +127,19 @@ func newHTTPClient(timeout time.Duration, options clientOptions) *http.Client {
 		return client
 	}
 
-	transport := http.DefaultTransport.(*http.Transport).Clone()
+	tr, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		return client
+	}
+	transport := tr.Clone()
 	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // Explicit opt-in for private/self-signed Yunxiao endpoints.
 	client.Transport = transport
 	return client
+}
+
+type orgEntry struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // ResolveDefaultOrgID fetches the user's organizations and, if exactly one exists,
@@ -142,10 +151,7 @@ func (c *Client) ResolveDefaultOrgID(ctx context.Context) error {
 	}
 
 	// Try array format first
-	var orgList []struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
-	}
+	var orgList []orgEntry
 	if err := json.Unmarshal(resp.Body, &orgList); err == nil && len(orgList) == 1 {
 		c.DefaultOrgID = orgList[0].ID
 		return nil
@@ -153,10 +159,7 @@ func (c *Client) ResolveDefaultOrgID(ctx context.Context) error {
 
 	// Try { data: [...] } format
 	var wrapped struct {
-		Data []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"data"`
+		Data []orgEntry `json:"data"`
 	}
 	if err := json.Unmarshal(resp.Body, &wrapped); err == nil && len(wrapped.Data) == 1 {
 		c.DefaultOrgID = wrapped.Data[0].ID

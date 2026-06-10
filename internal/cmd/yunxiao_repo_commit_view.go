@@ -28,7 +28,7 @@ func newYunxiaoRepoCommitViewCommand(streams IOStreams, cfgFile *string, v *vipe
 		Short:   "view a CodeUp commit overview as JSON",
 		Example: `  # View commit by SHA
   yunxiao repo commit view abc123def --repository-id group/repo`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

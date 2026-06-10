@@ -31,13 +31,13 @@ func NewYunxiaoCLI(streams IOStreams) *cobra.Command {
 		Short:         "Yunxiao CLI for Alibaba Cloud DevOps",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-			PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-				noColor, _ := cmd.Flags().GetBool("no-color")
-				SetCLINoColor(noColor)
-				outputFormat, _ := cmd.Flags().GetString("output")
-				SetCLIOutputFormat(outputFormat)
-				return nil
-			},
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			noColor, _ := cmd.Flags().GetBool("no-color")
+			SetCLINoColor(noColor)
+			outputFormat, _ := cmd.Flags().GetString("output")
+			SetCLIOutputFormat(outputFormat)
+			return nil
+		},
 	}
 
 	command.SetIn(streams.In)
@@ -253,7 +253,7 @@ func newYunxiaoToolsCallCommand(streams IOStreams, cfgFile *string, v *viper.Vip
 
   # Call a tool with params from a file
   yunxiao tools call search_projects --params-file query.json`,
-		Args:  cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {
@@ -379,7 +379,6 @@ func printToolSummariesTable(out anyWriter, tools []toolset.ServerTool) error {
 	return writer.Flush()
 }
 
-
 func parseToolParamsWithInput(rawParams, paramsFile string, in io.Reader) (map[string]any, error) {
 	if strings.TrimSpace(paramsFile) != "" {
 		if strings.TrimSpace(paramsFile) == "-" {
@@ -447,9 +446,9 @@ func newYunxiaoCompletionCommand(streams IOStreams) *cobra.Command {
 		Args:                  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 		Run: func(cmd *cobra.Command, args []string) {
 			switch args[0] {
-		case "install":
-			printCompletionInstall(streams.Out)
-			return
+			case "install":
+				printCompletionInstall(streams.Out)
+				return
 			case "bash":
 				_ = cmd.Root().GenBashCompletion(streams.Out)
 			case "zsh":

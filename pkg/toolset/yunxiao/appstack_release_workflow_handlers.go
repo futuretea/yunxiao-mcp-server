@@ -163,7 +163,7 @@ func handleExecuteAppReleaseStage(ctx context.Context, client any, params map[st
 	if err != nil {
 		return "", err
 	}
-	return prettyResponseJSON(resp), nil
+	return PrettyResponseJSON(resp), nil
 }
 
 func requiredAppReleaseWorkflow(params map[string]any) (string, string, string, error) {
@@ -203,15 +203,15 @@ func requiredAppReleaseStageExecution(params map[string]any) (string, string, st
 }
 
 func appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn string) string {
-	return appstackAppPath(organizationID, appName) + "/releaseWorkflow/" + url.PathEscape(releaseWorkflowSn)
+	return appstackAppPath(organizationID, appName) + "/releaseWorkflow/" + encodePathValue(releaseWorkflowSn)
 }
 
 func appstackReleaseWorkflowResourcePath(organizationID, appName, releaseWorkflowSn string) string {
-	return appstackAppPath(organizationID, appName) + "/releaseWorkflows/" + url.PathEscape(releaseWorkflowSn)
+	return appstackAppPath(organizationID, appName) + "/releaseWorkflows/" + encodePathValue(releaseWorkflowSn)
 }
 
 func appstackReleaseStageResourcePath(organizationID, appName, releaseWorkflowSn, releaseStageSn string) string {
-	return appstackReleaseWorkflowResourcePath(organizationID, appName, releaseWorkflowSn) + "/releaseStages/" + url.PathEscape(releaseStageSn)
+	return appstackReleaseWorkflowResourcePath(organizationID, appName, releaseWorkflowSn) + "/releaseStages/" + encodePathValue(releaseStageSn)
 }
 
 func appstackReleaseStageExecutionPath(organizationID, appName, releaseWorkflowSn, releaseStageSn, executionNumber string) string {

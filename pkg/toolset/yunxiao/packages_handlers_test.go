@@ -136,9 +136,11 @@ func TestPackagesHandlersRequireParams(t *testing.T) {
 	}
 }
 
-func TestRequiredOrganizationAndPackageRepoRequiresRepoId(t *testing.T) {
-	_, _, err := requiredOrganizationAndPackageRepo(map[string]any{"organizationId": "org-1"})
-	if err == nil {
-		t.Fatal("expected missing repoId error")
+func TestPackagesPathHelpersEncodeValues(t *testing.T) {
+	if got := packagesOrganizationPath("org/1"); got != "/packages/organizations/org%2F1" {
+		t.Fatalf("packagesOrganizationPath() = %q", got)
+	}
+	if got := packagesRepoPath("org/1", "repo/1"); got != "/packages/organizations/org%2F1/repositories/repo%2F1" {
+		t.Fatalf("packagesRepoPath() = %q", got)
 	}
 }

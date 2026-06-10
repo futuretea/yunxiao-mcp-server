@@ -70,7 +70,7 @@ func handleGetProjectWorkitemDetail(ctx context.Context, client any, params map[
 	}
 
 	for _, section := range workitemDetailSections(workitemPath, params) {
-		if err := addWorkitemDetailSection(ctx, c, detail, params, section); err != nil {
+		if err := addOverviewSection(ctx, c, detail, params, section); err != nil {
 			return "", err
 		}
 	}

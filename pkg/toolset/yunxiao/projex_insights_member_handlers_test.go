@@ -221,21 +221,6 @@ func TestParseStatusGroups(t *testing.T) {
 	}
 }
 
-func TestCopyParams(t *testing.T) {
-	original := map[string]any{"a": 1, "b": "two"}
-	copied := copyParams(original)
-	copied["a"] = 999
-	if original["a"] != 1 {
-		t.Fatal("copyParams did not create independent copy")
-	}
-}
-
-func TestTodayDate(t *testing.T) {
-	if todayDate() == "" {
-		t.Fatal("todayDate() returned empty")
-	}
-}
-
 func TestProjectMembersFromResponse(t *testing.T) {
 	resp := &Response{Body: []byte(`[{"userId":" u-1 ","name":"Alice"},{"userId":"","name":"Bob"},{"userId":"u-2","name":"Charlie"}]`)}
 	members, ids, err := projectMembersFromResponse(resp, 2)
@@ -252,16 +237,6 @@ func TestProjectMembersFromResponse(t *testing.T) {
 	_, _, err = projectMembersFromResponse(&Response{Body: []byte(`{invalid`)}, 10)
 	if err == nil {
 		t.Fatal("expected decode error")
-	}
-}
-
-func TestSearchProjectWorkitemsReturnsError(t *testing.T) {
-	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-	})
-	c, _ := getClient(client)
-	if _, err := searchProjectWorkitems(context.Background(), c, "org-1", "project-1", "Task", map[string]any{}); err == nil {
-		t.Fatal("expected search error")
 	}
 }
 

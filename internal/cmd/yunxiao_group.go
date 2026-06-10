@@ -13,7 +13,7 @@ type groupListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoGroupCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

@@ -22,7 +22,7 @@ func handleListPackageRepositories(ctx context.Context, client any, params map[s
 	setOptionalInt(query, params, "page")
 	setOptionalInt(query, params, "perPage")
 
-	path := "/packages/organizations/" + url.PathEscape(organizationID) + "/repositories"
+	path := packagesOrganizationPath(organizationID) + "/repositories"
 	return c.GetJSONWithMetadata(ctx, path, query)
 }
 
@@ -32,7 +32,7 @@ func handleListArtifacts(ctx context.Context, client any, params map[string]any)
 		return "", err
 	}
 
-	organizationID, repoID, err := requiredOrganizationAndPackageRepo(params)
+	organizationID, repoID, err := requiredOrganizationAndNamedID(params, "repoId")
 	if err != nil {
 		return "", err
 	}
@@ -49,7 +49,7 @@ func handleListArtifacts(ctx context.Context, client any, params map[string]any)
 	setOptionalString(query, params, "orderBy")
 	setOptionalString(query, params, "sort")
 
-	path := "/packages/organizations/" + url.PathEscape(organizationID) + "/repositories/" + url.PathEscape(repoID) + "/artifacts"
+	path := packagesRepoPath(organizationID, repoID) + "/artifacts"
 	return c.GetJSONWithMetadata(ctx, path, query)
 }
 
@@ -59,7 +59,7 @@ func handleGetArtifact(ctx context.Context, client any, params map[string]any) (
 		return "", err
 	}
 
-	organizationID, repoID, err := requiredOrganizationAndPackageRepo(params)
+	organizationID, repoID, err := requiredOrganizationAndNamedID(params, "repoId")
 	if err != nil {
 		return "", err
 	}
@@ -75,18 +75,14 @@ func handleGetArtifact(ctx context.Context, client any, params map[string]any) (
 	query := url.Values{}
 	query.Set("repoType", repoType)
 
-	path := "/packages/organizations/" + url.PathEscape(organizationID) + "/repositories/" + url.PathEscape(repoID) + "/artifacts/" + url.PathEscape(artifactID)
+	path := packagesRepoPath(organizationID, repoID) + "/artifacts/" + encodePathValue(artifactID)
 	return c.GetJSON(ctx, path, query)
 }
 
-func requiredOrganizationAndPackageRepo(params map[string]any) (string, string, error) {
-	organizationID, err := requiredString(params, "organizationId")
-	if err != nil {
-		return "", "", err
-	}
-	repoID, err := requiredString(params, "repoId")
-	if err != nil {
-		return "", "", err
-	}
-	return organizationID, repoID, nil
+func packagesOrganizationPath(organizationID string) string {
+	return "/packages/organizations/" + encodePathValue(organizationID)
+}
+
+func packagesRepoPath(organizationID, repoID string) string {
+	return packagesOrganizationPath(organizationID) + "/repositories/" + encodePathValue(repoID)
 }

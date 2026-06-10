@@ -27,7 +27,7 @@ func newYunxiaoRepoCompareCommand(streams IOStreams, cfgFile *string, v *viper.V
 
   # Compare two commits
   yunxiao repo compare abc123 def456 --repository-id group/repo`,
-		Args:    cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

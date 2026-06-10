@@ -93,7 +93,7 @@ func checkWorkitemBlockers(ctx context.Context, c *Client, organizationID, itemI
 	}
 
 	relations := responsePayload(relResp)
-	relList := parseAnyList(relations)
+	relList := parseListData(relations)
 
 	for _, rel := range relList {
 		relMap, ok := rel.(map[string]any)
@@ -115,18 +115,6 @@ func checkWorkitemBlockers(ctx context.Context, c *Client, organizationID, itemI
 		}
 	}
 	return hasBlockingDeps, hasBlockedItems
-}
-
-func parseAnyList(data any) []any {
-	switch d := data.(type) {
-	case []any:
-		return d
-	case map[string]any:
-		if data, ok := d["data"].([]any); ok {
-			return data
-		}
-	}
-	return nil
 }
 
 func blockerAnalysisFilters(params map[string]any, categories []string) map[string]any {

@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"fmt"
 	"strings"
 	"text/tabwriter"
 )
@@ -22,7 +22,7 @@ type taskListOptions struct {
 	Page           int
 	PerPage        int
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func (o taskListOptions) params() (map[string]any, error) {
@@ -95,7 +95,7 @@ type taskTypeListOptions struct {
 	ProjectID      string
 	Category       string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoTaskTypeListCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -198,8 +198,8 @@ func taskTypeRowsFromJSONForPrint(raw string) ([]taskTypeRow, bool) {
 }
 
 type taskTimelineOptions struct {
-	OrganizationID   string
-	IncludeWorkitem  bool
+	OrganizationID  string
+	IncludeWorkitem bool
 }
 
 func newYunxiaoTaskTimelineCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -233,8 +233,8 @@ func newYunxiaoTaskTimelineCommand(streams IOStreams, cfgFile *string, v *viper.
 
 func (o taskTimelineOptions) params(workitemID string) map[string]any {
 	params := map[string]any{
-		"workitemId":       workitemID,
-		"includeWorkitem":  o.IncludeWorkitem,
+		"workitemId":      workitemID,
+		"includeWorkitem": o.IncludeWorkitem,
 	}
 	setCLIStringParam(params, "organizationId", o.OrganizationID)
 	return params
@@ -300,11 +300,11 @@ func (o taskMyOptions) params() map[string]any {
 }
 
 type taskTypeViewOptions struct {
-	OrganizationID    string
-	ProjectID         string
-	WorkItemTypeID    string
+	OrganizationID     string
+	ProjectID          string
+	WorkItemTypeID     string
 	IncludeFieldConfig bool
-	IncludeWorkflow   bool
+	IncludeWorkflow    bool
 }
 
 func newYunxiaoTaskTypeViewCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -347,10 +347,10 @@ func newYunxiaoTaskTypeViewCommand(streams IOStreams, cfgFile *string, v *viper.
 
 func (o taskTypeViewOptions) params() (map[string]any, error) {
 	params := map[string]any{
-		"projectId":         o.ProjectID,
-		"workItemTypeId":    o.WorkItemTypeID,
+		"projectId":          o.ProjectID,
+		"workItemTypeId":     o.WorkItemTypeID,
 		"includeFieldConfig": o.IncludeFieldConfig,
-		"includeWorkflow":   o.IncludeWorkflow,
+		"includeWorkflow":    o.IncludeWorkflow,
 	}
 	if params["projectId"] == "" {
 		return nil, fmt.Errorf("project-id is required")
@@ -363,7 +363,7 @@ type taskTypeAllOptions struct {
 	OrganizationID string
 	Categories     string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoTaskTypeAllCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -413,7 +413,7 @@ type taskRelationTypesOptions struct {
 	WorkItemTypeID string
 	RelationType   string
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoTaskRelationTypesCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

@@ -19,10 +19,6 @@ func PrettyJSON(raw json.RawMessage) string {
 	return string(formatted)
 }
 
-func prettyJSON(raw json.RawMessage) string {
-	return PrettyJSON(raw)
-}
-
 // PrettyResponseJSON returns an indented JSON payload that includes response metadata.
 func PrettyResponseJSON(resp *Response) string {
 	var data any
@@ -45,10 +41,6 @@ func PrettyResponseJSON(resp *Response) string {
 		return PrettyJSON(resp.Body)
 	}
 	return string(formatted)
-}
-
-func prettyResponseJSON(resp *Response) string {
-	return PrettyResponseJSON(resp)
 }
 
 func parsePagination(header http.Header) *Pagination {

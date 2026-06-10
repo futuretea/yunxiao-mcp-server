@@ -69,8 +69,8 @@ func TestHandleGetCurrentOrganizationInfoBuildsPath(t *testing.T) {
 		_, _ = w.Write([]byte(`{"id":"user-1"}`))
 	})
 
-	if _, err := handleGetCurrentOrganizationInfo(context.Background(), client, nil); err != nil {
-		t.Fatalf("handleGetCurrentOrganizationInfo() error = %v", err)
+	if _, err := handleGetCurrentUser(context.Background(), client, nil); err != nil {
+		t.Fatalf("handleGetCurrentUser() error = %v", err)
 	}
 }
 
@@ -105,8 +105,8 @@ func TestHandleGetUserOrganizationsBuildsQuery(t *testing.T) {
 		_, _ = w.Write([]byte(`[{"id":"org-1"}]`))
 	})
 
-	if _, err := handleGetUserOrganizations(context.Background(), client, nil); err != nil {
-		t.Fatalf("handleGetUserOrganizations() error = %v", err)
+	if _, err := handleListOrganizations(context.Background(), client, nil); err != nil {
+		t.Fatalf("handleListOrganizations() error = %v", err)
 	}
 }
 

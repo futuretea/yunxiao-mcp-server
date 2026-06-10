@@ -48,9 +48,11 @@ func addRiskCategorySections(ctx context.Context, c *Client, target map[string]a
 }
 
 func addRiskFocusSections(ctx context.Context, c *Client, dashboard map[string]any, organizationID, projectID string, categories []string, params map[string]any) error {
+	categoryList := strings.Join(categories, ",")
+
 	overdueParams := copyParams(params)
 	overdueParams["finishTimeBefore"] = optionalStringDefault(params, "overdueBefore", todayDate())
-	overdue, err := searchProjectWorkitems(ctx, c, organizationID, projectID, strings.Join(categories, ","), overdueParams)
+	overdue, err := searchProjectWorkitems(ctx, c, organizationID, projectID, categoryList, overdueParams)
 	if err != nil {
 		return err
 	}
@@ -59,7 +61,7 @@ func addRiskFocusSections(ctx context.Context, c *Client, dashboard map[string]a
 	if highPriority := optionalStringDefault(params, "highPriority", ""); highPriority != "" {
 		priorityParams := copyParams(params)
 		priorityParams["priority"] = highPriority
-		highPriorityPayload, err := searchProjectWorkitems(ctx, c, organizationID, projectID, strings.Join(categories, ","), priorityParams)
+		highPriorityPayload, err := searchProjectWorkitems(ctx, c, organizationID, projectID, categoryList, priorityParams)
 		if err != nil {
 			return err
 		}
@@ -68,7 +70,7 @@ func addRiskFocusSections(ctx context.Context, c *Client, dashboard map[string]a
 	if staleBefore := optionalStringDefault(params, "staleBefore", ""); staleBefore != "" {
 		staleParams := copyParams(params)
 		staleParams["updateStatusAtBefore"] = staleBefore
-		stalePayload, err := searchProjectWorkitems(ctx, c, organizationID, projectID, strings.Join(categories, ","), staleParams)
+		stalePayload, err := searchProjectWorkitems(ctx, c, organizationID, projectID, categoryList, staleParams)
 		if err != nil {
 			return err
 		}

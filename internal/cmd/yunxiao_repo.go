@@ -18,7 +18,7 @@ type repoListOptions struct {
 	Archived       bool
 	ArchivedSet    bool
 	JSONOutput     bool
-	OutputFormat string
+	OutputFormat   string
 }
 
 func newYunxiaoRepoCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {

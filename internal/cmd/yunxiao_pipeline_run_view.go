@@ -25,7 +25,7 @@ func newYunxiaoPipelineRunViewCommand(streams IOStreams, cfgFile *string, v *vip
 		Short:   "view a Flow pipeline run overview as JSON",
 		Example: `  # View run overview
   yunxiao pipeline run view run-456 --pipeline-id pipeline-123`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

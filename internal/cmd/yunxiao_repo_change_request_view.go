@@ -28,7 +28,7 @@ func newYunxiaoRepoChangeRequestViewCommand(streams IOStreams, cfgFile *string, 
 		Short:   "view a CodeUp change request overview as JSON",
 		Example: `  # View change request by local ID
   yunxiao repo change-request view 42 --repository-id group/repo`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

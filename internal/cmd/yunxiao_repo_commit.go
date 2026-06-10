@@ -23,7 +23,7 @@ type repoCommitListOptions struct {
 	ShowSignatureSet bool
 	CommitterIDs     string
 	JSONOutput       bool
-	OutputFormat string
+	OutputFormat     string
 }
 
 func newYunxiaoRepoCommitCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -140,7 +140,6 @@ type repoCommitRow struct {
 	Author  string
 	Date    string
 }
-
 
 func repoCommitRowsFromJSONForPrint(raw string) ([]repoCommitRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)

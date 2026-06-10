@@ -47,7 +47,7 @@ func TestClassifyErrorNetwork(t *testing.T) {
 
 func TestClassifyErrorWrapped(t *testing.T) {
 	apiErr := &APIError{StatusCode: http.StatusUnauthorized}
-	wrapped := friendlyAPIError(apiErr)
+	wrapped := FriendlyAPIError(apiErr)
 	category := ClassifyError(wrapped)
 	if category != ErrAuth {
 		t.Fatalf("ClassifyError(wrapped APIError) = %q, want %q", category, ErrAuth)
@@ -75,17 +75,17 @@ func TestWrapErrorValidationError(t *testing.T) {
 
 func TestFriendlyAPIErrorReturnsNilOnNonAPIError(t *testing.T) {
 	err := errors.New("plain error")
-	got := friendlyAPIError(err)
+	got := FriendlyAPIError(err)
 	if got != err {
-		t.Fatal("friendlyAPIError should return non-API errors unchanged")
+		t.Fatal("FriendlyAPIError should return non-API errors unchanged")
 	}
 }
 
 func TestFriendlyAPIErrorReturnsUncategorizedOnNonStandardStatus(t *testing.T) {
 	apiErr := &APIError{StatusCode: http.StatusFound, Body: "redirect"}
-	got := friendlyAPIError(apiErr)
+	got := FriendlyAPIError(apiErr)
 	if got != apiErr {
-		t.Fatal("friendlyAPIError should return uncategorized APIErrors unchanged")
+		t.Fatal("FriendlyAPIError should return uncategorized APIErrors unchanged")
 	}
 }
 

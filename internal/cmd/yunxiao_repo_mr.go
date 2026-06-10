@@ -22,7 +22,7 @@ type mrListOptions struct {
 	Page            int
 	PerPage         int
 	JSONOutput      bool
-	OutputFormat string
+	OutputFormat    string
 }
 
 func newYunxiaoRepoMrCommand(streams IOStreams, cfgFile *string, v *viper.Viper) *cobra.Command {
@@ -134,7 +134,6 @@ type mrRow struct {
 	Target string
 }
 
-
 func mrRowsFromJSONForPrint(raw string) ([]mrRow, bool) {
 	items, ok := rowsFromJSONWithPresence(raw)
 	if !ok {
@@ -171,7 +170,7 @@ func newYunxiaoRepoMrViewCommand(streams IOStreams, cfgFile *string, v *viper.Vi
 		Short: "view a legacy CodeUp merge request as JSON",
 		Example: `  # View merge request by ID
   yunxiao repo mr view 12345 --repository-id group/repo`,
-		Args:  cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadYunxiaoCLIConfig(cmd, *cfgFile, v)
 			if err != nil {

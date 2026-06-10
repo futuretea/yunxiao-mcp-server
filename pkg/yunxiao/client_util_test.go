@@ -135,24 +135,24 @@ func TestWithAccessTokenReturnsOriginalContextForEmptyToken(t *testing.T) {
 }
 
 func TestPrettyJSONReturnsFormattedForValidJSON(t *testing.T) {
-	got := prettyJSON([]byte(`{"key":"value"}`))
+	got := PrettyJSON([]byte(`{"key":"value"}`))
 	if !strings.Contains(got, `"key"`) || !strings.Contains(got, `"value"`) {
-		t.Fatalf("prettyJSON() = %q, want formatted", got)
+		t.Fatalf("PrettyJSON() = %q, want formatted", got)
 	}
 }
 
 func TestPrettyJSONReturnsRawForInvalidJSON(t *testing.T) {
 	invalid := []byte(`{invalid`)
-	if got := prettyJSON(invalid); got != string(invalid) {
-		t.Fatalf("prettyJSON() = %q, want raw", got)
+	if got := PrettyJSON(invalid); got != string(invalid) {
+		t.Fatalf("PrettyJSON() = %q, want raw", got)
 	}
 }
 
 func TestPrettyResponseJSONWrapsInvalidBodyAsString(t *testing.T) {
 	resp := &Response{Body: []byte(`{invalid`)}
-	got := prettyResponseJSON(resp)
+	got := PrettyResponseJSON(resp)
 	if !strings.Contains(got, `"data"`) || !strings.Contains(got, "{invalid") {
-		t.Fatalf("prettyResponseJSON() = %q", got)
+		t.Fatalf("PrettyResponseJSON() = %q", got)
 	}
 }
 

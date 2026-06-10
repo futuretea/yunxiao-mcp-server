@@ -6,9 +6,13 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var errNoCategories = errors.New("categories must include at least one category")
+
+// timeNow is injectable for tests that need a fixed clock.
+var timeNow = time.Now
 
 func getClient(client any) (*Client, error) {
 	c, ok := client.(*Client)
@@ -91,4 +95,16 @@ func requiredNumberPathString(params map[string]any, key string) (string, error)
 		}
 	}
 	return "", &ValidationError{Msg: fmt.Sprintf("%s is required", key)}
+}
+
+func copyParams(params map[string]any) map[string]any {
+	copied := make(map[string]any, len(params))
+	for key, value := range params {
+		copied[key] = value
+	}
+	return copied
+}
+
+func todayDate() string {
+	return timeNow().Format("2006-01-02")
 }

@@ -5,6 +5,14 @@ import (
 	"fmt"
 )
 
+func setWorkitemOptionalBody(body map[string]any, params map[string]any) {
+	setOptionalStringBody(body, params, "description")
+	setOptionalStringBody(body, params, "assignedTo")
+	setOptionalStringBody(body, params, "priority")
+	setOptionalStringBody(body, params, "sprint")
+	setOptionalStringArrayBody(body, params, "labels")
+}
+
 func handleCreateWorkitem(ctx context.Context, client any, params map[string]any) (string, error) {
 	c, err := getClient(client)
 	if err != nil {
@@ -38,12 +46,8 @@ func handleCreateWorkitem(ctx context.Context, client any, params map[string]any
 		"workitemTypeId": workitemTypeID,
 		"subject":        subject,
 	}
-	setOptionalStringBody(body, params, "description")
-	setOptionalStringBody(body, params, "assignedTo")
-	setOptionalStringBody(body, params, "priority")
+	setWorkitemOptionalBody(body, params)
 	setOptionalStringBody(body, params, "parentId")
-	setOptionalStringBody(body, params, "sprint")
-	setOptionalStringArrayBody(body, params, "labels")
 
 	path := projexOrganizationPath(organizationID) + "/workitems"
 	return c.PostJSONWithMetadata(ctx, path, body)
@@ -66,11 +70,7 @@ func handleUpdateWorkitem(ctx context.Context, client any, params map[string]any
 
 	body := map[string]any{}
 	setOptionalStringBody(body, params, "subject")
-	setOptionalStringBody(body, params, "description")
-	setOptionalStringBody(body, params, "assignedTo")
-	setOptionalStringBody(body, params, "priority")
-	setOptionalStringBody(body, params, "sprint")
-	setOptionalStringArrayBody(body, params, "labels")
+	setWorkitemOptionalBody(body, params)
 
 	if len(body) == 0 {
 		return "", fmt.Errorf("at least one field to update must be provided")
