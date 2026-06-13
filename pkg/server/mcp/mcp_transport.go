@@ -17,8 +17,8 @@ import (
 
 func (s *Server) registerTool(tool toolset.ServerTool) {
 	handler := server.ToolHandlerFunc(func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		params, _ := request.Params.Arguments.(map[string]any)
-		if params == nil {
+		params, ok := request.Params.Arguments.(map[string]any)
+		if !ok || params == nil {
 			params = map[string]any{}
 		}
 
@@ -84,17 +84,14 @@ func requestAccessToken(r *http.Request) string {
 
 // NewTextResult creates a standard MCP text result.
 func NewTextResult(content string, err error) *mcp.CallToolResult {
+	text := content
+	isError := false
 	if err != nil {
-		return &mcp.CallToolResult{
-			IsError: true,
-			Content: []mcp.Content{
-				mcp.TextContent{Type: "text", Text: err.Error()},
-			},
-		}
+		text = err.Error()
+		isError = true
 	}
 	return &mcp.CallToolResult{
-		Content: []mcp.Content{
-			mcp.TextContent{Type: "text", Text: content},
-		},
+		IsError: isError,
+		Content: []mcp.Content{mcp.TextContent{Type: "text", Text: text}},
 	}
 }

@@ -59,13 +59,12 @@ func workitemStatusTimelineFilters(params map[string]any) map[string]any {
 }
 
 func parseStatusTimeline(activities any) []map[string]any {
-	timeline := make([]map[string]any, 0)
-
 	activityList := parseListData(activities)
 	if activityList == nil {
-		return timeline
+		return []map[string]any{}
 	}
 
+	timeline := make([]map[string]any, 0, len(activityList))
 	for _, act := range activityList {
 		actMap, ok := act.(map[string]any)
 		if !ok {

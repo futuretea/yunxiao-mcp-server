@@ -3,8 +3,11 @@ package yunxiao
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 
@@ -41,7 +44,7 @@ func TestBuildToolCatalogDisablesDomains(t *testing.T) {
 	}
 }
 
-func TestBuildToolCatalogAppliesCompactBeforeToolValidation(t *testing.T) {
+func TestBuildToolCatalogRejectsEnablingCompactHiddenTool(t *testing.T) {
 	_, err := BuildToolCatalog(nil, ToolCatalogOptions{
 		ReadOnly:     true,
 		CompactMode:  true,
@@ -52,7 +55,7 @@ func TestBuildToolCatalogAppliesCompactBeforeToolValidation(t *testing.T) {
 	}
 }
 
-func TestBuildToolCatalogAllowsCompactDisabledHiddenTool(t *testing.T) {
+func TestBuildToolCatalogRejectsDisablingCompactHiddenTool(t *testing.T) {
 	if _, err := BuildToolCatalog(nil, ToolCatalogOptions{
 		ReadOnly:      true,
 		CompactMode:   true,
@@ -147,8 +150,8 @@ func TestValidateToolRequiredParamsHandlesNoRequiredInvalidRawAndNonStringValues
 			RawInputSchema: json.RawMessage(`{`),
 		},
 	}
-	if err := ValidateToolRequiredParams(invalidRawTool, nil); err != nil {
-		t.Fatalf("ValidateToolRequiredParams() invalid raw schema error = %v", err)
+	if err := ValidateToolRequiredParams(invalidRawTool, nil); err == nil {
+		t.Fatal("ValidateToolRequiredParams() expected invalid raw schema error")
 	}
 
 	numberTool := toolset.ServerTool{
@@ -162,8 +165,28 @@ func TestValidateToolRequiredParamsHandlesNoRequiredInvalidRawAndNonStringValues
 	}
 }
 
+func newTestClientWithDefaultOrg(t *testing.T, orgID string) *Client {
+	t.Helper()
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/oapi/v1/platform/organizations" {
+			t.Fatalf("path = %q, want /oapi/v1/platform/organizations", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`[{` + `"id":"` + orgID + `","name":"Test Org"` + `}]`))
+	}))
+	t.Cleanup(server.Close)
+
+	client, err := NewClient(server.URL, "token-1", time.Second)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
+		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
+	}
+	return client
+}
+
 func TestInvokeToolFillsDefaultOrganizationID(t *testing.T) {
-	client := &Client{DefaultOrgID: "default-org"}
+	client := newTestClientWithDefaultOrg(t, "default-org")
 	var got map[string]any
 	mockTool := toolset.ServerTool{
 		Tool: mcp.NewTool("mock_tool"),
@@ -186,7 +209,7 @@ func TestInvokeToolFillsDefaultOrganizationID(t *testing.T) {
 }
 
 func TestInvokeToolPreservesProvidedOrganizationID(t *testing.T) {
-	client := &Client{DefaultOrgID: "default-org"}
+	client := newTestClientWithDefaultOrg(t, "default-org")
 	var got map[string]any
 	mockTool := toolset.ServerTool{
 		Tool: mcp.NewTool("mock_tool"),
@@ -221,5 +244,29 @@ func TestInvokeToolHandlesNilParams(t *testing.T) {
 	}
 	if got == nil {
 		t.Fatal("params should be initialized")
+	}
+}
+
+func TestValidateToolFiltersRejectsDuplicateTools(t *testing.T) {
+	tools := []toolset.ServerTool{
+		{Tool: mcp.NewTool("duplicate")},
+		{Tool: mcp.NewTool("duplicate")},
+	}
+	if err := validateToolFilters(tools, nil, nil); err == nil {
+		t.Fatal("validateToolFilters() expected duplicate tool error")
+	}
+}
+
+func TestValidateToolFiltersRejectsUnknownEnabledTool(t *testing.T) {
+	tools := []toolset.ServerTool{{Tool: mcp.NewTool("known")}}
+	if err := validateToolFilters(tools, []string{"unknown"}, nil); err == nil {
+		t.Fatal("validateToolFilters() expected unknown enabled tool error")
+	}
+}
+
+func TestValidateToolFiltersRejectsUnknownDisabledTool(t *testing.T) {
+	tools := []toolset.ServerTool{{Tool: mcp.NewTool("known")}}
+	if err := validateToolFilters(tools, nil, []string{"unknown"}); err == nil {
+		t.Fatal("validateToolFilters() expected unknown disabled tool error")
 	}
 }

@@ -7,8 +7,10 @@ import (
 )
 
 func optionalStringDefault(params map[string]any, key, defaultValue string) string {
-	if value, _ := params[key].(string); strings.TrimSpace(value) != "" {
-		return strings.TrimSpace(value)
+	if value, _ := params[key].(string); value != "" {
+		if trimmed := strings.TrimSpace(value); trimmed != "" {
+			return trimmed
+		}
 	}
 	return defaultValue
 }

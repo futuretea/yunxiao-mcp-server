@@ -162,6 +162,14 @@ func (t errorBodyTransport) RoundTrip(req *http.Request) (*http.Response, error)
 	}, nil
 }
 
+type failingTransport struct {
+	err error
+}
+
+func (t *failingTransport) RoundTrip(_ *http.Request) (*http.Response, error) {
+	return nil, t.err
+}
+
 func TestClientRequestReturnsReadError(t *testing.T) {
 	client, err := NewClient("https://example.com", "token", time.Second)
 	if err != nil {

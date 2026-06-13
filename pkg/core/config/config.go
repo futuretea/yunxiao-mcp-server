@@ -66,18 +66,23 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 		v = viper.New()
 	}
 
-	v.SetDefault("port", 0)
-	v.SetDefault("sse_base_url", "")
-	v.SetDefault("log_level", "info")
-	v.SetDefault("base_url", DefaultBaseURL)
-	v.SetDefault("insecure_skip_tls_verify", false)
-	v.SetDefault("read_only", true)
-	v.SetDefault("enabled_tools", []string{})
-	v.SetDefault("disabled_tools", []string{})
-	v.SetDefault("enabled_domains", []string{})
-	v.SetDefault("disabled_domains", []string{})
-	v.SetDefault("compact", true)
-	v.SetDefault("request_timeout_seconds", 30)
+	defaults := map[string]any{
+		"port":                     0,
+		"sse_base_url":             "",
+		"log_level":                "info",
+		"base_url":                 DefaultBaseURL,
+		"insecure_skip_tls_verify": false,
+		"read_only":                true,
+		"enabled_tools":            []string{},
+		"disabled_tools":           []string{},
+		"enabled_domains":          []string{},
+		"disabled_domains":         []string{},
+		"compact":                  true,
+		"request_timeout_seconds":  30,
+	}
+	for key, value := range defaults {
+		v.SetDefault(key, value)
+	}
 
 	if configPath != "" {
 		v.SetConfigFile(configPath)

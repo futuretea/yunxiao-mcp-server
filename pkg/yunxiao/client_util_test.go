@@ -2,6 +2,7 @@ package yunxiao
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -11,8 +12,9 @@ import (
 
 func TestClientResolveDefaultOrgIDWithSingleOrganization(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/oapi/v1/platform/organizations" {
-			t.Fatalf("path = %q", r.URL.Path)
+		wantPath := "/oapi/v1/platform/organizations"
+		if r.URL.Path != wantPath {
+			t.Fatalf("path = %q, want %q", r.URL.Path, wantPath)
 		}
 		_, _ = w.Write([]byte(`[{"id":"org-1","name":"My Org"}]`))
 	}))
@@ -26,8 +28,8 @@ func TestClientResolveDefaultOrgIDWithSingleOrganization(t *testing.T) {
 	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
 		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
 	}
-	if client.DefaultOrgID != "org-1" {
-		t.Fatalf("DefaultOrgID = %q, want org-1", client.DefaultOrgID)
+	if client.DefaultOrgID() != "org-1" {
+		t.Fatalf("DefaultOrgID() = %q, want org-1", client.DefaultOrgID())
 	}
 }
 
@@ -45,8 +47,8 @@ func TestClientResolveDefaultOrgIDWithWrappedData(t *testing.T) {
 	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
 		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
 	}
-	if client.DefaultOrgID != "org-wrapped" {
-		t.Fatalf("DefaultOrgID = %q, want org-wrapped", client.DefaultOrgID)
+	if client.DefaultOrgID() != "org-wrapped" {
+		t.Fatalf("DefaultOrgID() = %q, want org-wrapped", client.DefaultOrgID())
 	}
 }
 
@@ -64,8 +66,8 @@ func TestClientResolveDefaultOrgIDWithMultipleOrganizations(t *testing.T) {
 	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
 		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
 	}
-	if client.DefaultOrgID != "" {
-		t.Fatalf("DefaultOrgID = %q, want empty for multiple orgs", client.DefaultOrgID)
+	if client.DefaultOrgID() != "" {
+		t.Fatalf("DefaultOrgID() = %q, want empty for multiple orgs", client.DefaultOrgID())
 	}
 }
 
@@ -99,8 +101,8 @@ func TestClientResolveDefaultOrgIDWithZeroOrganizations(t *testing.T) {
 	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
 		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
 	}
-	if client.DefaultOrgID != "" {
-		t.Fatalf("DefaultOrgID = %q, want empty for zero orgs", client.DefaultOrgID)
+	if client.DefaultOrgID() != "" {
+		t.Fatalf("DefaultOrgID() = %q, want empty for zero orgs", client.DefaultOrgID())
 	}
 }
 
@@ -164,10 +166,11 @@ func TestNewClientReturnsErrorForInvalidBaseURL(t *testing.T) {
 }
 
 func TestClientGetJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
-	client, err := NewClient("https://example.com", "token-1", time.Millisecond)
+	client, err := NewClient("https://example.com", "token-1", time.Second)
 	if err != nil {
 		t.Fatalf("NewClient() error = %v", err)
 	}
+	client.httpClient = &http.Client{Transport: &failingTransport{err: errors.New("network error")}}
 
 	_, err = client.GetJSONWithMetadata(context.Background(), "/platform/users:me", nil)
 	if err == nil {
@@ -176,10 +179,11 @@ func TestClientGetJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
 }
 
 func TestClientPostJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
-	client, err := NewClient("https://example.com", "token-1", time.Millisecond)
+	client, err := NewClient("https://example.com", "token-1", time.Second)
 	if err != nil {
 		t.Fatalf("NewClient() error = %v", err)
 	}
+	client.httpClient = &http.Client{Transport: &failingTransport{err: errors.New("network error")}}
 
 	_, err = client.PostJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": "value"})
 	if err == nil {
@@ -214,10 +218,11 @@ func TestClientPostJSONWithMetadataReturnsResponse(t *testing.T) {
 }
 
 func TestClientPutJSONWithMetadataReturnsErrorOnRequestFailure(t *testing.T) {
-	client, err := NewClient("https://example.com", "token-1", time.Millisecond)
+	client, err := NewClient("https://example.com", "token-1", time.Second)
 	if err != nil {
 		t.Fatalf("NewClient() error = %v", err)
 	}
+	client.httpClient = &http.Client{Transport: &failingTransport{err: errors.New("network error")}}
 
 	_, err = client.PutJSONWithMetadata(context.Background(), "/platform/users:me", map[string]any{"key": "value"})
 	if err == nil {

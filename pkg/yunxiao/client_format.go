@@ -52,12 +52,7 @@ func parsePagination(header http.Header) *Pagination {
 		Total:      parseHeaderInt(header, "x-total"),
 		TotalPages: parseHeaderInt(header, "x-total-pages"),
 	}
-	if pagination.Page == 0 &&
-		pagination.PerPage == 0 &&
-		pagination.PrevPage == 0 &&
-		pagination.NextPage == 0 &&
-		pagination.Total == 0 &&
-		pagination.TotalPages == 0 {
+	if *pagination == (Pagination{}) {
 		return nil
 	}
 	return pagination

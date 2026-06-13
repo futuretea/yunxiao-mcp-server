@@ -77,7 +77,11 @@ func ValidateToolRequiredParams(tool toolset.ServerTool, params map[string]any, 
 	for _, key := range defaultedKeys {
 		defaulted[key] = struct{}{}
 	}
-	for _, key := range toolRequiredParams(tool) {
+	required, err := toolRequiredParams(tool)
+	if err != nil {
+		return err
+	}
+	for _, key := range required {
 		if _, ok := defaulted[key]; ok {
 			continue
 		}
@@ -93,26 +97,27 @@ func InvokeTool(ctx context.Context, client *Client, tool toolset.ServerTool, pa
 	if params == nil {
 		params = map[string]any{}
 	}
+	params = copyParams(params)
 	fillDefaultOrganizationID(client, params)
 
 	result, err := tool.Handler(ctx, client, params)
 	return result, WrapError(err)
 }
 
-func toolRequiredParams(tool toolset.ServerTool) []string {
+func toolRequiredParams(tool toolset.ServerTool) ([]string, error) {
 	if len(tool.Tool.InputSchema.Required) > 0 {
-		return tool.Tool.InputSchema.Required
+		return tool.Tool.InputSchema.Required, nil
 	}
 	if len(tool.Tool.RawInputSchema) == 0 {
-		return nil
+		return nil, nil
 	}
 	var schema struct {
 		Required []string `json:"required"`
 	}
 	if err := json.Unmarshal(tool.Tool.RawInputSchema, &schema); err != nil {
-		return nil
+		return nil, fmt.Errorf("unmarshal tool schema for %s: %w", tool.Tool.Name, err)
 	}
-	return schema.Required
+	return schema.Required, nil
 }
 
 func isMissingToolParam(value any) bool {
@@ -126,11 +131,11 @@ func isMissingToolParam(value any) bool {
 }
 
 func fillDefaultOrganizationID(client *Client, params map[string]any) {
-	if client == nil || client.DefaultOrgID == "" {
+	if client == nil || client.DefaultOrgID() == "" {
 		return
 	}
 	if orgID, ok := params["organizationId"].(string); !ok || strings.TrimSpace(orgID) == "" {
-		params["organizationId"] = client.DefaultOrgID
+		params["organizationId"] = client.DefaultOrgID()
 	}
 }
 
@@ -140,13 +145,10 @@ func filterToolsByDomains(tools []toolset.ServerTool, enabled, disabled []string
 		for _, d := range enabled {
 			allowed[d] = struct{}{}
 		}
-		filtered := make([]toolset.ServerTool, 0, len(tools))
-		for _, tool := range tools {
-			if _, ok := allowed[tool.Domain]; ok {
-				filtered = append(filtered, tool)
-			}
-		}
-		return filtered
+		return filterTools(tools, func(domain string) bool {
+			_, ok := allowed[domain]
+			return ok
+		})
 	}
 
 	if len(disabled) > 0 {
@@ -154,16 +156,23 @@ func filterToolsByDomains(tools []toolset.ServerTool, enabled, disabled []string
 		for _, d := range disabled {
 			blocked[d] = struct{}{}
 		}
-		filtered := make([]toolset.ServerTool, 0, len(tools))
-		for _, tool := range tools {
-			if _, ok := blocked[tool.Domain]; !ok {
-				filtered = append(filtered, tool)
-			}
-		}
-		return filtered
+		return filterTools(tools, func(domain string) bool {
+			_, ok := blocked[domain]
+			return !ok
+		})
 	}
 
 	return tools
+}
+
+func filterTools(tools []toolset.ServerTool, keep func(string) bool) []toolset.ServerTool {
+	filtered := make([]toolset.ServerTool, 0, len(tools))
+	for _, tool := range tools {
+		if keep(tool.Domain) {
+			filtered = append(filtered, tool)
+		}
+	}
+	return filtered
 }
 
 func validateToolFilters(tools []toolset.ServerTool, enabledTools, disabledTools []string) error {
