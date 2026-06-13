@@ -16,11 +16,11 @@ import (
 	yunxiaoToolset "github.com/futuretea/yunxiao-mcp-server/pkg/toolset/yunxiao"
 )
 
-func TestRegisterToolFillsDefaultOrganizationID(t *testing.T) {
+func newServerWithResolvedOrg(t *testing.T) *Server {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`[{"id":"default-org"}]`))
 	}))
-	defer ts.Close()
+	t.Cleanup(ts.Close)
 
 	client, err := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
 	if err != nil {
@@ -30,11 +30,15 @@ func TestRegisterToolFillsDefaultOrganizationID(t *testing.T) {
 		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
 	}
 
-	s := &Server{
+	return &Server{
 		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
 		server:        server.NewMCPServer("test", "1.0.0"),
 		client:        client,
 	}
+}
+
+func TestRegisterToolFillsDefaultOrganizationID(t *testing.T) {
+	s := newServerWithResolvedOrg(t)
 
 	var gotParams map[string]any
 	mockTool := toolset.ServerTool{
@@ -52,7 +56,7 @@ func TestRegisterToolFillsDefaultOrganizationID(t *testing.T) {
 		t.Fatal("mock_tool should be registered")
 	}
 
-	_, err = registered.Handler(context.Background(), mcp.CallToolRequest{
+	_, err := registered.Handler(context.Background(), mcp.CallToolRequest{
 		Params: mcp.CallToolParams{
 			Name:      "mock_tool",
 			Arguments: map[string]any{},
@@ -68,24 +72,7 @@ func TestRegisterToolFillsDefaultOrganizationID(t *testing.T) {
 }
 
 func TestRegisterToolReplacesBlankOrganizationIDWithDefault(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(`[{"id":"default-org"}]`))
-	}))
-	defer ts.Close()
-
-	client, err := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
-	if err != nil {
-		t.Fatalf("NewClient() error = %v", err)
-	}
-	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
-		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
-	}
-
-	s := &Server{
-		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
-		server:        server.NewMCPServer("test", "1.0.0"),
-		client:        client,
-	}
+	s := newServerWithResolvedOrg(t)
 
 	var gotParams map[string]any
 	mockTool := toolset.ServerTool{
@@ -103,7 +90,7 @@ func TestRegisterToolReplacesBlankOrganizationIDWithDefault(t *testing.T) {
 		t.Fatal("mock_tool should be registered")
 	}
 
-	_, err = registered.Handler(context.Background(), mcp.CallToolRequest{
+	_, err := registered.Handler(context.Background(), mcp.CallToolRequest{
 		Params: mcp.CallToolParams{
 			Name:      "mock_tool",
 			Arguments: map[string]any{"organizationId": " \t "},
@@ -119,24 +106,7 @@ func TestRegisterToolReplacesBlankOrganizationIDWithDefault(t *testing.T) {
 }
 
 func TestRegisterToolPreservesExistingOrganizationID(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(`[{"id":"default-org"}]`))
-	}))
-	defer ts.Close()
-
-	client, err := yunxiaoToolset.NewClient(ts.URL, "token", time.Second)
-	if err != nil {
-		t.Fatalf("NewClient() error = %v", err)
-	}
-	if err := client.ResolveDefaultOrgID(context.Background()); err != nil {
-		t.Fatalf("ResolveDefaultOrgID() error = %v", err)
-	}
-
-	s := &Server{
-		configuration: &Configuration{StaticConfig: &config.StaticConfig{}},
-		server:        server.NewMCPServer("test", "1.0.0"),
-		client:        client,
-	}
+	s := newServerWithResolvedOrg(t)
 
 	var gotParams map[string]any
 	mockTool := toolset.ServerTool{
@@ -154,7 +124,7 @@ func TestRegisterToolPreservesExistingOrganizationID(t *testing.T) {
 		t.Fatal("mock_tool should be registered")
 	}
 
-	_, err = registered.Handler(context.Background(), mcp.CallToolRequest{
+	_, err := registered.Handler(context.Background(), mcp.CallToolRequest{
 		Params: mcp.CallToolParams{
 			Name:      "mock_tool",
 			Arguments: map[string]any{"organizationId": "provided-org"},

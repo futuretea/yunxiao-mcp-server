@@ -19,7 +19,21 @@ import (
 
 func newTestMCPServer(t *testing.T, accessToken string) *mcpserver.Server {
 	t.Helper()
-	return newTestMCPServerWithBaseURL(t, accessToken, config.DefaultBaseURL)
+	return newTestMCPServerWithBaseURL(t, accessToken, newMockBaseURL(t))
+}
+
+func newMockBaseURL(t *testing.T) string {
+	t.Helper()
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/oapi/v1/platform/organizations" {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`[{"id":"default-org"}]`))
+			return
+		}
+		http.Error(w, "not found", http.StatusNotFound)
+	}))
+	t.Cleanup(ts.Close)
+	return ts.URL
 }
 
 func newTestMCPServerWithBaseURL(t *testing.T, accessToken, baseURL string) *mcpserver.Server {
@@ -307,7 +321,7 @@ func TestHandlerShutdown(t *testing.T) {
 	httpServer := &http.Server{}
 	handler := NewHandler(newTestMCPServer(t, "token"), httpServer, "")
 
-	if err := handler.Shutdown(t.Context()); err != nil {
+	if err := handler.Shutdown(5 * time.Second); err != nil {
 		t.Fatalf("Shutdown() error = %v", err)
 	}
 }
@@ -330,9 +344,7 @@ func TestHandlerShutdownCancelsActiveStreamableHTTPGet(t *testing.T) {
 
 	done := make(chan error, 1)
 	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		done <- handler.Shutdown(ctx)
+		done <- handler.Shutdown(time.Second)
 	}()
 
 	select {
@@ -405,10 +417,7 @@ func TestHandlerShutdownPreservesBothErrors(t *testing.T) {
 		t.Fatal("streamable HTTP connection did not start")
 	}
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
-	defer shutdownCancel()
-
-	err := handler.Shutdown(shutdownCtx)
+	err := handler.Shutdown(10 * time.Millisecond)
 	if err == nil {
 		t.Fatal("Shutdown() expected an error")
 	}

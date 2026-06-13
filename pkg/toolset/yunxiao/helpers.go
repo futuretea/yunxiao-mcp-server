@@ -3,6 +3,7 @@ package yunxiao
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"math"
 	"strconv"
 	"strings"
@@ -98,11 +99,7 @@ func requiredNumberPathString(params map[string]any, key string) (string, error)
 }
 
 func copyParams(params map[string]any) map[string]any {
-	copied := make(map[string]any, len(params))
-	for key, value := range params {
-		copied[key] = value
-	}
-	return copied
+	return maps.Clone(params)
 }
 
 func todayDate() string {

@@ -8,27 +8,25 @@ import (
 	"github.com/spf13/viper"
 )
 
-func TestValidateValidConfig(t *testing.T) {
-	cfg := &StaticConfig{
+func newValidConfig() *StaticConfig {
+	return &StaticConfig{
 		Port:                  0,
 		LogLevel:              "info",
 		BaseURL:               DefaultBaseURL,
 		ReadOnly:              true,
 		RequestTimeoutSeconds: 30,
 	}
+}
 
-	if err := cfg.Validate(); err != nil {
+func TestValidateValidConfig(t *testing.T) {
+	if err := newValidConfig().Validate(); err != nil {
 		t.Fatalf("Validate() error = %v", err)
 	}
 }
 
 func TestValidateRejectsInvalidPort(t *testing.T) {
-	cfg := &StaticConfig{
-		Port:                  70000,
-		LogLevel:              "info",
-		BaseURL:               DefaultBaseURL,
-		RequestTimeoutSeconds: 30,
-	}
+	cfg := newValidConfig()
+	cfg.Port = 70000
 
 	if err := cfg.Validate(); err == nil {
 		t.Fatal("Validate() expected invalid port error")
@@ -36,11 +34,8 @@ func TestValidateRejectsInvalidPort(t *testing.T) {
 }
 
 func TestValidateRejectsInvalidBaseURL(t *testing.T) {
-	cfg := &StaticConfig{
-		LogLevel:              "info",
-		BaseURL:               "openapi-rdc.aliyuncs.com",
-		RequestTimeoutSeconds: 30,
-	}
+	cfg := newValidConfig()
+	cfg.BaseURL = "openapi-rdc.aliyuncs.com"
 
 	if err := cfg.Validate(); err == nil {
 		t.Fatal("Validate() expected invalid base_url error")
@@ -179,12 +174,8 @@ func TestLoadConfigExplicitSetOverridesEnvironment(t *testing.T) {
 }
 
 func TestValidateRejectsInvalidLogLevel(t *testing.T) {
-	cfg := &StaticConfig{
-		Port:                  0,
-		LogLevel:              "not_a_level",
-		BaseURL:               DefaultBaseURL,
-		RequestTimeoutSeconds: 30,
-	}
+	cfg := newValidConfig()
+	cfg.LogLevel = "not_a_level"
 
 	if err := cfg.Validate(); err == nil {
 		t.Fatal("Validate() expected invalid log_level error")
@@ -192,12 +183,8 @@ func TestValidateRejectsInvalidLogLevel(t *testing.T) {
 }
 
 func TestValidateRejectsNonPositiveTimeout(t *testing.T) {
-	cfg := &StaticConfig{
-		Port:                  0,
-		LogLevel:              "info",
-		BaseURL:               DefaultBaseURL,
-		RequestTimeoutSeconds: 0,
-	}
+	cfg := newValidConfig()
+	cfg.RequestTimeoutSeconds = 0
 
 	if err := cfg.Validate(); err == nil {
 		t.Fatal("Validate() expected non-positive timeout error")
@@ -205,12 +192,8 @@ func TestValidateRejectsNonPositiveTimeout(t *testing.T) {
 }
 
 func TestValidateRejectsInvalidURLScheme(t *testing.T) {
-	cfg := &StaticConfig{
-		Port:                  0,
-		LogLevel:              "info",
-		BaseURL:               "ftp://example.com",
-		RequestTimeoutSeconds: 30,
-	}
+	cfg := newValidConfig()
+	cfg.BaseURL = "ftp://example.com"
 
 	if err := cfg.Validate(); err == nil {
 		t.Fatal("Validate() expected invalid scheme error")

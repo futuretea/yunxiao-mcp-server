@@ -6,75 +6,51 @@ import (
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
 )
 
+func contains(names []string, target string) bool {
+	for _, name := range names {
+		if name == target {
+			return true
+		}
+	}
+	return false
+}
+
+func assertContains(t *testing.T, names []string, target string) {
+	t.Helper()
+	if !contains(names, target) {
+		t.Fatalf("expected %v to contain %q", names, target)
+	}
+}
+
+func assertNotContains(t *testing.T, names []string, target string) {
+	t.Helper()
+	if contains(names, target) {
+		t.Fatalf("expected %v not to contain %q", names, target)
+	}
+}
+
 func TestNewServerCompactMode(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		CompactMode:           true,
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.CompactMode = true
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
 
 	enabled := s.GetEnabledTools()
 
-	// Should include enhanced tools
-	hasProjectOverview := false
-	for _, name := range enabled {
-		if name == "get_project_overview" {
-			hasProjectOverview = true
-			break
-		}
-	}
-	if !hasProjectOverview {
-		t.Fatal("compact mode should include get_project_overview")
-	}
-
-	// Should NOT include superseded raw tools
-	for _, name := range enabled {
-		if name == "get_project" {
-			t.Fatalf("compact mode should hide get_project, got %v", enabled)
-		}
-	}
-
-	// Should NOT include superseded appstack tools
-	for _, name := range enabled {
-		if name == "get_application" {
-			t.Fatalf("compact mode should hide get_application, got %v", enabled)
-		}
-	}
-
-	// Should NOT include superseded flow tools
-	for _, name := range enabled {
-		if name == "get_pipeline" {
-			t.Fatalf("compact mode should hide get_pipeline, got %v", enabled)
-		}
-	}
-
-	// Should still include non-superseded raw tools
-	hasPodLog := false
-	for _, name := range enabled {
-		if name == "get_pod_container_log" {
-			hasPodLog = true
-			break
-		}
-	}
-	if !hasPodLog {
-		t.Fatal("compact mode should include non-superseded tools like get_pod_container_log")
-	}
+	assertContains(t, enabled, "get_project_overview")
+	assertNotContains(t, enabled, "get_project")
+	assertNotContains(t, enabled, "get_application")
+	assertNotContains(t, enabled, "get_pipeline")
+	assertContains(t, enabled, "get_pod_container_log")
 }
 
 func TestNewServerCompactModeAllowsExplicitEnable(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		CompactMode:           true,
-		EnabledTools:          []string{"get_current_user"},
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.CompactMode = true
+		c.EnabledTools = []string{"get_current_user"}
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
@@ -86,180 +62,75 @@ func TestNewServerCompactModeAllowsExplicitEnable(t *testing.T) {
 }
 
 func TestNewServerEnableDomainsWhitelist(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		EnabledDomains:        []string{"platform"},
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.EnabledDomains = []string{"platform"}
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
 
 	enabled := s.GetEnabledTools()
-	for _, name := range enabled {
-		if name == "search_projects" {
-			t.Fatalf("enable-domains whitelist should exclude projex, got %v", enabled)
-		}
-	}
-	if len(enabled) == 0 {
-		t.Fatal("enable-domains whitelist should include platform tools")
-	}
+	assertNotContains(t, enabled, "search_projects")
+	assertContains(t, enabled, "get_current_user")
 }
 
 func TestNewServerDisableDomainsBlacklist(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		DisabledDomains:       []string{"codeup", "flow", "appstack", "lingma", "packages"},
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.DisabledDomains = []string{"codeup", "flow", "appstack", "lingma", "packages"}
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
 
 	enabled := s.GetEnabledTools()
-	for _, name := range enabled {
-		if name == "list_repositories" || name == "list_pipelines" {
-			t.Fatalf("disable-domains blacklist should exclude codeup/flow, got %v", enabled)
-		}
-	}
-	hasPlatform := false
-	hasProjex := false
-	for _, name := range enabled {
-		if name == "get_current_user" {
-			hasPlatform = true
-		}
-		if name == "get_project_overview" {
-			hasProjex = true
-		}
-	}
-	if !hasPlatform {
-		t.Fatalf("disable-domains should keep platform, got %v", enabled)
-	}
-	if !hasProjex {
-		t.Fatalf("disable-domains should keep projex, got %v", enabled)
-	}
+	assertNotContains(t, enabled, "list_repositories")
+	assertNotContains(t, enabled, "list_pipelines")
+	assertContains(t, enabled, "get_current_user")
+	assertContains(t, enabled, "get_project_overview")
 }
 
 func TestNewServerDefaultCompactHidesRawTools(t *testing.T) {
 	// Default CompactMode=true means raw tools with enhanced alternatives are hidden
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		CompactMode:           true,
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.CompactMode = true
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
 
 	enabled := s.GetEnabledTools()
-	for _, name := range enabled {
-		if name == "get_application" {
-			t.Fatalf("default compact should hide get_application, got %v", enabled)
-		}
-		if name == "get_pipeline" {
-			t.Fatalf("default compact should hide get_pipeline, got %v", enabled)
-		}
-	}
+	assertNotContains(t, enabled, "get_application")
+	assertNotContains(t, enabled, "get_pipeline")
 }
 
 func TestNewServerNoCompactShowsAllTools(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		CompactMode:           false,
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.CompactMode = false
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
 
 	enabled := s.GetEnabledTools()
-	hasGetApplication := false
-	hasGetPipeline := false
-	for _, name := range enabled {
-		if name == "get_application" {
-			hasGetApplication = true
-		}
-		if name == "get_pipeline" {
-			hasGetPipeline = true
-		}
-	}
-	if !hasGetApplication {
-		t.Fatal("compact=false should show get_application")
-	}
-	if !hasGetPipeline {
-		t.Fatal("compact=false should show get_pipeline")
-	}
+	assertContains(t, enabled, "get_application")
+	assertContains(t, enabled, "get_pipeline")
 }
 
 func TestNewServerEnableDomainsWithCompact(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		CompactMode:           true,
-		EnabledDomains:        []string{"platform", "projex"},
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.CompactMode = true
+		c.EnabledDomains = []string{"platform", "projex"}
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
 
 	enabled := s.GetEnabledTools()
 
-	// Should include platform tools
-	hasCurrentUser := false
-	for _, name := range enabled {
-		if name == "get_current_user" {
-			hasCurrentUser = true
-			break
-		}
-	}
-	if !hasCurrentUser {
-		t.Fatal("domain+compact should include platform tools")
-	}
-
-	// Should include projex tools
-	hasProjectOverview := false
-	for _, name := range enabled {
-		if name == "get_project_overview" {
-			hasProjectOverview = true
-			break
-		}
-	}
-	if !hasProjectOverview {
-		t.Fatal("domain+compact should include projex enhanced tools")
-	}
-
-	// Should NOT include codeup tools
-	for _, name := range enabled {
-		if name == "list_repositories" {
-			t.Fatalf("domain+compact should not include codeup tools, got %v", enabled)
-		}
-	}
-
-	// Should NOT include superseded raw tools
-	for _, name := range enabled {
-		if name == "get_project" || name == "get_organization" {
-			t.Fatalf("domain+compact should hide superseded raw tool %s, got %v", name, enabled)
-		}
-	}
-
-	// Should still include non-superseded list tools
-	hasSearchProjects := false
-	for _, name := range enabled {
-		if name == "search_projects" {
-			hasSearchProjects = true
-		}
-	}
-	if !hasSearchProjects {
-		t.Fatal("domain+compact should include non-superseded tools like search_projects")
-	}
+	assertContains(t, enabled, "get_current_user")
+	assertContains(t, enabled, "get_project_overview")
+	assertNotContains(t, enabled, "list_repositories")
+	assertNotContains(t, enabled, "get_project")
+	assertNotContains(t, enabled, "get_organization")
+	assertContains(t, enabled, "search_projects")
 }

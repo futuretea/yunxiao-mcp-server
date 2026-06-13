@@ -1,8 +1,9 @@
 package yunxiao
 
 import (
-	"fmt"
 	"net/url"
+	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -16,7 +17,7 @@ func TestSetOptionalIntBody(t *testing.T) {
 	}{
 		{"float64", map[string]any{"k": float64(42)}, "k", 42, true},
 		{"int", map[string]any{"k": int(7)}, "k", 7, true},
-		{"int64", map[string]any{"k": int64(99)}, "k", 99, true},
+		{"int64", map[string]any{"k": int64(99)}, "k", int64(99), true},
 		{"string non-empty", map[string]any{"k": "123"}, "k", "123", true},
 		{"string empty", map[string]any{"k": ""}, "k", nil, false},
 		{"nil", map[string]any{}, "k", nil, false},
@@ -27,8 +28,8 @@ func TestSetOptionalIntBody(t *testing.T) {
 			body := map[string]any{}
 			setOptionalIntBody(body, tt.params, tt.key)
 			if tt.wantOk {
-				if fmt.Sprint(body[tt.key]) != fmt.Sprint(tt.want) {
-					t.Fatalf("body[%q] = %v, want %v", tt.key, body[tt.key], tt.want)
+				if !reflect.DeepEqual(body[tt.key], tt.want) {
+					t.Fatalf("body[%q] = %v (%T), want %v (%T)", tt.key, body[tt.key], body[tt.key], tt.want, tt.want)
 				}
 			} else {
 				if _, ok := body[tt.key]; ok {
@@ -103,13 +104,8 @@ func TestSetOptionalStringArrayBody(t *testing.T) {
 				if !ok {
 					t.Fatalf("body[%q] type = %T, want []string", tt.key, body[tt.key])
 				}
-				if len(got) != len(tt.want) {
+				if !slices.Equal(got, tt.want) {
 					t.Fatalf("body[%q] = %v, want %v", tt.key, got, tt.want)
-				}
-				for i := range got {
-					if got[i] != tt.want[i] {
-						t.Fatalf("body[%q][%d] = %q, want %q", tt.key, i, got[i], tt.want[i])
-					}
 				}
 			} else {
 				if _, ok := body[tt.key]; ok {

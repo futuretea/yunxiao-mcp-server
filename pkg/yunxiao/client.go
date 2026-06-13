@@ -5,9 +5,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/version"
@@ -40,11 +42,23 @@ func WithInsecureSkipTLSVerify(skip bool) ClientOption {
 
 // Client is a minimal Yunxiao OpenAPI client.
 type Client struct {
-	baseURL      *url.URL
-	accessToken  string
-	httpClient   *http.Client
-	userAgent    string
-	DefaultOrgID string
+	baseURL        *url.URL
+	accessToken    string
+	httpClient     *http.Client
+	userAgent      string
+	defaultOrgID   string
+	defaultOrgIDMu sync.RWMutex
+}
+
+// DefaultOrgID returns the cached default organization ID, if any.
+// It is safe for concurrent use.
+func (c *Client) DefaultOrgID() string {
+	if c == nil {
+		return ""
+	}
+	c.defaultOrgIDMu.RLock()
+	defer c.defaultOrgIDMu.RUnlock()
+	return c.defaultOrgID
 }
 
 // APIError includes response context from a failed Yunxiao API call.
@@ -127,12 +141,21 @@ func newHTTPClient(timeout time.Duration, options clientOptions) *http.Client {
 		return client
 	}
 
-	tr, ok := http.DefaultTransport.(*http.Transport)
-	if !ok {
-		return client
+	// Build a fresh transport so TLS settings are applied even when the
+	// runtime has replaced http.DefaultTransport with a custom RoundTripper.
+	transport := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		TLSClientConfig:       &tls.Config{InsecureSkipVerify: true}, //nolint:gosec // Explicit opt-in for private/self-signed Yunxiao endpoints.
 	}
-	transport := tr.Clone()
-	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // Explicit opt-in for private/self-signed Yunxiao endpoints.
 	client.Transport = transport
 	return client
 }
@@ -144,6 +167,8 @@ type orgEntry struct {
 
 // ResolveDefaultOrgID fetches the user's organizations and, if exactly one exists,
 // caches its ID as the default organization for automatic parameter filling.
+// Responses that cannot be parsed or contain zero/multiple organizations are
+// ignored intentionally so the caller can fall back to explicit parameters.
 func (c *Client) ResolveDefaultOrgID(ctx context.Context) error {
 	resp, err := c.Request(ctx, http.MethodGet, "/platform/organizations", nil, nil)
 	if err != nil {
@@ -153,7 +178,7 @@ func (c *Client) ResolveDefaultOrgID(ctx context.Context) error {
 	// Try array format first
 	var orgList []orgEntry
 	if err := json.Unmarshal(resp.Body, &orgList); err == nil && len(orgList) == 1 {
-		c.DefaultOrgID = orgList[0].ID
+		c.setDefaultOrgID(orgList[0].ID)
 		return nil
 	}
 
@@ -162,11 +187,17 @@ func (c *Client) ResolveDefaultOrgID(ctx context.Context) error {
 		Data []orgEntry `json:"data"`
 	}
 	if err := json.Unmarshal(resp.Body, &wrapped); err == nil && len(wrapped.Data) == 1 {
-		c.DefaultOrgID = wrapped.Data[0].ID
+		c.setDefaultOrgID(wrapped.Data[0].ID)
 		return nil
 	}
 
 	return nil
+}
+
+func (c *Client) setDefaultOrgID(id string) {
+	c.defaultOrgIDMu.Lock()
+	defer c.defaultOrgIDMu.Unlock()
+	c.defaultOrgID = id
 }
 
 func normalizeAPIBaseURL(raw string) (*url.URL, error) {

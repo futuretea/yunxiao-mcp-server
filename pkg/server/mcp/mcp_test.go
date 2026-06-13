@@ -24,6 +24,21 @@ func newTestServer(enabledTools, disabledTools []string) *Server {
 	}
 }
 
+// newTestConfig returns a fresh base StaticConfig for tests. Callers may safely
+// mutate the returned pointer.
+func newTestConfig(modifiers ...func(*config.StaticConfig)) *config.StaticConfig {
+	cfg := &config.StaticConfig{
+		BaseURL:               config.DefaultBaseURL,
+		LogLevel:              "info",
+		RequestTimeoutSeconds: 30,
+		ReadOnly:              true,
+	}
+	for _, m := range modifiers {
+		m(cfg)
+	}
+	return cfg
+}
+
 func TestShouldEnableToolAllEnabledByDefault(t *testing.T) {
 	tools, err := yunxiaoToolset.BuildToolCatalog(nil, yunxiaoToolset.ToolCatalogOptions{ReadOnly: true})
 	if err != nil {
@@ -75,24 +90,18 @@ func TestNewServerRejectsNilStaticConfig(t *testing.T) {
 }
 
 func TestNewServerRejectsInvalidBaseURL(t *testing.T) {
-	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               "://invalid-url",
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-	}})
+	_, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.BaseURL = "://invalid-url"
+	})})
 	if err == nil {
 		t.Fatal("NewServer() expected error for invalid base URL")
 	}
 }
 
 func TestNewServerRegistersTools(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		EnabledTools:          []string{"get_current_user"},
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.EnabledTools = []string{"get_current_user"}
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
@@ -104,13 +113,9 @@ func TestNewServerRegistersTools(t *testing.T) {
 }
 
 func TestNewServerRejectsUnknownEnabledTool(t *testing.T) {
-	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		EnabledTools:          []string{"get_user_organizations_typo"},
-	}})
+	_, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.EnabledTools = []string{"get_user_organizations_typo"}
+	})})
 	if err == nil {
 		t.Fatal("NewServer() expected unknown enabled tool error")
 	}
@@ -124,14 +129,11 @@ func TestNewServerRejectsUnknownEnabledToolBeforeDefaultOrgRequest(t *testing.T)
 	}))
 	defer server.Close()
 
-	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               server.URL,
-		AccessToken:           "token-1",
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		EnabledTools:          []string{"get_user_organizations_typo"},
-	}})
+	_, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.BaseURL = server.URL
+		c.AccessToken = "token-1"
+		c.EnabledTools = []string{"get_user_organizations_typo"}
+	})})
 	if err == nil {
 		t.Fatal("NewServer() expected unknown enabled tool error")
 	}
@@ -141,27 +143,19 @@ func TestNewServerRejectsUnknownEnabledToolBeforeDefaultOrgRequest(t *testing.T)
 }
 
 func TestNewServerRejectsUnknownDisabledTool(t *testing.T) {
-	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		DisabledTools:         []string{"get_user_organizations_typo"},
-	}})
+	_, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.DisabledTools = []string{"get_user_organizations_typo"}
+	})})
 	if err == nil {
 		t.Fatal("NewServer() expected unknown disabled tool error")
 	}
 }
 
 func TestNewServerRejectsZeroEnabledTools(t *testing.T) {
-	_, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		EnabledTools:          []string{"get_current_user"},
-		DisabledTools:         []string{"get_current_user"},
-	}})
+	_, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.EnabledTools = []string{"get_current_user"}
+		c.DisabledTools = []string{"get_current_user"}
+	})})
 	if err == nil {
 		t.Fatal("NewServer() expected zero enabled tools error")
 	}
@@ -193,13 +187,9 @@ func TestIsHealthy(t *testing.T) {
 		t.Fatal("test server without client should not be healthy")
 	}
 
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-		EnabledTools:          []string{"get_current_user"},
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.EnabledTools = []string{"get_current_user"}
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}

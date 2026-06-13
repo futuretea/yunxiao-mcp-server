@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"errors"
+	"net"
 	"net/http"
 	"os/signal"
 	"syscall"
@@ -24,12 +25,62 @@ const (
 
 // Serve starts HTTP transports for MCP and blocks until shutdown.
 func Serve(ctx context.Context, mcpServer *mcpserver.Server, staticConfig *config.StaticConfig) error {
+	if staticConfig == nil {
+		return errors.New("static config is required")
+	}
+
+	listener, err := net.Listen("tcp", staticConfig.GetPortString())
+	if err != nil {
+		return err
+	}
+	defer listener.Close()
+
+	return ServeListener(ctx, mcpServer, staticConfig, listener)
+}
+
+const (
+	defaultReadHeaderTimeout = 5 * time.Second
+	defaultReadTimeout       = 30 * time.Second
+	defaultWriteTimeout      = 30 * time.Second
+	defaultIdleTimeout       = 120 * time.Second
+)
+
+// ServeListener starts HTTP transports for MCP on the provided listener and blocks until shutdown.
+func ServeListener(ctx context.Context, mcpServer *mcpserver.Server, staticConfig *config.StaticConfig, listener net.Listener) error {
+	if err := validateServeListenerInputs(mcpServer, staticConfig, listener); err != nil {
+		return err
+	}
+	httpServer, handler := newServerWithHandler(mcpServer, staticConfig, listener)
+	return runServer(ctx, httpServer, handler, listener)
+}
+
+func validateServeListenerInputs(mcpServer *mcpserver.Server, staticConfig *config.StaticConfig, listener net.Listener) error {
+	if mcpServer == nil {
+		return errors.New("MCP server is required")
+	}
+	if staticConfig == nil {
+		return errors.New("static config is required")
+	}
+	if listener == nil {
+		return errors.New("listener is required")
+	}
+	return nil
+}
+
+func newServerWithHandler(mcpServer *mcpserver.Server, staticConfig *config.StaticConfig, listener net.Listener) (*http.Server, *Handler) {
 	httpServer := &http.Server{
-		Addr: staticConfig.GetPortString(),
+		Addr:              listener.Addr().String(),
+		ReadHeaderTimeout: defaultReadHeaderTimeout,
+		ReadTimeout:       defaultReadTimeout,
+		WriteTimeout:      defaultWriteTimeout,
+		IdleTimeout:       defaultIdleTimeout,
 	}
 	handler := NewHandler(mcpServer, httpServer, staticConfig.SSEBaseURL)
 	httpServer.Handler = RequestMiddleware(handler)
+	return httpServer, handler
+}
 
+func runServer(ctx context.Context, httpServer *http.Server, handler *Handler, listener net.Listener) error {
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM)
 	defer stop()
 
@@ -43,24 +94,34 @@ func Serve(ctx context.Context, mcpServer *mcpserver.Server, staticConfig *confi
 			Str("sse", SSEEndpoint).
 			Str("message", SSEMessageEndpoint).
 			Msg("starting HTTP MCP server")
-		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := httpServer.Serve(listener); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- err
 		}
 	}()
 
+	var serveErr error
 	select {
 	case <-ctx.Done():
 	case err := <-serverErr:
-		return err
+		serveErr = err
 	}
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := handler.Shutdown(shutdownCtx); err != nil {
+	select {
+	case err := <-serverErr:
+		if serveErr == nil {
+			serveErr = err
+		}
+	default:
+	}
+
+	if err := handler.Shutdown(9 * time.Second); err != nil {
+		if serveErr != nil {
+			return errors.Join(serveErr, err)
+		}
 		return err
 	}
 	<-serverDone
-	return nil
+	return serveErr
 }
 
 // Handler owns mounted MCP HTTP transports so they can be shut down cleanly.
@@ -70,10 +131,18 @@ type Handler struct {
 	shutdownCancel       context.CancelFunc
 	sseServer            *mcpgo.SSEServer
 	streamableHTTPServer *mcpgo.StreamableHTTPServer
+	httpServer           *http.Server
 }
 
 // NewHandler wires HTTP routes to MCP transport handlers.
 func NewHandler(mcpServer *mcpserver.Server, httpServer *http.Server, sseBaseURL string) *Handler {
+	if mcpServer == nil {
+		panic("mcp server is required")
+	}
+	if httpServer == nil {
+		panic("http server is required")
+	}
+
 	mux := http.NewServeMux()
 	shutdownCtx, shutdownCancel := context.WithCancel(context.Background())
 
@@ -86,19 +155,19 @@ func NewHandler(mcpServer *mcpserver.Server, httpServer *http.Server, sseBaseURL
 		shutdownCancel:       shutdownCancel,
 		sseServer:            sseServer,
 		streamableHTTPServer: streamableHTTPServer,
+		httpServer:           httpServer,
 	}
 
 	mux.Handle(SSEEndpoint, sseServer.SSEHandler())
 	mux.Handle(SSEMessageEndpoint, sseServer.MessageHandler())
 	mux.Handle(MCPEndpoint, handler.withShutdownContext(streamableHTTPServer))
 	mux.HandleFunc(HealthEndpoint, func(w http.ResponseWriter, r *http.Request) {
+		status, body := http.StatusServiceUnavailable, "unhealthy"
 		if mcpServer.IsHealthy() {
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte("healthy"))
-			return
+			status, body = http.StatusOK, "healthy"
 		}
-		w.WriteHeader(http.StatusServiceUnavailable)
-		_, _ = w.Write([]byte("unhealthy"))
+		w.WriteHeader(status)
+		_, _ = w.Write([]byte(body))
 	})
 
 	return handler
@@ -111,17 +180,13 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) withShutdownContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithCancel(r.Context())
-		done := make(chan struct{})
+		defer cancel()
 		go func() {
 			select {
 			case <-h.shutdownCtx.Done():
 				cancel()
-			case <-done:
+			case <-ctx.Done():
 			}
-		}()
-		defer func() {
-			close(done)
-			cancel()
 		}()
 
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -129,19 +194,51 @@ func (h *Handler) withShutdownContext(next http.Handler) http.Handler {
 }
 
 // Shutdown closes active MCP transport sessions and the underlying HTTP server.
-func (h *Handler) Shutdown(ctx context.Context) error {
+// Each active subsystem receives an equal slice of the supplied timeout budget.
+func (h *Handler) Shutdown(timeout time.Duration) error {
 	h.shutdownCancel()
+
+	active := 0
+	if h.sseServer != nil {
+		active++
+	}
+	if h.streamableHTTPServer != nil {
+		active++
+	}
+	if h.httpServer != nil {
+		active++
+	}
+	if active == 0 {
+		return nil
+	}
+
+	const minSlice = 50 * time.Millisecond
+	perCall := timeout / time.Duration(active)
+	if perCall < minSlice {
+		perCall = minSlice
+	}
 
 	var errs []error
 	if h.sseServer != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), perCall)
 		if err := h.sseServer.Shutdown(ctx); err != nil {
 			errs = append(errs, err)
 		}
+		cancel()
 	}
 	if h.streamableHTTPServer != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), perCall)
 		if err := h.streamableHTTPServer.Shutdown(ctx); err != nil {
 			errs = append(errs, err)
 		}
+		cancel()
+	}
+	if h.httpServer != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), perCall)
+		if err := h.httpServer.Shutdown(ctx); err != nil {
+			errs = append(errs, err)
+		}
+		cancel()
 	}
 	return errors.Join(errs...)
 }

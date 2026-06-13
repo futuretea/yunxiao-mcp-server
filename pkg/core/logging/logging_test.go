@@ -63,4 +63,8 @@ func TestDisableSilencesLogging(t *testing.T) {
 	if zerolog.GlobalLevel() != zerolog.Disabled {
 		t.Fatalf("global level = %v, want disabled", zerolog.GlobalLevel())
 	}
+	log.Info().Msg("should not appear")
+	if buf.Len() != 0 {
+		t.Fatalf("output = %q, want empty after Disable", buf.String())
+	}
 }

@@ -11,13 +11,9 @@ import (
 )
 
 func TestServeSSEReturnsWorkingSSEServer(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		AccessToken:           "token",
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.AccessToken = "token"
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
@@ -45,13 +41,9 @@ func TestServeSSEReturnsWorkingSSEServer(t *testing.T) {
 }
 
 func TestServeSSEUsesBaseURL(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		AccessToken:           "token",
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.AccessToken = "token"
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}
@@ -71,13 +63,9 @@ func TestServeSSEUsesBaseURL(t *testing.T) {
 }
 
 func TestServeStreamableHTTPReturnsWorkingHandler(t *testing.T) {
-	s, err := NewServer(Configuration{StaticConfig: &config.StaticConfig{
-		BaseURL:               config.DefaultBaseURL,
-		AccessToken:           "token",
-		LogLevel:              "info",
-		RequestTimeoutSeconds: 30,
-		ReadOnly:              true,
-	}})
+	s, err := NewServer(Configuration{StaticConfig: newTestConfig(func(c *config.StaticConfig) {
+		c.AccessToken = "token"
+	})})
 	if err != nil {
 		t.Fatalf("NewServer() error = %v", err)
 	}

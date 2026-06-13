@@ -96,10 +96,7 @@ func (s *Server) GetEnabledTools() []string {
 
 // IsHealthy reports whether the server has a configured API client and registered tools.
 func (s *Server) IsHealthy() bool {
-	return s != nil &&
-		s.client != nil &&
-		s.configuration != nil &&
-		len(s.enabledTools) > 0
+	return s != nil && s.client != nil && s.configuration != nil && len(s.enabledTools) > 0
 }
 
 // Close releases server resources.

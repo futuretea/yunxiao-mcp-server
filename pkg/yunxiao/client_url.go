@@ -8,11 +8,12 @@ import (
 func (c *Client) resolveURL(path string, query url.Values) string {
 	u := *c.baseURL
 	escapedPath := joinEscapedPath(c.baseURL.EscapedPath(), path)
-	decodedPath, err := url.PathUnescape(escapedPath)
-	if err == nil {
+	if decodedPath, err := url.PathUnescape(escapedPath); err == nil {
 		u.Path = decodedPath
 		u.RawPath = escapedPath
 	} else {
+		// Invalid escape sequences are rare; fall back to a plain concatenation
+		// and let the server decide how to handle the malformed path.
 		u.Path = strings.TrimRight(u.Path, "/") + "/" + strings.TrimLeft(path, "/")
 		u.RawPath = ""
 	}

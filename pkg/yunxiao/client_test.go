@@ -2,6 +2,7 @@ package yunxiao
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -64,6 +65,10 @@ func TestClientRejectsSelfSignedTLSByDefault(t *testing.T) {
 	_, err = client.GetJSON(context.Background(), "/platform/users:me", nil)
 	if err == nil {
 		t.Fatal("GetJSON() expected TLS verification error")
+	}
+	msg := strings.ToLower(err.Error())
+	if !strings.Contains(msg, "certificate") && !strings.Contains(msg, "tls") {
+		t.Fatalf("GetJSON() error = %v, want certificate/TLS error", err)
 	}
 }
 
@@ -216,8 +221,12 @@ func TestClientRequiresAccessToken(t *testing.T) {
 		t.Fatalf("NewClient() error = %v", err)
 	}
 
-	if _, err := client.GetJSON(context.Background(), "/platform/users:me", nil); err == nil {
+	_, err = client.GetJSON(context.Background(), "/platform/users:me", nil)
+	if err == nil {
 		t.Fatal("GetJSON() expected missing access token error")
+	}
+	if !strings.Contains(err.Error(), "access token is required") {
+		t.Fatalf("GetJSON() error = %v, want access token required", err)
 	}
 }
 
@@ -232,7 +241,46 @@ func TestClientReturnsAPIError(t *testing.T) {
 		t.Fatalf("NewClient() error = %v", err)
 	}
 
-	if _, err := client.GetJSON(context.Background(), "/platform/users:me", nil); err == nil {
+	_, err = client.GetJSON(context.Background(), "/platform/users:me", nil)
+	if err == nil {
 		t.Fatal("GetJSON() expected API error")
+	}
+	var apiErr *APIError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("GetJSON() error = %T, want *APIError", err)
+	}
+	if apiErr.StatusCode != http.StatusForbidden {
+		t.Fatalf("APIError.StatusCode = %d, want %d", apiErr.StatusCode, http.StatusForbidden)
+	}
+	if !strings.Contains(apiErr.Body, `"error":"denied"`) {
+		t.Fatalf("APIError.Body = %q, want denied error body", apiErr.Body)
+	}
+}
+
+type customDefaultTransport struct{}
+
+func (customDefaultTransport) RoundTrip(*http.Request) (*http.Response, error) {
+	return nil, errors.New("custom default transport should not be used")
+}
+
+func TestClientInsecureSkipTLSVerifyWithCustomDefaultTransport(t *testing.T) {
+	original := http.DefaultTransport
+	defer func() { http.DefaultTransport = original }()
+	http.DefaultTransport = customDefaultTransport{}
+
+	client, err := NewClient("https://example.com", "token", time.Second, WithInsecureSkipTLSVerify(true))
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+
+	transport, ok := client.httpClient.Transport.(*http.Transport)
+	if !ok {
+		t.Fatalf("client transport = %T, want *http.Transport", client.httpClient.Transport)
+	}
+	if transport.TLSClientConfig == nil {
+		t.Fatal("TLSClientConfig is nil")
+	}
+	if !transport.TLSClientConfig.InsecureSkipVerify {
+		t.Fatal("TLSClientConfig.InsecureSkipVerify = false, want true")
 	}
 }
