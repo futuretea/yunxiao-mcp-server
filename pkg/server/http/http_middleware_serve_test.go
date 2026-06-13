@@ -222,7 +222,11 @@ func TestServeStartsAndShutsDown(t *testing.T) {
 	if err != nil {
 		t.Fatalf("listen: %v", err)
 	}
-	defer listener.Close()
+	defer func() {
+		if err := listener.Close(); err != nil {
+			t.Logf("close listener: %v", err)
+		}
+	}()
 
 	addr := fmt.Sprintf("http://%s%s", listener.Addr().String(), HealthEndpoint)
 	rl := &readyListener{Listener: listener, ready: make(chan struct{})}

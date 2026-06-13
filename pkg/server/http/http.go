@@ -33,7 +33,11 @@ func Serve(ctx context.Context, mcpServer *mcpserver.Server, staticConfig *confi
 	if err != nil {
 		return err
 	}
-	defer listener.Close()
+	defer func() {
+		if err := listener.Close(); err != nil {
+			log.Error().Err(err).Msg("close listener")
+		}
+	}()
 
 	return ServeListener(ctx, mcpServer, staticConfig, listener)
 }
