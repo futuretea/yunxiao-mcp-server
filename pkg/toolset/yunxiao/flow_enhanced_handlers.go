@@ -68,7 +68,7 @@ func handleGetPipelineRunOverview(ctx context.Context, client any, params map[st
 	pipelinePath := flowPipelinePath(organizationID, pipelineID)
 	runPath := pipelinePath + "/runs/" + url.PathEscape(pipelineRunID)
 
-	run, err := getProjectOverviewSection(ctx, c, "run", runPath, nil)
+	run, err := getProjectOverviewSectionPreservingNumbers(ctx, c, "run", runPath, nil)
 	if err != nil {
 		return "", err
 	}

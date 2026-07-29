@@ -11,6 +11,7 @@ func flowTools() []toolset.ServerTool {
 	tools = append(tools, flowPipelineTools()...)
 	tools = append(tools, flowPipelineRunTools()...)
 	tools = append(tools, flowPipelineJobTools()...)
+	tools = append(tools, flowPipelineJobStepTools()...)
 	tools = append(tools, flowArtifactRelationTools()...)
 	tools = append(tools, flowResourceMemberTools()...)
 	tools = append(tools, flowEnhancedTools()...)
@@ -128,6 +129,50 @@ func flowPipelineJobTools() []toolset.ServerTool {
 				mcp.WithReadOnlyHintAnnotation(true),
 			),
 			Handler: handleGetPipelineJobRunLog,
+		},
+	}
+}
+
+func flowPipelineJobStepTools() []toolset.ServerTool {
+	return []toolset.ServerTool{
+		{
+			Tool: mcp.NewTool("get_pipeline_job_steps",
+				mcp.WithDescription("List steps for one job in a specific Flow pipeline run. Use get_pipeline_run_overview to select an actual run job ID before calling this tool."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string).")),
+				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID (string).")),
+				mcp.WithString("jobId", mcp.Required(), mcp.Description("Actual job ID from the selected pipeline run, kept as a string to preserve precision.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipelineJobSteps,
+		},
+		{
+			Tool: mcp.NewTool("get_pipeline_job_step_log",
+				mcp.WithDescription("Read one explicit page of logs for a selected Flow pipeline run job step. This tool does not choose a step or request additional pages automatically."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string).")),
+				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID (string).")),
+				mcp.WithString("jobId", mcp.Required(), mcp.Description("Actual job ID from the selected pipeline run, kept as a string to preserve precision.")),
+				mcp.WithNumber("stepIndex", mcp.Required(), mcp.Description("Step index from get_pipeline_job_steps.")),
+				mcp.WithNumber("offset", mcp.Required(), mcp.Description("Log offset. Provide an explicit value; this tool does not set a default.")),
+				mcp.WithNumber("limit", mcp.Required(), mcp.Description("Maximum log entries. Provide an explicit value; this tool does not set a default.")),
+				mcp.WithString("buildId", mcp.Required(), mcp.Description("Decimal build ID from get_pipeline_job_steps, passed as a string to preserve precision.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipelineJobStepLog,
+		},
+		{
+			Tool: mcp.NewTool("get_pipeline_job_step_log_url",
+				mcp.WithDescription("Get the upstream log download URL for one selected Flow pipeline run job step. The URL is returned only when explicitly requested."),
+				mcp.WithString("organizationId", mcp.Required(), mcp.Description("Yunxiao organization ID.")),
+				mcp.WithString("pipelineId", mcp.Required(), mcp.Description("Pipeline ID (string).")),
+				mcp.WithString("pipelineRunId", mcp.Required(), mcp.Description("Pipeline run ID (string).")),
+				mcp.WithString("jobId", mcp.Required(), mcp.Description("Actual job ID from the selected pipeline run, kept as a string to preserve precision.")),
+				mcp.WithNumber("stepIndex", mcp.Required(), mcp.Description("Step index from get_pipeline_job_steps.")),
+				mcp.WithString("buildId", mcp.Required(), mcp.Description("Decimal build ID from get_pipeline_job_steps, passed as a string to preserve precision.")),
+				mcp.WithReadOnlyHintAnnotation(true),
+			),
+			Handler: handleGetPipelineJobStepLogURL,
 		},
 	}
 }

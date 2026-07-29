@@ -1,8 +1,8 @@
 # Flow Tools
 
-This document describes the 18 MCP tools in the flow domain.
+This document describes the 21 MCP tools in the flow domain.
 
-Access summary: 16 read-only, 2 write-capable.
+Access summary: 19 read-only, 2 write-capable.
 
 ## Enhanced Tools
 
@@ -41,6 +41,9 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `list_pipeline_jobs_by_category` | Read-only | List jobs (tasks) within a Flow pipeline grouped by category. Use this after identifying a pipeline to see its build, deploy, and test stages. |
 | `list_pipeline_job_historys` | Read-only | List execution history for a specific Flow pipeline job. Use this to track how a particular job (e.g., a deploy step) has performed across multiple runs. |
 | `get_pipeline_job_run_log` | Read-only | Get the execution log for a specific job within a Flow pipeline run. Use this to debug pipeline failures by inspecting individual job output. |
+| `get_pipeline_job_steps` | Read-only | List steps for one job in a specific Flow pipeline run. Use get_pipeline_run_overview to select an actual run job ID before calling this tool. |
+| `get_pipeline_job_step_log` | Read-only | Read one explicit page of logs for a selected Flow pipeline run job step. This tool does not choose a step or request additional pages automatically. |
+| `get_pipeline_job_step_log_url` | Read-only | Get the upstream log download URL for one selected Flow pipeline run job step. The URL is returned only when explicitly requested. |
 | `pass_pipeline_validate` | Write-capable | Pass (approve) a pipeline validation job. |
 | `refuse_pipeline_validate` | Write-capable | Refuse (reject) a pipeline validation job. |
 
@@ -294,6 +297,57 @@ Tools marked in **bold** are enhanced aggregation tools.
 | `pipelineId` | string | Yes | Pipeline ID (string). Use list_pipelines to find the pipeline ID. |
 | `pipelineRunId` | string | Yes | Pipeline run ID. Use list_pipeline_runs to discover valid run IDs. |
 | `jobId` | string | Yes | Job ID within the pipeline run. Use list_pipeline_jobs_by_category to discover valid job IDs. |
+
+### get_pipeline_job_steps
+
+**Description**: List steps for one job in a specific Flow pipeline run. Use get_pipeline_run_overview to select an actual run job ID before calling this tool.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | Yes | Yunxiao organization ID. |
+| `pipelineId` | string | Yes | Pipeline ID (string). |
+| `pipelineRunId` | string | Yes | Pipeline run ID (string). |
+| `jobId` | string | Yes | Actual job ID from the selected pipeline run, kept as a string to preserve precision. |
+
+### get_pipeline_job_step_log
+
+**Description**: Read one explicit page of logs for a selected Flow pipeline run job step. This tool does not choose a step or request additional pages automatically.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | Yes | Yunxiao organization ID. |
+| `pipelineId` | string | Yes | Pipeline ID (string). |
+| `pipelineRunId` | string | Yes | Pipeline run ID (string). |
+| `jobId` | string | Yes | Actual job ID from the selected pipeline run, kept as a string to preserve precision. |
+| `stepIndex` | number | Yes | Step index from get_pipeline_job_steps. |
+| `offset` | number | Yes | Log offset. Provide an explicit value; this tool does not set a default. |
+| `limit` | number | Yes | Maximum log entries. Provide an explicit value; this tool does not set a default. |
+| `buildId` | string | Yes | Decimal build ID from get_pipeline_job_steps, passed as a string to preserve precision. |
+
+### get_pipeline_job_step_log_url
+
+**Description**: Get the upstream log download URL for one selected Flow pipeline run job step. The URL is returned only when explicitly requested.
+
+**Access**: Read-only
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `organizationId` | string | Yes | Yunxiao organization ID. |
+| `pipelineId` | string | Yes | Pipeline ID (string). |
+| `pipelineRunId` | string | Yes | Pipeline run ID (string). |
+| `jobId` | string | Yes | Actual job ID from the selected pipeline run, kept as a string to preserve precision. |
+| `stepIndex` | number | Yes | Step index from get_pipeline_job_steps. |
+| `buildId` | string | Yes | Decimal build ID from get_pipeline_job_steps, passed as a string to preserve precision. |
 
 ### pass_pipeline_validate
 

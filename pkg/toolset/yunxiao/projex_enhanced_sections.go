@@ -46,6 +46,14 @@ func getProjectOverviewSection(ctx context.Context, c *Client, name, path string
 	return responsePayload(resp), nil
 }
 
+func getProjectOverviewSectionPreservingNumbers(ctx context.Context, c *Client, name, path string, query url.Values) (any, error) {
+	resp, err := c.Request(ctx, http.MethodGet, path, query, nil)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return responsePayloadPreservingNumbers(resp), nil
+}
+
 func projectOverviewListQuery(params map[string]any, withStatus bool) url.Values {
 	query := url.Values{}
 	query.Set("page", strconv.Itoa(optionalIntDefault(params, "page", 1)))

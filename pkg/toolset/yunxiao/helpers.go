@@ -5,12 +5,18 @@ import (
 	"fmt"
 	"maps"
 	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
 var errNoCategories = errors.New("categories must include at least one category")
+
+var (
+	strictIntegerPattern = regexp.MustCompile(`^-?[0-9]+$`)
+	decimalStringPattern = regexp.MustCompile(`^[0-9]+$`)
+)
 
 // timeNow is injectable for tests that need a fixed clock.
 var timeNow = time.Now
@@ -96,6 +102,38 @@ func requiredNumberPathString(params map[string]any, key string) (string, error)
 		}
 	}
 	return "", &ValidationError{Msg: fmt.Sprintf("%s is required", key)}
+}
+
+func requiredStrictIntegerString(params map[string]any, key string) (string, error) {
+	switch value := params[key].(type) {
+	case float64:
+		if value == math.Trunc(value) && value >= -9223372036854775808 && value < 9223372036854775808 {
+			return strconv.FormatInt(int64(value), 10), nil
+		}
+	case int:
+		return strconv.Itoa(value), nil
+	case int64:
+		return strconv.FormatInt(value, 10), nil
+	case string:
+		if strictIntegerPattern.MatchString(value) {
+			return value, nil
+		}
+	}
+	if _, ok := params[key]; !ok {
+		return "", &ValidationError{Msg: fmt.Sprintf("%s is required", key)}
+	}
+	return "", &ValidationError{Msg: fmt.Sprintf("%s must be an integer", key)}
+}
+
+func requiredDecimalString(params map[string]any, key string) (string, error) {
+	value, ok := params[key].(string)
+	if !ok || value == "" {
+		return "", &ValidationError{Msg: fmt.Sprintf("%s is required", key)}
+	}
+	if !decimalStringPattern.MatchString(value) {
+		return "", &ValidationError{Msg: fmt.Sprintf("%s must be a decimal string", key)}
+	}
+	return value, nil
 }
 
 func copyParams(params map[string]any) map[string]any {

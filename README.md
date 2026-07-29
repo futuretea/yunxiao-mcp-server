@@ -20,7 +20,7 @@ export YUNXIAO_MCP_ACCESS_TOKEN=<your-token>
 
 ## Features
 
-- **193 MCP tools** across 9 domains (177 read-only, 16 write)
+- **196 MCP tools** across 9 domains (180 read-only, 16 write)
 - **Dual mode**: MCP server for AI assistants + standalone CLI for humans (`yunxiao`)
 - **Zero-install**: available via `npx` with automatic platform binary download
 - **Multi-transport**: stdio, SSE, and Streamable HTTP
@@ -31,7 +31,7 @@ export YUNXIAO_MCP_ACCESS_TOKEN=<your-token>
 |--------|-------|-----------------|
 | **Projex** | 47 | Projects, work items, sprints, milestones, test cases |
 | **Codeup** | 37 | Repositories, branches, commits, MRs, CRs, code review |
-| **Flow** | 18 | Pipelines, pipeline runs, build jobs, validation gates |
+| **Flow** | 21 | Pipelines, pipeline runs, build jobs, step diagnostics, validation gates |
 | **Appstack** | 62 | App stacks, environments, releases, change orders |
 | **Platform** | 18 | Organizations, departments, members, roles |
 | **Packages** | 3 | Artifact repositories and versions |
