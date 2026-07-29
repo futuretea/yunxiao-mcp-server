@@ -2,6 +2,7 @@ third-party-projects/
 .auto8/
 .auto-loop/
 .auto-runs/
+/enhancements/
 .qoder/
 /yunxiao-mcp-server
 /bin/
