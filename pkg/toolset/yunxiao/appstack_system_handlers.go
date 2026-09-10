@@ -15,8 +15,12 @@ func handleListSystems(ctx context.Context, client any, params map[string]any) (
 		return "", err
 	}
 
-	path := "/appstack/organizations/" + url.PathEscape(organizationID) + "/systems"
+	path := appstackSystemsPath(organizationID)
 	return c.GetJSON(ctx, path, appstackDefaultPageQuery(params))
+}
+
+func appstackSystemsPath(organizationID string) string {
+	return "/appstack/organizations/" + url.PathEscape(organizationID) + "/systems"
 }
 
 func handleListAttachedApps(ctx context.Context, client any, params map[string]any) (string, error) {

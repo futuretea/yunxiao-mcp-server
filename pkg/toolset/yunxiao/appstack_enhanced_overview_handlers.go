@@ -2,6 +2,8 @@ package yunxiao
 
 import (
 	"context"
+	"fmt"
+	"net/url"
 	"strconv"
 )
 
@@ -17,7 +19,7 @@ func handleGetSystemOverview(ctx context.Context, client any, params map[string]
 
 	systemPath := appstackSystemPath(organizationID, systemName)
 
-	system, err := c.GetJSON(ctx, systemPath, nil)
+	system, err := findAppStackSystem(ctx, c, organizationID, systemName)
 	if err != nil {
 		return "", err
 	}
@@ -50,6 +52,42 @@ func handleGetSystemOverview(ctx context.Context, client any, params map[string]
 	return marshalPretty(overview)
 }
 
+func findAppStackSystem(ctx context.Context, c *Client, organizationID, systemName string) (any, error) {
+	const maxPages = 20
+	page := 1
+	for {
+		query := url.Values{}
+		query.Set("current", strconv.Itoa(page))
+		query.Set("pageSize", "100")
+		payload, err := getProjectOverviewSection(ctx, c, "systems", appstackSystemsPath(organizationID), query)
+		if err != nil {
+			return nil, err
+		}
+
+		pagePayload, ok := payload.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("unexpected systems payload")
+		}
+		records, _ := pagePayload["records"].([]any)
+		for _, record := range records {
+			system, ok := record.(map[string]any)
+			if !ok {
+				continue
+			}
+			if name, _ := system["name"].(string); name == systemName {
+				return system, nil
+			}
+		}
+
+		pages, _ := pagePayload["pages"].(float64)
+		if page >= int(pages) || page >= maxPages || len(records) == 0 {
+			break
+		}
+		page++
+	}
+	return nil, fmt.Errorf("system %q not found in organization %q", systemName, organizationID)
+}
+
 func handleGetChangeOrderOverview(ctx context.Context, client any, params map[string]any) (string, error) {
 	organizationID, appName, changeOrderSn, err := requiredAppChangeOrder(params)
 	if err != nil {
@@ -62,7 +100,7 @@ func handleGetChangeOrderOverview(ctx context.Context, client any, params map[st
 
 	coPath := appstackChangeOrderPath(organizationID, appName, changeOrderSn)
 
-	changeOrder, err := c.GetJSON(ctx, coPath, nil)
+	changeOrder, err := getProjectOverviewSection(ctx, c, "changeOrder", coPath, nil)
 	if err != nil {
 		return "", err
 	}
@@ -73,11 +111,10 @@ func handleGetChangeOrderOverview(ctx context.Context, client any, params map[st
 	}
 
 	if optionalBoolDefault(params, "includeJobLogs", true) {
-		jobs, err := getProjectOverviewSection(ctx, c, "jobs", coPath+"/jobs", nil)
-		if err != nil {
-			overview["jobLogsError"] = err.Error()
-		} else {
-			overview["jobs"] = jobs
+		if detail, ok := changeOrder.(map[string]any); ok {
+			if jobs, ok := detail["jobs"]; ok {
+				overview["jobs"] = jobs
+			}
 		}
 	}
 
@@ -151,7 +188,7 @@ func handleGetAppReleaseWorkflowOverview(ctx context.Context, client any, params
 
 	wfPath := appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn)
 
-	workflow, err := c.GetJSON(ctx, wfPath, nil)
+	workflow, err := findAppReleaseWorkflow(ctx, c, organizationID, appName, releaseWorkflowSn)
 	if err != nil {
 		return "", err
 	}
@@ -162,7 +199,7 @@ func handleGetAppReleaseWorkflowOverview(ctx context.Context, client any, params
 	}
 
 	if optionalBoolDefault(params, "includeStageBriefs", true) {
-		briefs, err := c.GetJSON(ctx, wfPath+"/releaseStageBriefs", nil)
+		briefs, err := getProjectOverviewSection(ctx, c, "stageBriefs", wfPath+"/releaseStageBriefs", nil)
 		if err != nil {
 			return "", err
 		}
@@ -170,6 +207,28 @@ func handleGetAppReleaseWorkflowOverview(ctx context.Context, client any, params
 	}
 
 	return marshalPretty(overview)
+}
+
+func findAppReleaseWorkflow(ctx context.Context, c *Client, organizationID, appName, releaseWorkflowSn string) (any, error) {
+	payload, err := getProjectOverviewSection(ctx, c, "workflows", appstackReleaseWorkflowsPath(organizationID, appName), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	items, ok := payload.([]any)
+	if !ok {
+		return nil, fmt.Errorf("unexpected release workflows payload")
+	}
+	for _, item := range items {
+		workflow, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		if sn, _ := workflow["sn"].(string); sn == releaseWorkflowSn {
+			return workflow, nil
+		}
+	}
+	return nil, fmt.Errorf("release workflow %q not found in app %q", releaseWorkflowSn, appName)
 }
 
 func workflowOverviewFilters(params map[string]any) map[string]any {

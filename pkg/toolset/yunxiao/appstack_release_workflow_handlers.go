@@ -18,7 +18,7 @@ func handleListAppReleaseWorkflows(ctx context.Context, client any, params map[s
 		return "", err
 	}
 
-	path := appstackAppPath(organizationID, appName) + "/releaseWorkflows"
+	path := appstackReleaseWorkflowsPath(organizationID, appName)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -204,6 +204,10 @@ func requiredAppReleaseStageExecution(params map[string]any) (string, string, st
 
 func appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn string) string {
 	return appstackAppPath(organizationID, appName) + "/releaseWorkflow/" + encodePathValue(releaseWorkflowSn)
+}
+
+func appstackReleaseWorkflowsPath(organizationID, appName string) string {
+	return appstackAppPath(organizationID, appName) + "/releaseWorkflows"
 }
 
 func appstackReleaseStagePath(organizationID, appName, releaseWorkflowSn, releaseStageSn string) string {

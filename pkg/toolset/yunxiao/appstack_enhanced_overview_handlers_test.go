@@ -14,10 +14,16 @@ func TestHandleGetSystemOverviewBuildsAndCombinesResponses(t *testing.T) {
 		callCount++
 		switch callCount {
 		case 1:
-			if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/systems/sys-1" {
-				t.Fatalf("unexpected system path: %s", r.URL.Path)
+			if r.Method != http.MethodGet {
+				t.Fatalf("method = %s", r.Method)
 			}
-			_, _ = w.Write([]byte(`{"name":"sys-1","displayName":"System 1"}`))
+			if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/systems" {
+				t.Fatalf("unexpected systems path: %s", r.URL.Path)
+			}
+			if r.URL.Query().Get("current") != "1" {
+				t.Fatalf("current = %q", r.URL.Query().Get("current"))
+			}
+			_, _ = w.Write([]byte(`{"current":1,"pageSize":100,"pages":1,"total":1,"records":[{"name":"sys-1","displayName":"System 1"}]}`))
 		case 2:
 			if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/systems/sys-1/apps" {
 				t.Fatalf("unexpected apps path: %s", r.URL.Path)
@@ -48,10 +54,77 @@ func TestHandleGetSystemOverviewBuildsAndCombinesResponses(t *testing.T) {
 	if err := json.Unmarshal([]byte(result), &overview); err != nil {
 		t.Fatalf("unmarshal result: %v", err)
 	}
-	for _, key := range []string{"system", "apps", "members", "filters"} {
+	system, ok := overview["system"].(map[string]any)
+	if !ok {
+		t.Fatalf("overview system = %#v", overview["system"])
+	}
+	if system["name"] != "sys-1" || system["displayName"] != "System 1" {
+		t.Fatalf("system = %#v", system)
+	}
+	for _, key := range []string{"apps", "members", "filters"} {
 		if _, ok := overview[key]; !ok {
 			t.Fatalf("overview missing key %q", key)
 		}
+	}
+}
+
+func TestHandleGetSystemOverviewSystemNotFound(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/systems" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"current":1,"pageSize":100,"pages":1,"records":[{"name":"other"}]}`))
+	})
+
+	_, err := handleGetSystemOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"systemName":     "sys-1",
+	})
+	if err == nil || !strings.Contains(err.Error(), "not found") {
+		t.Fatalf("expected not found error, got %v", err)
+	}
+}
+
+func TestHandleGetSystemOverviewSystemOnLaterPage(t *testing.T) {
+	callCount := 0
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		switch callCount {
+		case 1:
+			if r.URL.Query().Get("current") != "1" {
+				t.Fatalf("current = %q", r.URL.Query().Get("current"))
+			}
+			_, _ = w.Write([]byte(`{"current":1,"pageSize":100,"pages":2,"records":[{"name":"other"}]}`))
+		case 2:
+			if r.URL.Query().Get("current") != "2" {
+				t.Fatalf("current = %q", r.URL.Query().Get("current"))
+			}
+			_, _ = w.Write([]byte(`{"current":2,"pageSize":100,"pages":2,"records":[{"name":"sys-1"}]}`))
+		default:
+			t.Fatalf("unexpected request %d", callCount)
+		}
+	})
+
+	result, err := handleGetSystemOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"systemName":     "sys-1",
+		"includeApps":    false,
+		"includeMembers": false,
+	})
+	if err != nil {
+		t.Fatalf("handleGetSystemOverview() error = %v", err)
+	}
+	if callCount != 2 {
+		t.Fatalf("callCount = %d, want 2", callCount)
+	}
+
+	var overview map[string]any
+	if err := json.Unmarshal([]byte(result), &overview); err != nil {
+		t.Fatalf("unmarshal result: %v", err)
+	}
+	system, ok := overview["system"].(map[string]any)
+	if !ok || system["name"] != "sys-1" {
+		t.Fatalf("overview system = %#v", overview["system"])
 	}
 }
 
@@ -59,17 +132,16 @@ func TestHandleGetChangeOrderOverviewBuildsAndCombinesResponses(t *testing.T) {
 	callCount := 0
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		callCount++
-		switch callCount {
-		case 1:
-			if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/apps/app-1/changeOrders/co-1" {
-				t.Fatalf("unexpected path: %s", r.URL.Path)
-			}
-			_, _ = w.Write([]byte(`{"sn":"co-1","status":"SUCCESS"}`))
-		case 2:
-			_, _ = w.Write([]byte(`[{"jobSn":"job-1"}]`))
-		default:
+		if callCount > 1 {
 			t.Fatalf("unexpected request %d", callCount)
 		}
+		if r.Method != http.MethodGet {
+			t.Fatalf("method = %s", r.Method)
+		}
+		if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/apps/app-1/changeOrders/co-1" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"sn":"co-1","state":"SUCCESS","jobs":[{"sn":"job-1","envName":"prod"}]}`))
 	})
 
 	result, err := handleGetChangeOrderOverview(context.Background(), client, map[string]any{
@@ -80,18 +152,27 @@ func TestHandleGetChangeOrderOverviewBuildsAndCombinesResponses(t *testing.T) {
 	if err != nil {
 		t.Fatalf("handleGetChangeOrderOverview() error = %v", err)
 	}
-	if callCount != 2 {
-		t.Fatalf("callCount = %d, want 2", callCount)
+	if callCount != 1 {
+		t.Fatalf("callCount = %d, want 1", callCount)
 	}
 
 	var overview map[string]any
 	if err := json.Unmarshal([]byte(result), &overview); err != nil {
 		t.Fatalf("unmarshal result: %v", err)
 	}
-	for _, key := range []string{"changeOrder", "jobs", "filters"} {
-		if _, ok := overview[key]; !ok {
-			t.Fatalf("overview missing key %q", key)
-		}
+	changeOrder, ok := overview["changeOrder"].(map[string]any)
+	if !ok || changeOrder["sn"] != "co-1" {
+		t.Fatalf("overview changeOrder = %#v", overview["changeOrder"])
+	}
+	jobs, ok := overview["jobs"].([]any)
+	if !ok || len(jobs) != 1 {
+		t.Fatalf("overview jobs = %#v", overview["jobs"])
+	}
+	if job, _ := jobs[0].(map[string]any); job["sn"] != "job-1" {
+		t.Fatalf("jobs[0] = %#v", jobs[0])
+	}
+	if _, ok := overview["filters"]; !ok {
+		t.Fatal("overview missing filters")
 	}
 }
 
@@ -102,7 +183,7 @@ func TestHandleGetChangeOrderOverviewWithoutJobs(t *testing.T) {
 		if callCount > 1 {
 			t.Fatalf("unexpected request %d", callCount)
 		}
-		_, _ = w.Write([]byte(`{"sn":"co-1"}`))
+		_, _ = w.Write([]byte(`{"sn":"co-1","jobs":[{"sn":"job-1"}]}`))
 	})
 
 	result, err := handleGetChangeOrderOverview(context.Background(), client, map[string]any{
@@ -114,6 +195,9 @@ func TestHandleGetChangeOrderOverviewWithoutJobs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("handleGetChangeOrderOverview() error = %v", err)
 	}
+	if callCount != 1 {
+		t.Fatalf("callCount = %d, want 1", callCount)
+	}
 
 	var overview map[string]any
 	if err := json.Unmarshal([]byte(result), &overview); err != nil {
@@ -124,12 +208,38 @@ func TestHandleGetChangeOrderOverviewWithoutJobs(t *testing.T) {
 	}
 }
 
+func TestHandleGetChangeOrderOverviewWithoutJobsInPayload(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"sn":"co-1"}`))
+	})
+
+	result, err := handleGetChangeOrderOverview(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"appName":        "app-1",
+		"changeOrderSn":  "co-1",
+	})
+	if err != nil {
+		t.Fatalf("handleGetChangeOrderOverview() error = %v", err)
+	}
+
+	var overview map[string]any
+	if err := json.Unmarshal([]byte(result), &overview); err != nil {
+		t.Fatalf("unmarshal result: %v", err)
+	}
+	if _, ok := overview["jobs"]; ok {
+		t.Fatal("overview should not include jobs when the payload has none")
+	}
+}
+
 func TestHandleGetSystemOverviewWithoutApps(t *testing.T) {
 	callCount := 0
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		callCount++
 		if callCount == 1 { //nolint:staticcheck
-			_, _ = w.Write([]byte(`{"name":"sys-1"}`))
+			if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/systems" {
+				t.Fatalf("unexpected systems path: %s", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`{"current":1,"pageSize":100,"pages":1,"records":[{"name":"sys-1"}]}`))
 		} else if callCount == 2 {
 			if !strings.Contains(r.URL.Path, "/members") {
 				t.Fatalf("expected members path, got %s", r.URL.Path)
@@ -233,9 +343,15 @@ func TestHandleGetAppReleaseWorkflowOverviewCombinesResponses(t *testing.T) {
 		callCount++
 		switch callCount {
 		case 1:
-			_, _ = w.Write([]byte(`{"name":"wf-1"}`))
+			if r.Method != http.MethodGet {
+				t.Fatalf("method = %s", r.Method)
+			}
+			if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/apps/app-1/releaseWorkflows" {
+				t.Fatalf("unexpected workflows path: %s", r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`[{"sn":"wf-2"},{"sn":"wf-1","name":"Workflow 1"}]`))
 		case 2:
-			if !strings.Contains(r.URL.Path, "/releaseStageBriefs") {
+			if !strings.Contains(r.URL.Path, "/releaseWorkflow/wf-1/releaseStageBriefs") {
 				t.Fatalf("path = %q", r.URL.Path)
 			}
 			_, _ = w.Write([]byte(`[{"sn":"stage-1"}]`))
@@ -257,11 +373,33 @@ func TestHandleGetAppReleaseWorkflowOverviewCombinesResponses(t *testing.T) {
 	if err := json.Unmarshal([]byte(result), &overview); err != nil {
 		t.Fatalf("unmarshal result: %v", err)
 	}
-	if _, ok := overview["workflow"]; !ok {
-		t.Fatal("overview missing workflow")
+	workflow, ok := overview["workflow"].(map[string]any)
+	if !ok {
+		t.Fatalf("overview workflow = %#v", overview["workflow"])
+	}
+	if workflow["sn"] != "wf-1" || workflow["name"] != "Workflow 1" {
+		t.Fatalf("workflow = %#v", workflow)
 	}
 	if _, ok := overview["stageBriefs"]; !ok {
 		t.Fatal("overview missing stageBriefs")
+	}
+}
+
+func TestHandleGetAppReleaseWorkflowOverviewWorkflowNotFound(t *testing.T) {
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/apps/app-1/releaseWorkflows" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`[{"sn":"other"}]`))
+	})
+
+	_, err := handleGetAppReleaseWorkflowOverview(context.Background(), client, map[string]any{
+		"organizationId":    "org-1",
+		"appName":           "app-1",
+		"releaseWorkflowSn": "wf-1",
+	})
+	if err == nil || !strings.Contains(err.Error(), "not found") {
+		t.Fatalf("expected not found error, got %v", err)
 	}
 }
 

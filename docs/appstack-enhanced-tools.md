@@ -9,8 +9,8 @@ This document describes the enhanced aggregation tools in the Appstack (applicat
 | `get_application_overview` | Application dashboard with basic info, environments, and recent orchestrations | 1 + up to 2 |
 | `get_environment_overview` | Environment dashboard with basic info, variable groups, and latest orchestration | 1 + up to 2 |
 | `get_release_overview` | System release dashboard with members, products, and attached change requests | 1 + up to 3 |
-| `get_system_overview` | System dashboard with attached apps and members | 1 + up to 2 |
-| `get_change_order_overview` | Change order dashboard with basic info and job list | 1 + 1 |
+| `get_system_overview` | System dashboard with attached apps and members | 1-20 + up to 2 |
+| `get_change_order_overview` | Change order dashboard with basic info and job list | 1 |
 | `get_app_release_workflow_overview` | Release workflow dashboard with stage briefs | 1 + 1 |
 | `get_app_release_stage_overview` | Stage execution dashboard with pipeline run and integrated metadata | 1 + up to 2 |
 
