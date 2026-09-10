@@ -99,10 +99,10 @@ func handleUpdateWorkitemStatus(ctx context.Context, client any, params map[stri
 	}
 
 	body := map[string]any{
-		"statusId": statusID,
+		"status": statusID,
 	}
 
-	result, err := c.PostJSONWithMetadata(ctx, projexWorkitemPath(organizationID, workitemID)+"/status", body)
+	result, err := c.PutJSONWithMetadata(ctx, projexWorkitemPath(organizationID, workitemID), body)
 	if err != nil {
 		return "", err
 	}

@@ -110,24 +110,27 @@ func TestHandleUpdateWorkitemStatus(t *testing.T) {
 	callCount := 0
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		callCount++
-		if r.Method != http.MethodPost {
-			t.Fatalf("method = %s, want POST", r.Method)
-		}
 
 		switch callCount {
 		case 1:
-			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1/status" {
+			if r.Method != http.MethodPut {
+				t.Fatalf("method = %s, want PUT", r.Method)
+			}
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
 				t.Fatalf("path = %q", r.URL.Path)
 			}
 			var body map[string]any
 			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 				t.Fatalf("decode body: %v", err)
 			}
-			if body["statusId"] != "status-2" {
-				t.Fatalf("statusId = %v", body["statusId"])
+			if body["status"] != "status-2" {
+				t.Fatalf("status = %v", body["status"])
 			}
 			_, _ = w.Write([]byte(`{"success":true}`))
 		case 2:
+			if r.Method != http.MethodPost {
+				t.Fatalf("method = %s, want POST", r.Method)
+			}
 			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1/comments" {
 				t.Fatalf("path = %q", r.URL.Path)
 			}
@@ -165,7 +168,10 @@ func TestHandleUpdateWorkitemStatusWithoutComment(t *testing.T) {
 	callCount := 0
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		callCount++
-		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1/status" {
+		if r.Method != http.MethodPut {
+			t.Fatalf("method = %s, want PUT", r.Method)
+		}
+		if r.URL.Path == "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
 			_, _ = w.Write([]byte(`{"success":true}`))
 			return
 		}
@@ -191,11 +197,17 @@ func TestHandleUpdateWorkitemStatusReturnsCommentError(t *testing.T) {
 		callCount++
 		switch callCount {
 		case 1:
-			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1/status" {
+			if r.Method != http.MethodPut {
+				t.Fatalf("method = %s, want PUT", r.Method)
+			}
+			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
 				t.Fatalf("path = %q", r.URL.Path)
 			}
 			_, _ = w.Write([]byte(`{"success":true}`))
 		case 2:
+			if r.Method != http.MethodPost {
+				t.Fatalf("method = %s, want POST", r.Method)
+			}
 			if r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1/comments" {
 				t.Fatalf("path = %q", r.URL.Path)
 			}
@@ -280,6 +292,41 @@ func TestHandleUpdateWorkitemStatusAPIError(t *testing.T) {
 	})
 	if err == nil {
 		t.Fatal("expected API error")
+	}
+}
+
+func TestHandleUpdateWorkitemStatusUsesDocumentedRoute(t *testing.T) {
+	var gotMethod, gotPath string
+	var gotBody map[string]any
+	// The mock gateway serves only the route defined by the OpenAPI document
+	// and answers 404 for anything else, like the real API gateway.
+	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut || r.URL.Path != "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+			http.NotFound(w, r)
+			return
+		}
+		gotMethod = r.Method
+		gotPath = r.URL.Path
+		_ = json.NewDecoder(r.Body).Decode(&gotBody)
+		_, _ = w.Write([]byte(`{"id":"wi-1","status":"status-2"}`))
+	})
+
+	result, err := handleUpdateWorkitemStatus(context.Background(), client, map[string]any{
+		"organizationId": "org-1",
+		"workitemId":     "wi-1",
+		"statusId":       "status-2",
+	})
+	if err != nil {
+		t.Fatalf("handleUpdateWorkitemStatus() error = %v", err)
+	}
+	if gotMethod != http.MethodPut || gotPath != "/oapi/v1/projex/organizations/org-1/workitems/wi-1" {
+		t.Fatalf("request = %s %s, want PUT /oapi/v1/projex/organizations/org-1/workitems/wi-1", gotMethod, gotPath)
+	}
+	if gotBody["status"] != "status-2" {
+		t.Fatalf("body status = %v, want status-2", gotBody["status"])
+	}
+	if !strings.Contains(result, "wi-1") {
+		t.Fatalf("result = %q", result)
 	}
 }
 
