@@ -69,6 +69,15 @@ func TestHandleGetAppReleaseWorkflowStageBuildsPath(t *testing.T) {
 	}
 }
 
+func TestAppstackReleaseStagePath(t *testing.T) {
+	if got := appstackReleaseStagePath("org-1", "app-1", "wf-1", "st-1"); got != "/appstack/organizations/org-1/apps/app-1/releaseWorkflow/wf-1/releaseStage/st-1" {
+		t.Fatalf("appstackReleaseStagePath() = %q", got)
+	}
+	if got := appstackReleaseStagePath("org-1", "app-1", "wf/1", "st/1"); got != "/appstack/organizations/org-1/apps/app-1/releaseWorkflow/wf%2F1/releaseStage/st%2F1" {
+		t.Fatalf("appstackReleaseStagePath() escaped = %q", got)
+	}
+}
+
 func TestHandleListAppReleaseStageBriefsBuildsPath(t *testing.T) {
 	client := newHandlerTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {

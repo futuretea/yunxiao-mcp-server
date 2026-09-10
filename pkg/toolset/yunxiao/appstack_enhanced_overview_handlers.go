@@ -110,7 +110,7 @@ func handleGetAppReleaseStageOverview(ctx context.Context, client any, params ma
 	}
 
 	if optionalBoolDefault(params, "includeStageInfo", true) {
-		stagePath := appstackReleaseStageResourcePath(organizationID, appName, releaseWorkflowSn, releaseStageSn)
+		stagePath := appstackReleaseStagePath(organizationID, appName, releaseWorkflowSn, releaseStageSn)
 		stage, err := c.GetJSON(ctx, stagePath, nil)
 		if err != nil {
 			return "", err

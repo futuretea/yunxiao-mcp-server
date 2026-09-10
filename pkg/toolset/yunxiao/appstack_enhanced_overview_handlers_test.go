@@ -271,7 +271,10 @@ func TestHandleGetAppReleaseStageOverviewCombinesResponses(t *testing.T) {
 		callCount++
 		switch callCount {
 		case 1:
-			if !strings.Contains(r.URL.Path, "/releaseStages/stage-1") {
+			if r.Method != http.MethodGet {
+				t.Fatalf("stage method = %s", r.Method)
+			}
+			if r.URL.Path != "/oapi/v1/appstack/organizations/org-1/apps/app-1/releaseWorkflow/wf-1/releaseStage/stage-1" {
 				t.Fatalf("unexpected stage path: %s", r.URL.Path)
 			}
 			_, _ = w.Write([]byte(`{"name":"stage-1"}`))

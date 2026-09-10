@@ -46,7 +46,7 @@ func handleGetAppReleaseWorkflowStage(ctx context.Context, client any, params ma
 		return "", err
 	}
 
-	path := appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn) + "/releaseStage/" + url.PathEscape(releaseStageSn)
+	path := appstackReleaseStagePath(organizationID, appName, releaseWorkflowSn, releaseStageSn)
 	return c.GetJSON(ctx, path, nil)
 }
 
@@ -204,6 +204,10 @@ func requiredAppReleaseStageExecution(params map[string]any) (string, string, st
 
 func appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn string) string {
 	return appstackAppPath(organizationID, appName) + "/releaseWorkflow/" + encodePathValue(releaseWorkflowSn)
+}
+
+func appstackReleaseStagePath(organizationID, appName, releaseWorkflowSn, releaseStageSn string) string {
+	return appstackReleaseWorkflowPath(organizationID, appName, releaseWorkflowSn) + "/releaseStage/" + url.PathEscape(releaseStageSn)
 }
 
 func appstackReleaseWorkflowResourcePath(organizationID, appName, releaseWorkflowSn string) string {
