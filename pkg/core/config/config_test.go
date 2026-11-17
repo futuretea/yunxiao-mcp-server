@@ -200,6 +200,112 @@ func TestValidateRejectsInvalidURLScheme(t *testing.T) {
 	}
 }
 
+func TestLoadConfigBlankFilterEnvPreservesFile(t *testing.T) {
+	t.Setenv("YUNXIAO_MCP_ENABLED_TOOLS", " ")
+	t.Setenv("YUNXIAO_MCP_DISABLED_TOOLS", ",")
+	t.Setenv("YUNXIAO_MCP_ENABLED_DOMAINS", " , ")
+	t.Setenv("YUNXIAO_MCP_DISABLED_DOMAINS", " ")
+
+	configPath := writeFilterConfig(t)
+	cfg, err := LoadConfig(configPath, viper.New())
+	if err != nil {
+		t.Fatalf("LoadConfig() error = %v", err)
+	}
+
+	if got, want := cfg.EnabledTools, []string{"get_current_user"}; !equalStrings(got, want) {
+		t.Fatalf("EnabledTools = %#v, want %#v", got, want)
+	}
+	if got, want := cfg.DisabledTools, []string{"list_organizations"}; !equalStrings(got, want) {
+		t.Fatalf("DisabledTools = %#v, want %#v", got, want)
+	}
+	if got, want := cfg.EnabledDomains, []string{"platform"}; !equalStrings(got, want) {
+		t.Fatalf("EnabledDomains = %#v, want %#v", got, want)
+	}
+	if got, want := cfg.DisabledDomains, []string{"codeup"}; !equalStrings(got, want) {
+		t.Fatalf("DisabledDomains = %#v, want %#v", got, want)
+	}
+}
+
+func TestLoadConfigEmptyFilterEnvPreservesFile(t *testing.T) {
+	t.Setenv("YUNXIAO_MCP_ENABLED_TOOLS", "")
+	t.Setenv("YUNXIAO_MCP_DISABLED_TOOLS", "")
+	t.Setenv("YUNXIAO_MCP_ENABLED_DOMAINS", "")
+	t.Setenv("YUNXIAO_MCP_DISABLED_DOMAINS", "")
+
+	cfg, err := LoadConfig(writeFilterConfig(t), viper.New())
+	if err != nil {
+		t.Fatalf("LoadConfig() error = %v", err)
+	}
+	if got, want := cfg.DisabledTools, []string{"list_organizations"}; !equalStrings(got, want) {
+		t.Fatalf("DisabledTools = %#v, want %#v", got, want)
+	}
+	if got, want := cfg.EnabledDomains, []string{"platform"}; !equalStrings(got, want) {
+		t.Fatalf("EnabledDomains = %#v, want %#v", got, want)
+	}
+}
+
+func TestLoadConfigNamedFilterEnvOverridesFile(t *testing.T) {
+	t.Setenv("YUNXIAO_MCP_DISABLED_TOOLS", " get_current_user ")
+	t.Setenv("YUNXIAO_MCP_ENABLED_DOMAINS", "projex")
+
+	cfg, err := LoadConfig(writeFilterConfig(t), viper.New())
+	if err != nil {
+		t.Fatalf("LoadConfig() error = %v", err)
+	}
+	if got, want := cfg.DisabledTools, []string{"get_current_user"}; !equalStrings(got, want) {
+		t.Fatalf("DisabledTools = %#v, want %#v", got, want)
+	}
+	if got, want := cfg.EnabledDomains, []string{"projex"}; !equalStrings(got, want) {
+		t.Fatalf("EnabledDomains = %#v, want %#v", got, want)
+	}
+	if got, want := cfg.EnabledTools, []string{"get_current_user"}; !equalStrings(got, want) {
+		t.Fatalf("EnabledTools = %#v, want %#v", got, want)
+	}
+}
+
+func writeFilterConfig(t *testing.T) string {
+	t.Helper()
+	configPath := filepath.Join(t.TempDir(), "config.yaml")
+	content := []byte(`
+enabled_tools:
+  - get_current_user
+disabled_tools:
+  - list_organizations
+enabled_domains:
+  - platform
+disabled_domains:
+  - codeup
+`)
+	if err := os.WriteFile(configPath, content, 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	return configPath
+}
+
+func TestBlankOnlyKeepsExplicitEmptyDistinct(t *testing.T) {
+	if BlankOnly(nil) || BlankOnly([]string{}) {
+		t.Fatal("empty list is an explicit clear, not a blank override")
+	}
+	if !BlankOnly([]string{" ", "\t", ""}) {
+		t.Fatal("nonempty all-blank list should be a blank override")
+	}
+	if BlankOnly([]string{" get_current_user ", ""}) {
+		t.Fatal("a named entry is not a blank override")
+	}
+}
+
+func equalStrings(got, want []string) bool {
+	if len(got) != len(want) {
+		return false
+	}
+	for i := range got {
+		if got[i] != want[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func TestLoadConfigNormalizesToolFilters(t *testing.T) {
 	v := viper.New()
 	v.Set("enabled_tools", []string{" get_current_user ", "", "list_organizations"})
