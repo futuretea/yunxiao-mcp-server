@@ -85,6 +85,7 @@ func bindFlags(v *viper.Viper, cmd *cobra.Command) error {
 			return fmt.Errorf("bind flag %s: %w", flag, err)
 		}
 	}
+	ignoreBlankSliceFlags(cmd.Flags())
 	return nil
 }
 

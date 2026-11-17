@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/rs/zerolog"
@@ -65,6 +66,8 @@ func LoadConfig(configPath string, v *viper.Viper) (*StaticConfig, error) {
 	if v == nil {
 		v = viper.New()
 	}
+	restoreBlankFilterEnv := suppressBlankFilterEnv()
+	defer restoreBlankFilterEnv()
 
 	defaults := map[string]any{
 		"port":                     0,
@@ -142,4 +145,48 @@ func normalizeStringSlice(values []string) []string {
 		}
 	}
 	return normalized
+}
+
+// BlankOnly reports whether values is a present list whose entries are all empty after trimming.
+// A nil or empty list is an explicit clear, not a blank override.
+func BlankOnly(values []string) bool {
+	if len(values) == 0 {
+		return false
+	}
+	for _, value := range values {
+		if strings.TrimSpace(value) != "" {
+			return false
+		}
+	}
+	return true
+}
+
+func blankCommaSeparated(value string) bool {
+	if value == "" {
+		return false
+	}
+	return BlankOnly(strings.Split(value, ","))
+}
+
+func suppressBlankFilterEnv() func() {
+	keys := []string{
+		"YUNXIAO_MCP_ENABLED_TOOLS",
+		"YUNXIAO_MCP_DISABLED_TOOLS",
+		"YUNXIAO_MCP_ENABLED_DOMAINS",
+		"YUNXIAO_MCP_DISABLED_DOMAINS",
+	}
+	restored := make(map[string]string, len(keys))
+	for _, key := range keys {
+		value, ok := os.LookupEnv(key)
+		if !ok || !blankCommaSeparated(value) {
+			continue
+		}
+		restored[key] = value
+		_ = os.Unsetenv(key)
+	}
+	return func() {
+		for key, value := range restored {
+			_ = os.Setenv(key, value)
+		}
+	}
 }

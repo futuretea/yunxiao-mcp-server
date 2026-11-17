@@ -282,6 +282,18 @@ disabled_domains:
 	return configPath
 }
 
+func TestBlankOnlyKeepsExplicitEmptyDistinct(t *testing.T) {
+	if BlankOnly(nil) || BlankOnly([]string{}) {
+		t.Fatal("empty list is an explicit clear, not a blank override")
+	}
+	if !BlankOnly([]string{" ", "\t", ""}) {
+		t.Fatal("nonempty all-blank list should be a blank override")
+	}
+	if BlankOnly([]string{" get_current_user ", ""}) {
+		t.Fatal("a named entry is not a blank override")
+	}
+}
+
 func equalStrings(got, want []string) bool {
 	if len(got) != len(want) {
 		return false

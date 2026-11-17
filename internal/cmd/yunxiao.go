@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
 	"github.com/futuretea/yunxiao-mcp-server/pkg/core/config"
@@ -101,7 +102,22 @@ func bindYunxiaoCLIFlags(v *viper.Viper, cmd *cobra.Command) error {
 			return fmt.Errorf("bind flag %s: %w", flag, err)
 		}
 	}
+	ignoreBlankSliceFlags(flags)
 	return nil
+}
+
+func ignoreBlankSliceFlags(flags *pflag.FlagSet) {
+	for _, name := range []string{"enabled-tools", "disabled-tools", "enable-domains", "disable-domains"} {
+		flag := flags.Lookup(name)
+		if flag == nil || !flag.Changed {
+			continue
+		}
+		values, err := flags.GetStringSlice(name)
+		if err != nil || !config.BlankOnly(values) {
+			continue
+		}
+		flag.Changed = false
+	}
 }
 
 func loadYunxiaoCLIConfig(cmd *cobra.Command, cfgFile string, v *viper.Viper) (*config.StaticConfig, error) {
